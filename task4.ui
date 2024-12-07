@@ -67,6 +67,9 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
          <property name="text">
           <string>Magnitude/Phase</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">components_buttonGroup</string>
          </attribute>
@@ -118,7 +121,7 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
           <string>Real/Imaginary</string>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">components_buttonGroup</string>
@@ -431,16 +434,6 @@ QComboBox QAbstractItemView {
          </property>
          <item>
           <property name="text">
-           <string>FT Real</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Imaginary</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
            <string>FT Magnitude</string>
           </property>
          </item>
@@ -561,6 +554,9 @@ QSlider::add-page:vertical {
 }
 </string>
          </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -599,16 +595,6 @@ QComboBox QAbstractItemView {
     border-radius: 10px;
 }</string>
          </property>
-         <item>
-          <property name="text">
-           <string>FT Real</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Imaginary</string>
-          </property>
-         </item>
          <item>
           <property name="text">
            <string>FT Magnitude</string>
@@ -670,16 +656,6 @@ QComboBox QAbstractItemView {
     border-radius: 10px;
 }</string>
          </property>
-         <item>
-          <property name="text">
-           <string>FT Real</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Imaginary</string>
-          </property>
-         </item>
          <item>
           <property name="text">
            <string>FT Magnitude</string>
@@ -792,6 +768,9 @@ QSlider::add-page:vertical {
 }
 </string>
          </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -824,6 +803,9 @@ QSlider::add-page:vertical {
 
 </string>
          </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -854,6 +836,9 @@ QSlider::add-page:vertical {
     border-radius: 4px;
 }
 </string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -893,16 +878,6 @@ QComboBox QAbstractItemView {
     border-radius: 10px;
 }</string>
          </property>
-         <item>
-          <property name="text">
-           <string>FT Real</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Imaginary</string>
-          </property>
-         </item>
          <item>
           <property name="text">
            <string>FT Magnitude</string>
