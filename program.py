@@ -75,6 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
         self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)  
 
         for row in range(3):
             for col in range(2):
@@ -85,7 +86,6 @@ class MainWindow(QtWidgets.QMainWindow):
         uic.loadUi("table_item.ui", widget)
         self.frequency_phase_table_2.setCellWidget(row, col, widget)
         
-
 
     def open_file(self, frame, mouseevent):
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
