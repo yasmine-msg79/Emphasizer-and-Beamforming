@@ -10,6 +10,10 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsPixmapItem, QGraphicsSce
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QHeaderView
+from PyQt5.QtWidgets import (
+    QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox
+)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -70,6 +74,16 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
+        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        for row in range(3):
+            for col in range(2):
+                self.add_custom_widget(row, col)
+
+    def add_custom_widget(self, row, col):
+        widget = QWidget()
+        uic.loadUi("table_item.ui", widget)
+        self.frequency_phase_table_2.setCellWidget(row, col, widget)
         
 
 
