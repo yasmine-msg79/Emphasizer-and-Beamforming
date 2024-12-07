@@ -1223,7 +1223,7 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_return">
+          <widget class="QPushButton" name="return_button">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>

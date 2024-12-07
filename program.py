@@ -22,7 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
-        self.pushButton.clicked.connect(self.show_image_frame_and_label)
+        self.return_button.clicked.connect(self.show_image_frame_and_label)
         self.frame_5.hide()
         self.image1.mouseDoubleClickEvent = lambda event: self.open_file(1, event)
         self.image2.mouseDoubleClickEvent = lambda event: self.open_file(2, event)
