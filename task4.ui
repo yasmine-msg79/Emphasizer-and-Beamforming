@@ -1468,11 +1468,11 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;
              <string>Arrays</string>
             </property>
            </item>
-           <item>
+           <!-- <item>
             <property name="text">
              <string>Array1</string>
             </property>
-           </item>
+           </item> -->
           </widget>
          </item>
          <item>
