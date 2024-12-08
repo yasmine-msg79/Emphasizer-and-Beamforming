@@ -11,10 +11,6 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsPixmapItem, QGraphicsSce
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHeaderView
-from PyQt5.QtWidgets import (
-    QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox
-)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -25,23 +21,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.min_width = 0
         self.min_height = 0
 
-        # Connect add array button click signal to the slot function
-        self.add_array_button.clicked.connect(self.add_new_array)
+        # # Connect add array button click signal to the slot function
+        # self.add_array_button.clicked.connect(self.add_new_array)
 
-        # Connect spinBox signal to the slot function
-        self.spinBox_No_transmitters.valueChanged.connect(self.update_frequency_phase_table)
+        # # Connect spinBox signal to the slot function
+        # self.spinBox_No_transmitters.valueChanged.connect(self.update_frequency_phase_table)
         
-        # Initialize array counter
-        self.array_counter = 2
-        self.array_data = {}  # Dictionary to store table data for each array
+        # # Initialize array counter
+        # self.array_counter = 2
+        # self.array_data = {}  # Dictionary to store table data for each array
 
-        # Initialize array1 in combobox and default state in table
-        self.comboBox_arrays.addItem("Array1")
-        self.array_data["Array1"] = [(1, 0)]   # Initially, Array1 has 1 row in the table
-        self.update_frequency_phase_table(1)
+        # # Initialize array1 in combobox and default state in table
+        # self.comboBox_arrays.addItem("Array1")
+        # self.array_data["Array1"] = [(1, 0)]   # Initially, Array1 has 1 row in the table
+        # self.update_frequency_phase_table(1)
 
-        # Connect the comboBox selection change to switch tables
-        self.comboBox_arrays.currentIndexChanged.connect(self.switch_array)
+        # # Connect the comboBox selection change to switch tables
+        # self.comboBox_arrays.currentIndexChanged.connect(self.switch_array)
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
@@ -93,16 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
-        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        for row in range(3):
-            for col in range(2):
-                self.add_custom_widget(row, col)
-
-    def add_custom_widget(self, row, col):
-        widget = QWidget()
-        uic.loadUi("table_item.ui", widget)
-        self.frequency_phase_table_2.setCellWidget(row, col, widget)
         
 
 
@@ -345,70 +331,70 @@ class MainWindow(QtWidgets.QMainWindow):
         label.setScene(scene)
         label.fitInView(pixmap_item, Qt.KeepAspectRatio)
 
-    def update_frequency_phase_table(self, no_transmitters):
-        table = self.frequency_phase_table
+    # def update_frequency_phase_table(self, no_transmitters):
+    #     table = self.frequency_phase_table
         
-        # Set the number of rows in the table to match no_transmitters
-        table.setRowCount(no_transmitters)
+    #     # Set the number of rows in the table to match no_transmitters
+    #     table.setRowCount(no_transmitters)
 
-        # Get the selected array from combobox
-        selected_array = self.comboBox_arrays.currentText()
+    #     # Get the selected array from combobox
+    #     selected_array = self.comboBox_arrays.currentText()
         
-        # If the array has existing data, populate the table with that data
-        if selected_array in self.array_data:
-            data = self.array_data[selected_array]
-        else:
-            data = []
+    #     # If the array has existing data, populate the table with that data
+    #     if selected_array in self.array_data:
+    #         data = self.array_data[selected_array]
+    #     else:
+    #         data = []
         
-        # Populate the table with frequency and phase values
-        for row in range(no_transmitters):
-            if row < len(data):
-                # If the row data exists, populate it
-                freq, phase = data[row]
-                table.setItem(row, 0, QTableWidgetItem(str(freq)))
-                table.setItem(row, 1, QTableWidgetItem(str(phase)))
-            else:
-                # Otherwise, use default values for new rows
-                table.setItem(row, 0, QTableWidgetItem(f"Freq {row + 1}"))
-                table.setItem(row, 1, QTableWidgetItem(f"Phase {row + 1}"))
+    #     # Populate the table with frequency and phase values
+    #     for row in range(no_transmitters):
+    #         if row < len(data):
+    #             # If the row data exists, populate it
+    #             freq, phase = data[row]
+    #             table.setItem(row, 0, QTableWidgetItem(str(freq)))
+    #             table.setItem(row, 1, QTableWidgetItem(str(phase)))
+    #         else:
+    #             # Otherwise, use default values for new rows
+    #             table.setItem(row, 0, QTableWidgetItem(f"Freq {row + 1}"))
+    #             table.setItem(row, 1, QTableWidgetItem(f"Phase {row + 1}"))
     
-    def add_new_array(self):
+    # def add_new_array(self):
         
-        # Add new option to the comboBox_arrays
-        new_array_name = f"Array{self.array_counter}"
-        self.comboBox_arrays.addItem(new_array_name)
+    #     # Add new option to the comboBox_arrays
+    #     new_array_name = f"Array{self.array_counter}"
+    #     self.comboBox_arrays.addItem(new_array_name)
 
-        self.array_data[new_array_name] = [(1, 0)]
+    #     self.array_data[new_array_name] = [(1, 0)]
         
-        # Reset the table with the default values for the new array (e.g., 1 transmitter initially)
-        self.update_frequency_phase_table(1)
+    #     # Reset the table with the default values for the new array (e.g., 1 transmitter initially)
+    #     self.update_frequency_phase_table(1)
 
-        # Reset the no.transmitters spinbox to 1
-        self.spinBox_No_transmitters.setValue(1)
+    #     # Reset the no.transmitters spinbox to 1
+    #     self.spinBox_No_transmitters.setValue(1)
         
-        # Increment the array counter
-        self.array_counter += 1
+    #     # Increment the array counter
+    #     self.array_counter += 1
 
-    def switch_array(self):
+    # def switch_array(self):
         
-        # Get the selected array name
-        selected_array = self.comboBox_arrays.currentText()
+    #     # Get the selected array name
+    #     selected_array = self.comboBox_arrays.currentText()
         
-        # Retrieve the number of transmitters (rows) saved for the selected array
-        no_transmitters = self.array_data.get(selected_array, [])  # Default to 1 if not found
+    #     # Retrieve the number of transmitters (rows) saved for the selected array
+    #     no_transmitters = self.array_data.get(selected_array, [])  # Default to 1 if not found
         
-        # Update the frequency_phase_table with the saved number of rows
-        self.update_frequency_phase_table(no_transmitters)
+    #     # Update the frequency_phase_table with the saved number of rows
+    #     self.update_frequency_phase_table(no_transmitters)
         
-        # Update the spinBox_No_transmitters to match the saved number of rows
-        self.spinBox_No_transmitters.setValue(no_transmitters)
+    #     # Update the spinBox_No_transmitters to match the saved number of rows
+    #     self.spinBox_No_transmitters.setValue(no_transmitters)
         
-    def update_array_data(self):
-        selected_array = self.comboBox_arrays.currentText()
-        no_transmitters = self.spinBox_No_transmitters.value()
+    # def update_array_data(self):
+    #     selected_array = self.comboBox_arrays.currentText()
+    #     no_transmitters = self.spinBox_No_transmitters.value()
         
-        # Save the current number of rows (transmitters) for the selected array
-        self.array_data[selected_array] = no_transmitters
+    #     # Save the current number of rows (transmitters) for the selected array
+    #     self.array_data[selected_array] = no_transmitters
 
 
               
