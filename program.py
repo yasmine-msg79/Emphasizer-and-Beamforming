@@ -1,8 +1,9 @@
-from PyQt5 import QtWidgets, QtGui, QtCore, uic  # Added uic import
+from PyQt5 import QtWidgets, QtGui, QtCore, uic   # Added uic import
 import sys
 from PyQt5.QtGui import *
 import numpy as np
 import cv2
+import beamPlot
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -31,6 +32,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.Fourier_comboBox_2.currentIndexChanged.connect(self.update_ft_component)
         self.Fourier_comboBox_3.currentIndexChanged.connect(self.update_ft_component)
         self.Fourier_comboBox_4.currentIndexChanged.connect(self.update_ft_component)
+        self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
+        self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
+        self.beam_forming()
 
     def open_file(self, frame, mouseevent):
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -108,6 +112,50 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frame_5.hide()
         self.imageFrame.show()
         self.frame_3.show()
+
+###### Beam Forming ######
+
+    def beam_forming(self):
+        # Create an instance of the Visualizer
+        visualizer = beamPlot.Visualizer()
+        visualizer.map1 = self.beam_map_view
+        visualizer.plot1 = self.beam_plot_view
+
+        # Generate beam pattern (heatmap)
+        heatmap_fig = visualizer.plot_beam_pattern()
+
+        # Generate phase-magnitude plot
+        phase_mag_fig = visualizer.plot_phase_magnitude()
+
+        # Display the heatmap in beam_plot
+        self.display_plot(self.beam_plot_view, heatmap_fig)
+
+        # Display the phase-magnitude plot in beam_map
+        self.display_plot(self.beam_map_view, phase_mag_fig)
+
+    def display_plot(self, widget, figure):
+        """
+        Utility to render a matplotlib plot into a QWidget.
+        
+        Parameters:
+        - widget: The target QWidget where the plot should be displayed.
+        - figure: The matplotlib figure to be rendered.
+        """
+        from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+        from PyQt5.QtWidgets import QVBoxLayout
+
+        # # Clear any existing layout or children in the widget
+        # for i in reversed(range(widget.layout().count())):
+        #     widget.layout().itemAt(i).widget().deleteLater()
+
+        # Create a new FigureCanvas and add it to the widget
+        canvas = FigureCanvas(figure)
+        layout = widget.layout() if widget.layout() else QVBoxLayout(widget)
+        layout.addWidget(canvas)
+        layout.setAlignment(QtCore.Qt.AlignCenter)
+        widget.setLayout(layout)
+
+
 
 # Entry point of the application
 if __name__ == '__main__':
