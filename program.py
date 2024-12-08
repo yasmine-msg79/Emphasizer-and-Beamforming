@@ -77,7 +77,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output2.toggled.connect(self.change_output_location)
         self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)  
-
+        self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
+        self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
+        self.beam_forming()
         for row in range(3):
             for col in range(2):
                 self.add_custom_widget(row, col)
@@ -93,9 +95,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.Fourier_comboBox_2.currentIndexChanged.connect(self.update_ft_component)
         self.Fourier_comboBox_3.currentIndexChanged.connect(self.update_ft_component)
         self.Fourier_comboBox_4.currentIndexChanged.connect(self.update_ft_component)
-        self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
-        self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
-        self.beam_forming()
+        
 
     def open_file(self, frame, mouseevent):
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(

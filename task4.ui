@@ -1306,7 +1306,7 @@ QComboBox QAbstractItemView {
           </layout>
          </item>
          <item>
-          <widget class="QGraphicsView" name="output_mixer1_3">
+          <widget class="QWidget" name="beam_map">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -1318,19 +1318,19 @@ QComboBox QAbstractItemView {
 buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
 widget-shadow: 2px 2px 5px rgb(0, 0, 0);
 background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2" colspan="3">
-        <widget class="QWidget" name="beam_map">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="beam_plot">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-radius: 25px;
 buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
 widget-shadow: 2px 2px 5px rgb(0, 0, 0);
 background-color: rgb(255, 255, 255);</string>
@@ -1834,6 +1834,5 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
   <buttongroup name="components_buttonGroup"/>
   <buttongroup name="region_buttonGroup"/>
   <buttongroup name="output_buttonGroup"/>
-  <buttongroup name="components_buttonGroup"/>
  </buttongroups>
 </ui>
