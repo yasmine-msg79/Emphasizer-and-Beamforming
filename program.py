@@ -11,7 +11,9 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsPixmapItem, QGraphicsSce
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
 from PyQt5.QtCore import Qt
-
+from PyQt5.QtWidgets import QHeaderView
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidgetItem, QSpinBox, QVBoxLayout, QDoubleSpinBox, QHeaderView
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -21,23 +23,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.min_width = 0
         self.min_height = 0
 
-        # # Connect add array button click signal to the slot function
-        # self.add_array_button.clicked.connect(self.add_new_array)
+        # Connect spinbox signal for changing transmitter count
+        self.spinBox_No_transmitters_3.valueChanged.connect(self.update_transmitter_rows)
 
-        # # Connect spinBox signal to the slot function
-        # self.spinBox_No_transmitters.valueChanged.connect(self.update_frequency_phase_table)
-        
-        # # Initialize array counter
-        # self.array_counter = 2
-        # self.array_data = {}  # Dictionary to store table data for each array
+        # Set up the table
+        self.frequency_phase_table_2.setColumnCount(2)
+        self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
+        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        # # Initialize array1 in combobox and default state in table
-        # self.comboBox_arrays.addItem("Array1")
-        # self.array_data["Array1"] = [(1, 0)]   # Initially, Array1 has 1 row in the table
-        # self.update_frequency_phase_table(1)
-
-        # # Connect the comboBox selection change to switch tables
-        # self.comboBox_arrays.currentIndexChanged.connect(self.switch_array)
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
@@ -341,73 +334,73 @@ class MainWindow(QtWidgets.QMainWindow):
         label.setScene(scene)
         label.fitInView(pixmap_item, Qt.KeepAspectRatio)
 
-    # def update_frequency_phase_table(self, no_transmitters):
-    #     table = self.frequency_phase_table
+    def update_transmitter_rows(self, count):
+        """
+        Updates the number of rows in the frequency and phase table based on the transmitter count.
+        """
+        current_rows = self.frequency_phase_table_2.rowCount()
         
-    #     # Set the number of rows in the table to match no_transmitters
-    #     table.setRowCount(no_transmitters)
+        # Add or remove rows based on the new count
+        if count > current_rows:
+            for _ in range(count - current_rows):
+                self.add_table_row()
+        elif count < current_rows:
+            for _ in range(current_rows - count):
+                self.frequency_phase_table_2.removeRow(self.frequency_phase_table_2.rowCount() - 1)
 
-    #     # Get the selected array from combobox
-    #     selected_array = self.comboBox_arrays.currentText()
-        
-    #     # If the array has existing data, populate the table with that data
-    #     if selected_array in self.array_data:
-    #         data = self.array_data[selected_array]
-    #     else:
-    #         data = []
-        
-    #     # Populate the table with frequency and phase values
-    #     for row in range(no_transmitters):
-    #         if row < len(data):
-    #             # If the row data exists, populate it
-    #             freq, phase = data[row]
-    #             table.setItem(row, 0, QTableWidgetItem(str(freq)))
-    #             table.setItem(row, 1, QTableWidgetItem(str(phase)))
-    #         else:
-    #             # Otherwise, use default values for new rows
-    #             table.setItem(row, 0, QTableWidgetItem(f"Freq {row + 1}"))
-    #             table.setItem(row, 1, QTableWidgetItem(f"Phase {row + 1}"))
-    
-    # def add_new_array(self):
-        
-    #     # Add new option to the comboBox_arrays
-    #     new_array_name = f"Array{self.array_counter}"
-    #     self.comboBox_arrays.addItem(new_array_name)
+    def add_table_row(self):
+        """
+        Adds a new row with styled spin boxes for frequency and phase, matching size, style, and position.
+        """
+        row_position = self.frequency_phase_table_2.rowCount()
+        self.frequency_phase_table_2.insertRow(row_position)
 
-    #     self.array_data[new_array_name] = [(1, 0)]
-        
-    #     # Reset the table with the default values for the new array (e.g., 1 transmitter initially)
-    #     self.update_frequency_phase_table(1)
+        # Clone the existing frequency spin box
+        template_freq_spinbox = self.findChild(QSpinBox, "spinBox_No_transmitters_3")  
+        freq_spinbox = QSpinBox()
+        if template_freq_spinbox:
+            freq_spinbox.setStyleSheet(template_freq_spinbox.styleSheet())
+            freq_spinbox.setMinimum(template_freq_spinbox.minimum())
+            freq_spinbox.setMaximum(template_freq_spinbox.maximum())
+            freq_spinbox.setValue(template_freq_spinbox.value())
+            freq_spinbox.setSizePolicy(template_freq_spinbox.sizePolicy())
+            freq_spinbox.setMinimumSize(30, 30) 
+            freq_spinbox.setMaximumSize(60, 30)  
+            freq_spinbox.setFont(template_freq_spinbox.font())
+            freq_spinbox.setFixedSize(70, 35)
+             
+        # Center the widgets in the table cell
+        freq_layout = QVBoxLayout()
+        freq_layout.addWidget(freq_spinbox)
+        freq_layout.setAlignment(Qt.AlignCenter)
+        freq_widget = QWidget()
+        freq_widget.setLayout(freq_layout)
 
-    #     # Reset the no.transmitters spinbox to 1
-    #     self.spinBox_No_transmitters.setValue(1)
-        
-    #     # Increment the array counter
-    #     self.array_counter += 1
+        # Clone the existing phase spin box
+        template_phase_spinbox = self.findChild(QDoubleSpinBox, "doubleSpinBox_curvature_angle_3")  
+        phase_spinbox = QDoubleSpinBox()
+        if template_phase_spinbox:
+            phase_spinbox.setStyleSheet(template_phase_spinbox.styleSheet())
+            phase_spinbox.setMinimum(template_phase_spinbox.minimum())
+            phase_spinbox.setMaximum(template_phase_spinbox.maximum())
+            phase_spinbox.setValue(template_phase_spinbox.value())
+            phase_spinbox.setSingleStep(template_phase_spinbox.singleStep())
+            phase_spinbox.setSizePolicy(template_phase_spinbox.sizePolicy())
+            phase_spinbox.setMinimumSize(30, 30)  
+            phase_spinbox.setMaximumSize(80, 50)  
+            phase_spinbox.setFont(template_phase_spinbox.font())
 
-    # def switch_array(self):
-        
-    #     # Get the selected array name
-    #     selected_array = self.comboBox_arrays.currentText()
-        
-    #     # Retrieve the number of transmitters (rows) saved for the selected array
-    #     no_transmitters = self.array_data.get(selected_array, [])  # Default to 1 if not found
-        
-    #     # Update the frequency_phase_table with the saved number of rows
-    #     self.update_frequency_phase_table(no_transmitters)
-        
-    #     # Update the spinBox_No_transmitters to match the saved number of rows
-    #     self.spinBox_No_transmitters.setValue(no_transmitters)
-        
-    # def update_array_data(self):
-    #     selected_array = self.comboBox_arrays.currentText()
-    #     no_transmitters = self.spinBox_No_transmitters.value()
-        
-    #     # Save the current number of rows (transmitters) for the selected array
-    #     self.array_data[selected_array] = no_transmitters
+        phase_layout = QVBoxLayout()
+        phase_layout.addWidget(phase_spinbox)
+        phase_layout.setAlignment(Qt.AlignCenter)
+        phase_widget = QWidget()
+        phase_widget.setLayout(phase_layout)
 
+        # Add the widgets to the table
+        self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
+        self.frequency_phase_table_2.setCellWidget(row_position, 1, phase_widget)
 
-              
+          
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow()
