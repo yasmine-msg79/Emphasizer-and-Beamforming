@@ -1306,7 +1306,7 @@ QComboBox QAbstractItemView {
           </layout>
          </item>
          <item>
-          <widget class="QGraphicsView" name="output_mixer1_3">
+          <widget class="QWidget" name="beam_map">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -1322,7 +1322,7 @@ background-color: rgb(255, 255, 255);</string>
           </widget>
          </item>
          <item>
-          <widget class="QGraphicsView" name="output_mixer2_3">
+          <widget class="QWidget" name="beam_plot">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
