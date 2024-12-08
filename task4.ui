@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1224</width>
+    <width>1248</width>
     <height>1429</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="3" column="2" rowspan="2" colspan="2">
+    <item row="3" column="3" rowspan="2" colspan="2">
      <widget class="QFrame" name="frame">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -45,7 +45,7 @@
       </widget>
      </widget>
     </item>
-    <item row="4" column="0">
+    <item row="4" column="1">
      <widget class="QFrame" name="frame_3">
       <property name="styleSheet">
        <string notr="true">color: rgb(66, 31, 99);
@@ -347,7 +347,7 @@ QSlider::add-page:horizontal {
       </layout>
      </widget>
     </item>
-    <item row="3" column="0">
+    <item row="3" column="1">
      <widget class="QFrame" name="imageFrame">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -1171,7 +1171,7 @@ QComboBox QAbstractItemView {
       </layout>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="2" column="1">
      <widget class="QFrame" name="frame_5">
       <property name="styleSheet">
        <string notr="true">color: rgb(66, 31, 99);
@@ -1189,8 +1189,14 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
          <property name="spacing">
           <number>15</number>
          </property>
+         <property name="leftMargin">
+          <number>10</number>
+         </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_12">
+           <property name="spacing">
+            <number>11</number>
+           </property>
            <item>
             <spacer name="horizontalSpacer_3">
              <property name="orientation">
@@ -1245,11 +1251,35 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(123, 79, 149);
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-border-radius: 10px;
-color: rgb(255, 255, 255);
-font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
+              <string notr="true">QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: #7B4F95;  /* Background color */
+    border: 1px solid #1C1C1C;
+    border-radius: 15px;  /* Rounded corners */
+    padding: 5px;
+    font-size: 18px;
+}
+QComboBox::drop-down {
+   
+	color: #ffffff;
+    border-radius: 10px;  /* Rounded corners for the arrow box */
+    background-color: #7B4F95;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    width: 15px;
+    height: 15px;
+    color: white;  /* Arrow color */
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #7B4F95;
+    selection-background-color: #7B4F95;  /* Selected item background color */
+    background-color: #7B4F95;  /* Dropdown background color */
+    color: white;
+    border-radius: 10px;
+}</string>
              </property>
              <item>
               <property name="text">
@@ -1355,7 +1385,7 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>200</width>
+               <width>160</width>
                <height>20</height>
               </size>
              </property>
@@ -1387,6 +1417,54 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* Spinbox Main Style */
+QSpinBox {
+    border: 2px solid rgb(123, 79, 149); /* Darker purple border */
+    border-radius: 15px; /* Rounded corners */
+    background-color: rgb(123, 79, 149); /* Background color */
+    color: white; /* Text color */
+    font: bold 12px &quot;Arial&quot;; /* Adjust font size and style */
+    padding: 5px;
+}
+
+/* Spinbox Arrows Buttons */
+QSpinBox::up-button, QSpinBox::down-button {
+    background-color: rgb(123, 79, 149); /* Match background */
+    border: 1px solid white; /* Subtle border for arrows */
+    border-radius: 10px; /* Rounded arrows */
+    width: 15px; /* Adjust size */
+    margin: 0px; /* Prevent arrows from overlapping */
+}
+
+/* Up Arrow Style */
+QSpinBox::up-arrow {
+    width: 7px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(-45deg); /* Correct arrow direction */
+    margin: 2px;
+}
+
+/* Down Arrow Style */
+QSpinBox::down-arrow {
+    width: 7px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg); /* Correct arrow direction */
+    margin: 2px;
+}
+
+</string>
              </property>
              <property name="minimum">
               <number>1</number>
@@ -1436,6 +1514,48 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="styleSheet">
+              <string notr="true">/* Double Spinbox Main Style */
+QDoubleSpinBox {
+    border: 2px solid rgb(123, 79, 149); /* Darker purple border */
+    border-radius: 15px; /* Rounded corners */
+    background-color: rgb(123, 79, 149); /* Background color */
+    color: white; /* Text color */
+    font: bold 12px &quot;Arial&quot;; /* Adjust font size and style */
+    padding: 5px;
+}
+
+/* Double Spinbox Arrows Buttons */
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+    background-color: rgb(123, 79, 149); /* Match background */
+    border: 1px solid white; /* Subtle border for arrows */
+    border-radius: 10px; /* Rounded arrows */
+    width: 15px; /* Adjust size */
+    margin: 0px; /* Prevent arrows from overlapping */
+}
+
+/* Up Arrow Style */
+QDoubleSpinBox::up-arrow {
+    width: 7px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(-45deg); /* Correct arrow direction */
+    margin: 2px;
+}
+
+/* Down Arrow Style */
+QDoubleSpinBox::down-arrow {
+    width: 7px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg); /* Correct arrow direction */
+    margin: 2px;
+}
+
+</string>
+             </property>
              <property name="minimum">
               <double>1.000000000000000</double>
              </property>
@@ -1461,10 +1581,38 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
+            <string notr="true">/* Table Widget */
+QTableWidget {
+    border: 2px solid rgb(200, 200, 220); /* Darker border */
+    border-radius: 25px;
+    background-color: rgb(255, 255, 255);
+    gridline-color: transparent; /* Hide grid lines */
+}
+
+/* Horizontal Header */
+QHeaderView::section {
+    background-color: rgb(233, 233, 241);
+    border: none;
+    border-radius: 15px; /* Rounded corners for header */
+    padding: 5px;
+    font: bold 14px &quot;Arial&quot;; /* Adjust font if desired */
+    color: rgb(80, 80, 100); /* Header text color */
+    height: 20px; /* Fixed height for header cells */
+}
+
+/* Hide Vertical Header */
+QTableWidget::verticalHeader {
+    border: none;
+    background: transparent;
+    width: 0px; /* Hides it completely */
+}
+
+/* Table Cells */
+QTableWidget::item {
+    height: 20px; /* Fixed height for each cell */
+}
+
+</string>
            </property>
            <property name="rowCount">
             <number>2</number>
@@ -1483,12 +1631,12 @@ background-color: rgb(255, 255, 255);</string>
            </attribute>
            <row>
             <property name="text">
-             <string>1</string>
+             <string/>
             </property>
            </row>
            <row>
             <property name="text">
-             <string>2</string>
+             <string/>
             </property>
            </row>
            <column>
@@ -1536,12 +1684,35 @@ background-color: rgb(255, 255, 255);</string>
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(123, 79, 149);
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-border-radius: 10px;
-color: rgb(255, 255, 255);
-font: 11pt &quot;Microsoft Sans Serif&quot;;
-</string>
+              <string notr="true">QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: #7B4F95;  /* Background color */
+    border: 1px solid #1C1C1C;
+    border-radius: 15px;  /* Rounded corners */
+    padding: 5px;
+    font-size: 19px;
+}
+QComboBox::drop-down {
+   
+	color: #ffffff;
+    border-radius: 10px;  /* Rounded corners for the arrow box */
+    background-color: #7B4F95;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    width: 15px;
+    height: 15px;
+    color: white;  /* Arrow color */
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #7B4F95;
+    selection-background-color: #7B4F95;  /* Selected item background color */
+    background-color: #7B4F95;  /* Dropdown background color */
+    color: white;
+    border-radius: 10px;
+}</string>
              </property>
              <item>
               <property name="text">
@@ -1565,7 +1736,7 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>30</width>
                <height>20</height>
               </size>
              </property>
@@ -1604,7 +1775,7 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
       </layout>
      </widget>
     </item>
-    <item row="0" column="0">
+    <item row="0" column="1" colspan="2">
      <widget class="QLabel" name="label">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1627,6 +1798,22 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
       </property>
      </widget>
     </item>
+    <item row="0" column="0">
+     <spacer name="horizontalSpacer_6">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>10</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1634,7 +1821,7 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1224</width>
+     <width>1248</width>
      <height>26</height>
     </rect>
    </property>
