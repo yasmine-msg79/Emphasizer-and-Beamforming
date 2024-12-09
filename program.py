@@ -381,15 +381,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def display_output_image(self, label, mixed_image):
         if label == self.output_mixer1:
             scene = self.scene_output1 
+            self.scene_output1.clear()
         else:
-            scene = self.scene_output2  
-        # Convert NumPy array to QImage
+            scene = self.scene_output2 
+            self.scene_output2.clear() 
+        # convert NumPy array to QImage
         height, width = mixed_image.shape
 
-        # Convert the data to bytes explicitly
+        # convert the data to bytes
         image_data = mixed_image.tobytes()
 
-        # Create the QImage
+        # create the QImage
         q_image = QtGui.QImage(image_data, width, height, width, QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap.fromImage(q_image)
         
