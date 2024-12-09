@@ -14,11 +14,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHeaderView
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidgetItem, QSpinBox, QVBoxLayout, QDoubleSpinBox, QHeaderView
-from PyQt5.QtWidgets import (
-    QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox
-)
-
+from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox)
 import beamPlot
+from visualizer import Visualizer
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -27,15 +26,6 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.min_width = 0
         self.min_height = 0
-
-        # Connect spinbox signal for changing transmitter count
-        self.spinBox_No_transmitters_3.valueChanged.connect(self.update_transmitter_rows)
-
-        # Set up the table
-        self.frequency_phase_table_2.setColumnCount(2)
-        self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
-        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
@@ -87,28 +77,57 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
+
+        ################# PART B #########################
+        self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
+        self.curvature_angle_spinbox = self.findChild(QtWidgets.QDoubleSpinBox, "doubleSpinBox_curvature_angle_3")
+        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "label_15")
+        self.no_transmitters_spinbox = self.findChild(QtWidgets.QSpinBox, "spinBox_No_transmitters_3")
+        self.frequency_phase_table_2 = self.findChild(QtWidgets.QTableWidget, "frequency_phase_table_2")
+
+        # Initialize parameters
+        self.frequencies = []
+        self.phases = []
+        self.element_spacing = 0.5  # Wavelength units
+        self.array_type = "curved"  # Default array type
+        self.curvature_angle = 0.0  # Default curvature angle (in degrees)
+
+
+        # Set the initial state
+        self.linear_radio_button.setChecked(False)  
+        self.linear_radio_button.setText("Curved")  
+
+        self.update_radio_button_text(self.linear_radio_button.isChecked())
+        self.linear_radio_button.toggled.connect(self.update_radio_button_text)
+
+        # Connect spinbox signal for changing transmitter count
+        self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_rows)
+        self.curvature_angle_spinbox.valueChanged.connect(self.update_curvature_angle)
+
+        # Set up the table
+        self.frequency_phase_table_2.setColumnCount(2)
+        self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
         self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)  
+
+        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)
+
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
+
+        # Initialize phased array properties
+        self.num_transmitters = 3
+        self.frequencies = [1000] * self.num_transmitters  # Default frequency for each transmitter
+        self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
+
         self.beam_forming()
-        for row in range(3):
-            for col in range(2):
-                self.add_custom_widget(row, col)
 
-    def add_custom_widget(self, row, col):
-        widget = QWidget()
-        uic.loadUi("table_item.ui", widget)
-        self.frequency_phase_table_2.setCellWidget(row, col, widget)
-        
-        self.current_image = None
-        self.ft_components = {}
-        self.Fourier_comboBox_1.currentIndexChanged.connect(self.update_ft_component)
-        self.Fourier_comboBox_2.currentIndexChanged.connect(self.update_ft_component)
-        self.Fourier_comboBox_3.currentIndexChanged.connect(self.update_ft_component)
-        self.Fourier_comboBox_4.currentIndexChanged.connect(self.update_ft_component)
-        
+        # Create spinboxes for the transmitters
+        for row in range(self.num_transmitters):
+            self.add_custom_widget(row, 0, "frequency")
+            self.add_custom_widget(row, 1, "phase")
 
+        
     def open_file(self, frame, mouseevent):
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, "Select Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)"
@@ -348,116 +367,159 @@ class MainWindow(QtWidgets.QMainWindow):
         label.setScene(scene)
         label.fitInView(pixmap_item, Qt.KeepAspectRatio)
 
-    def update_transmitter_rows(self, count):
+    ############### PART B ###################
+
+    def update_transmitter_rows(self):
         """
         Updates the number of rows in the frequency and phase table based on the transmitter count.
         """
+        count = self.no_transmitters_spinbox.value()
         current_rows = self.frequency_phase_table_2.rowCount()
-        
-        # Add or remove rows based on the new count
-        if count > current_rows:
-            for _ in range(count - current_rows):
-                self.add_table_row()
-        elif count < current_rows:
-            for _ in range(current_rows - count):
-                self.frequency_phase_table_2.removeRow(self.frequency_phase_table_2.rowCount() - 1)
+
+        # Add or remove rows to match the transmitter count
+        while count > current_rows:
+            self.add_table_row()
+            current_rows += 1
+        while count < current_rows:
+            self.frequencies.pop()
+            self.phases.pop()
+            self.frequency_phase_table_2.removeRow(current_rows - 1)
+            current_rows -= 1
+
+        # Recalculate beamforming after updating rows
+        self.beam_forming()
 
     def add_table_row(self):
         """
-        Adds a new row with styled spin boxes for frequency and phase, matching size, style, and position.
+        Adds a new row with default widgets for frequency and phase.
         """
         row_position = self.frequency_phase_table_2.rowCount()
         self.frequency_phase_table_2.insertRow(row_position)
 
-        # Clone the existing frequency spin box
-        template_freq_spinbox = self.findChild(QSpinBox, "spinBox_No_transmitters_3")  
+        # Ensure the frequencies and phases lists have room for the new row
+        self.frequencies.append(1000)  # Default frequency
+        self.phases.append(0.0)  # Default phase
+
+        # Create new spin boxes for frequency and phase
         freq_spinbox = QSpinBox()
-        if template_freq_spinbox:
-            freq_spinbox.setStyleSheet(template_freq_spinbox.styleSheet())
-            freq_spinbox.setMinimum(template_freq_spinbox.minimum())
-            freq_spinbox.setMaximum(template_freq_spinbox.maximum())
-            freq_spinbox.setValue(template_freq_spinbox.value())
-            freq_spinbox.setSizePolicy(template_freq_spinbox.sizePolicy())
-            freq_spinbox.setMinimumSize(30, 30) 
-            freq_spinbox.setMaximumSize(60, 30)  
-            freq_spinbox.setFont(template_freq_spinbox.font())
-            freq_spinbox.setFixedSize(70, 35)
-             
-        # Center the widgets in the table cell
+        freq_spinbox.setMinimum(1)
+        freq_spinbox.setMaximum(10000)
+        freq_spinbox.setValue(self.frequencies[row_position])  # Default frequency value
+        freq_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "frequency", value))
+
+        phase_spinbox = QDoubleSpinBox()
+        phase_spinbox.setMinimum(-180)
+        phase_spinbox.setMaximum(180)
+        phase_spinbox.setValue(self.phases[row_position])  # Default phase value
+        phase_spinbox.setSingleStep(0.1)
+        phase_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "phase", value))
+
+        # Add the frequency spin box to the first column
         freq_layout = QVBoxLayout()
         freq_layout.addWidget(freq_spinbox)
         freq_layout.setAlignment(Qt.AlignCenter)
         freq_widget = QWidget()
         freq_widget.setLayout(freq_layout)
+        self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
 
-        # Clone the existing phase spin box
-        template_phase_spinbox = self.findChild(QDoubleSpinBox, "doubleSpinBox_curvature_angle_3")  
-        phase_spinbox = QDoubleSpinBox()
-        if template_phase_spinbox:
-            phase_spinbox.setStyleSheet(template_phase_spinbox.styleSheet())
-            phase_spinbox.setMinimum(template_phase_spinbox.minimum())
-            phase_spinbox.setMaximum(template_phase_spinbox.maximum())
-            phase_spinbox.setValue(template_phase_spinbox.value())
-            phase_spinbox.setSingleStep(template_phase_spinbox.singleStep())
-            phase_spinbox.setSizePolicy(template_phase_spinbox.sizePolicy())
-            phase_spinbox.setMinimumSize(30, 30)  
-            phase_spinbox.setMaximumSize(80, 50)  
-            phase_spinbox.setFont(template_phase_spinbox.font())
-
+        # Add the phase spin box to the second column
         phase_layout = QVBoxLayout()
         phase_layout.addWidget(phase_spinbox)
         phase_layout.setAlignment(Qt.AlignCenter)
         phase_widget = QWidget()
         phase_widget.setLayout(phase_layout)
-
-        # Add the widgets to the table
-        self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
         self.frequency_phase_table_2.setCellWidget(row_position, 1, phase_widget)
 
-          
+    def update_radio_button_text(self, checked):
+        """
+        Updates the UI based on the radio button state.
+        If checked, the radio button text changes to 'Curved', and curvature angle controls are shown.
+        If unchecked, the radio button text changes to 'Linear', and curvature angle controls are hidden.
+        """
+        if checked:
+            self.linear_radio_button.setText("linear") # Update the label next to the radio button
+            self.curvature_angle_label.setVisible(False)  # Show the "Curvature Angle" label
+            self.curvature_angle_spinbox.setVisible(False)  # Show the spinbox
+        else:
+            self.linear_radio_button.setText("curved")  # Update the label next to the radio button
+            self.curvature_angle_label.setVisible(True)  # Hide the "Curvature Angle" label
+            self.curvature_angle_spinbox.setVisible(True)  # Hide the spinbox
 
-###### Beam Forming ######
+
+    def add_custom_widget(self, row, col, mode):
+        """
+        Add a spinbox to the table for either frequency or phase adjustments.
+        """
+        widget = QtWidgets.QSpinBox() if mode == "frequency" else QtWidgets.QDoubleSpinBox()
+        widget.setMinimum(1 if mode == "frequency" else -180)
+        widget.setMaximum(10000 if mode == "frequency" else 180)
+        widget.setValue(self.frequencies[row] if mode == "frequency" else self.phases[row])
+
+        # Connect signal to update plots dynamically
+        widget.valueChanged.connect(lambda value, r=row, c=col, m=mode: self.update_parameters(r, m, value))
+
+        # Add the widget to the corresponding cell in the table
+        self.frequency_phase_table_2.setCellWidget(row, col, widget)
+
+    def update_parameters(self, row, mode, value):
+        """
+        Update parameters based on spinbox changes and regenerate plots.
+        """
+        if mode == "frequency":
+            self.frequencies[row] = value  # Update the frequency for the given transmitter
+        elif mode == "phase":
+            self.phases[row] = value  # Update the phase for the given transmitter
+
+        # Recalculate and update the plots
+        self.beam_forming()
 
     def beam_forming(self):
+        """
+        Generate and display updated heatmap and beam profile based on parameters.
+        """
         # Create an instance of the Visualizer
-        visualizer = beamPlot.Visualizer()
-        visualizer.map1 = self.beam_map_view
-        visualizer.plot1 = self.beam_plot_view
+        visualizer = Visualizer()
 
-        # Generate beam pattern (heatmap)
+        # Update the visualizer's state
+        visualizer.set_frequencies(self.frequencies)
+        visualizer.set_phases(self.phases)
+        visualizer.set_array_type(self.array_type, self.curvature_angle)
+
+        # Generate updated plots
         heatmap_fig = visualizer.plot_beam_pattern()
-
-        # Generate phase-magnitude plot
         phase_mag_fig = visualizer.plot_phase_magnitude()
 
-        # Display the heatmap in beam_plot
+        # Display the updated plots
         self.display_plot(self.beam_plot_view, heatmap_fig)
-
-        # Display the phase-magnitude plot in beam_map
         self.display_plot(self.beam_map_view, phase_mag_fig)
 
     def display_plot(self, widget, figure):
         """
         Utility to render a matplotlib plot into a QWidget.
-        
-        Parameters:
-        - widget: The target QWidget where the plot should be displayed.
-        - figure: The matplotlib figure to be rendered.
         """
         from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
         from PyQt5.QtWidgets import QVBoxLayout
 
-        # # Clear any existing layout or children in the widget
-        # for i in reversed(range(widget.layout().count())):
-        #     widget.layout().itemAt(i).widget().deleteLater()
+        # Ensure the widget has a layout
+        if widget.layout() is None:
+            widget.setLayout(QVBoxLayout())
 
-        # Create a new FigureCanvas and add it to the widget
+        # Clear any existing widgets in the layout
+        layout = widget.layout()
+        for i in reversed(range(layout.count())):
+            layout.itemAt(i).widget().deleteLater()
+
+        # Create a new FigureCanvas and add it to the layout
         canvas = FigureCanvas(figure)
-        layout = widget.layout() if widget.layout() else QVBoxLayout(widget)
         layout.addWidget(canvas)
         layout.setAlignment(QtCore.Qt.AlignCenter)
-        widget.setLayout(layout)
-
+    
+    def update_curvature_angle(self, value):
+        """
+        Updates the curvature angle for the phased array and recalculates the beamforming pattern.
+        """
+        self.curvature_angle = value  # Update the curvature angle
+        self.beam_forming()  # Recalculate the beamforming pattern
 
 
 # Entry point of the application
@@ -466,3 +528,50 @@ if __name__ == '__main__':
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
+
+
+
+
+
+
+
+
+    # def beam_forming(self):
+    #     # Create an instance of the Visualizer
+    #     visualizer = beamPlot.Visualizer()
+    #     visualizer.map1 = self.beam_map_view
+    #     visualizer.plot1 = self.beam_plot_view
+
+    #     # Generate beam pattern (heatmap)
+    #     heatmap_fig = visualizer.plot_beam_pattern()
+
+    #     # Generate phase-magnitude plot
+    #     phase_mag_fig = visualizer.plot_phase_magnitude()
+
+    #     # Display the heatmap in beam_plot
+    #     self.display_plot(self.beam_plot_view, heatmap_fig)
+
+    #     # Display the phase-magnitude plot in beam_map
+    #     self.display_plot(self.beam_map_view, phase_mag_fig)
+
+    # def display_plot(self, widget, figure):
+    #     """
+    #     Utility to render a matplotlib plot into a QWidget.
+        
+    #     Parameters:
+    #     - widget: The target QWidget where the plot should be displayed.
+    #     - figure: The matplotlib figure to be rendered.
+    #     """
+    #     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+    #     from PyQt5.QtWidgets import QVBoxLayout
+
+    #     # # Clear any existing layout or children in the widget
+    #     # for i in reversed(range(widget.layout().count())):
+    #     #     widget.layout().itemAt(i).widget().deleteLater()
+
+    #     # Create a new FigureCanvas and add it to the widget
+    #     canvas = FigureCanvas(figure)
+    #     layout = widget.layout() if widget.layout() else QVBoxLayout(widget)
+    #     layout.addWidget(canvas)
+    #     layout.setAlignment(QtCore.Qt.AlignCenter)
+    #     widget.setLayout(layout)
