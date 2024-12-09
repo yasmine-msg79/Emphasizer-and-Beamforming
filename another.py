@@ -30,14 +30,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
-        self.return_button.clicked.connect(self.show_image_frame_and_label)
+        self.pushButton.clicked.connect(self.show_image_frame_and_label)
         self.frame_5.hide()
         self.image1.mouseDoubleClickEvent = lambda event: self.open_file(1, event)
         self.image2.mouseDoubleClickEvent = lambda event: self.open_file(2, event)
         self.image3.mouseDoubleClickEvent = lambda event: self.open_file(3, event)
         self.image4.mouseDoubleClickEvent = lambda event: self.open_file(4, event)
-        self.scene1 = QtWidgets.QGraphicsScene()
-        self.image1.setScene(self.scene1)
+        self.scene = QtWidgets.QGraphicsScene()
+        self.image1.setScene(self.scene)
         self.scene2 = QtWidgets.QGraphicsScene()
         self.image2.setScene(self.scene2)
         self.scene3 = QtWidgets.QGraphicsScene()
@@ -71,22 +71,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.weight_3.valueChanged.connect(lambda value: self.update_weight(2, value))
         self.weight_4.valueChanged.connect(lambda value: self.update_weight(3, value))
         self.weights_sliders = [self.weight_1, self.weight_2,self.weight_3,self.weight_4]
-
-        self.mouse_pressed = False
-        self.active_frame = None
-      
-        self.brightness = [0] * 4  # Assuming 4 frames
-        self.contrast = [1.0] * 4
-
-        for i in range(1, 5):  # Assuming 4 viewports
-            image = getattr(self, f"image{i}")
-            image.setMouseTracking(True)
-            image.mouseMoveEvent = lambda event, i=i: self.mouse_movement(event, i-1)
-            image.mousePressEvent = lambda event, i=i: self.mouse_press(event, i-1)
-            image.mouseReleaseEvent = self.mouse_release
-
-        
-
         
         self.change_choices_combobox()
         self.magnitude_phase.toggled.connect(self.change_choices_combobox)
@@ -169,11 +153,11 @@ class MainWindow(QtWidgets.QMainWindow):
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
-                self.scene1.clear()
+                self.scene.clear()
                 pixmap = pixmap.scaled(self.image1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                self.scene1.addPixmap(pixmap)
-                self.scene1.setSceneRect(QtCore.QRectF(pixmap.rect()))
-                self.image1.fitInView(self.scene1.sceneRect(), QtCore.Qt.KeepAspectRatio)
+                self.scene.addPixmap(pixmap)
+                self.scene.setSceneRect(QtCore.QRectF(pixmap.rect()))
+                self.image1.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(0)
                 self.update_ft_component(0)
@@ -309,7 +293,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return reconstructed_image
 
-    
 
     def update_ft_component(self, index):
         if index == 0:
@@ -327,11 +310,11 @@ class MainWindow(QtWidgets.QMainWindow):
         elif index == 3:
             selected_component = self.Fourier_comboBox_4.currentText()
             currentFourierImage = self.fourierimage4  
-            print("frame4")         
+            print("frame4")        
         # selected_component = self.Fourier_comboBox_4.itemText(index)
         if selected_component in self.ft_components[index]:
             component_image = self.ft_components[index][selected_component]
-            print(component_image)
+            # print(component_image)
             component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
             height, width = component_image.shape
             q_image = QtGui.QImage(component_image.data, width, height, width, QtGui.QImage.Format_Grayscale8)
@@ -341,7 +324,6 @@ class MainWindow(QtWidgets.QMainWindow):
             currentFourierImage.addPixmap(pixmap)
             currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
             self.Gimage1.fitInView(currentFourierImage.sceneRect(), QtCore.Qt.KeepAspectRatio)
-            print(index)
         else:
             QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
 
@@ -358,6 +340,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frame_5.hide()
         self.imageFrame.show()
         self.frame_3.show()
+        
         
     def update_weight(self, frame, value):
         self.weights[frame] = value
@@ -388,76 +371,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set the scene to the label
         label.setScene(scene)
         label.fitInView(pixmap_item, Qt.KeepAspectRatio)
-    def mouse_press(self, event, frame_index):
-        """When mouse is pressed, track the active frame."""
-        self.mouse_pressed = True
-        self.active_frame = frame_index
-        self.last_mouse_pos = event.pos()
-
-
-    def mouse_movement(self, event, frame_index):
-        """Adjust brightness/contrast/FT only if dragging with the mouse."""
-        if self.mouse_pressed and self.active_frame == frame_index:
-            delta = event.pos() - self.last_mouse_pos
-
-            # Adjust contrast and brightness dynamically
-            self.brightness[frame_index] += delta.y()
-            self.contrast[frame_index] += delta.x() * 0.01
-            self.contrast[frame_index] = max(0.1, self.contrast[frame_index])  # Avoid invalid values
-            print(f"Adjusting: Brightness={self.brightness[frame_index]}, Contrast={self.contrast[frame_index]}")
-
-            # Apply these changes
-            self.adjust_brightness_contrast(frame_index)
-            # self.compute_ft_components(frame_index)
-            # self.update_ft_component(frame_index)
-
-            # Track mouse movement
-            self.last_mouse_pos = event.pos()
-
-
-    def mouse_release(self, event):
-        """When mouse is released, reset the tracking state."""
-        self.mouse_pressed = False
-        self.active_frame = None
-        self.last_mouse_pos = None
-
-
-    def adjust_brightness_contrast(self, frame):
-        """Apply contrast and brightness adjustment safely to the image."""
-        if frame < 0 or frame >= len(self.current_images):
-            print("Invalid frame index")
-            return
-
-        # Convert image to float32 for safe computation
-        original_image = self.current_images[frame].astype(np.float32)
-
-        # Apply brightness and contrast adjustments
-        adjusted = self.contrast[frame] * original_image + self.brightness[frame]
-
-        # Clip the adjusted values to ensure they are in the valid range
-        adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)
-
-        # Convert numpy array to QPixmap for display
-        pixmap = QtGui.QPixmap.fromImage(
-            QtGui.QImage(
-                adjusted.data,
-                adjusted.shape[1],
-                adjusted.shape[0],
-                adjusted.strides[0],
-                QtGui.QImage.Format_Grayscale8
-            )
-        )
-
-        # Update the associated QGraphicsScene
-        scene = getattr(self, f"scene{frame + 1}")
-        scene.clear()
-        pixmap = pixmap.scaled(
-            getattr(self, f"image{frame + 1}").size(),
-            QtCore.Qt.KeepAspectRatio,
-            QtCore.Qt.SmoothTransformation
-        )
-        scene.addPixmap(pixmap)
-        getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
 
     ############### PART B ###################
