@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>sliderSpinWidget</class>
+ <widget class="QWidget" name="sliderSpinWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QSpinBox" name="spinBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>70</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">/* Spinbox Main Style */
+QSpinBox {
+    border: 2px solid rgb(123, 79, 149); /* Darker purple border */
+    border-radius: 15px; /* Rounded corners */
+    background-color: rgb(123, 79, 149); /* Background color */
+    color: white; /* Text color */
+    font: bold 12px &quot;Arial&quot;; /* Adjust font size and style */
+    padding: 5px;
+}
+
+/* Spinbox Arrows Buttons */
+QSpinBox::up-button, QSpinBox::down-button {
+    background-color: rgb(123, 79, 149); /* Match background */
+    border: 1px solid white; /* Subtle border for arrows */
+    border-radius: 10px; /* Rounded arrows */
+    width: 15px; /* Adjust size */
+    margin: 0px; /* Prevent arrows from overlapping */
+}
+
+/* Up Arrow Style */
+QSpinBox::up-arrow {
+    width: 7px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(-45deg); /* Correct arrow direction */
+    margin: 2px;
+}
+
+/* Down Arrow Style */
+QSpinBox::down-arrow {
+    width: 7px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg); /* Correct arrow direction */
+    margin: 2px;
+}
+</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
