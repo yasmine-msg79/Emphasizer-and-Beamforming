@@ -1,35 +1,35 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 from PyQt5.QtGui import *
-from gui import Ui_MainWindow
+# from gui import Ui_MainWindow
 import numpy as np
 import cv2
-
+from PyQt5 import QtWidgets, uic
+import sys
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        self.ui.image1.mouseDoubleClickEvent = lambda event: self.open_file(1, event)
-        self.ui.image2.mouseDoubleClickEvent = lambda event: self.open_file(2, event)
-        self.ui.image3.mouseDoubleClickEvent = lambda event: self.open_file(3, event)
-        self.ui.image4.mouseDoubleClickEvent = lambda event: self.open_file(4, event)
+        uic.loadUi('task4.ui', self)
+        self.image1.mouseDoubleClickEvent = lambda event: self.open_file(1, event)
+        self.image2.mouseDoubleClickEvent = lambda event: self.open_file(2, event)
+        self.image3.mouseDoubleClickEvent = lambda event: self.open_file(3, event)
+        self.image4.mouseDoubleClickEvent = lambda event: self.open_file(4, event)
         self.scene = QtWidgets.QGraphicsScene()
-        self.ui.image1.setScene(self.scene)
+        self.image1.setScene(self.scene)
         self.scene2 = QtWidgets.QGraphicsScene()
-        self.ui.image2.setScene(self.scene2)
+        self.image2.setScene(self.scene2)
         # self.scene3 = QtWidgets.QGraphicsScene()
         # self.ui.image3.setScene(self.scene3)
         self.scene4 = QtWidgets.QGraphicsScene()
-        self.ui.image4.setScene(self.scene4)
+        self.image4.setScene(self.scene4)
         self.fourierimage1 = QtWidgets.QGraphicsScene()
-        self.ui.Gimage1.setScene(self.fourierimage1)
+        self.Gimage1.setScene(self.fourierimage1)
         self.current_image = None
         self.ft_components = {}
-        self.ui.Fourier_comboBox_1.currentIndexChanged.connect(self.update_ft_component)
-        self.ui.Fourier_comboBox_2.currentIndexChanged.connect(self.update_ft_component)
-        self.ui.Fourier_comboBox_3.currentIndexChanged.connect(self.update_ft_component)
-        self.ui.Fourier_comboBox_4.currentIndexChanged.connect(self.update_ft_component)
+        self.Fourier_comboBox_1.currentIndexChanged.connect(self.update_ft_component)
+        self.Fourier_comboBox_2.currentIndexChanged.connect(self.update_ft_component)
+        self.Fourier_comboBox_3.currentIndexChanged.connect(self.update_ft_component)
+        self.Fourier_comboBox_4.currentIndexChanged.connect(self.update_ft_component)
 
     def open_file(self, frame, mouseevent):
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -43,10 +43,10 @@ class MainWindow(QtWidgets.QMainWindow):
             pixmap = QPixmap.fromImage(image)
             if frame == 1:
                 self.scene.clear()
-                pixmap = pixmap.scaled(self.ui.image1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(self.image1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 self.scene.addPixmap(pixmap)
                 self.scene.setSceneRect(QtCore.QRectF(pixmap.rect()))
-                self.ui.image1.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+                self.image1.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 width = image.width()
                 height = image.height()
                 ptr = image.bits()
@@ -56,7 +56,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.update_ft_component(0)                
             elif frame == 2:
                 self.scene2.clear()
-                pixmap = pixmap.scaled(self.ui.image2.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(self.image2.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 self.scene2.addPixmap(pixmap)
                 self.scene2.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.ui.image2.fitInView(self.scene2.sceneRect(), QtCore.Qt.KeepAspectRatio)
@@ -68,7 +68,7 @@ class MainWindow(QtWidgets.QMainWindow):
             #     self.ui.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
             elif frame == 4:
                 self.scene4.clear()
-                pixmap = pixmap.scaled(self.ui.image4.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(self.image4.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 self.scene4.addPixmap(pixmap)
                 self.scene4.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.ui.image4.fitInView(self.scene4.sceneRect(), QtCore.Qt.KeepAspectRatio)
@@ -97,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow):
             pixmap = pixmap.scaled(self.ui.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
             self.fourierimage1.addPixmap(pixmap)
             self.fourierimage1.setSceneRect(QtCore.QRectF(pixmap.rect()))
-            self.ui.Gimage1.fitInView(self.fourierimage1.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            self.Gimage1.fitInView(self.fourierimage1.sceneRect(), QtCore.Qt.KeepAspectRatio)
         else:
             QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
 
