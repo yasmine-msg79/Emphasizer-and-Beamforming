@@ -88,6 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initialize parameters
         self.frequencies = []
         self.phases = []
+        self.magnitudes = []
         self.element_spacing = 0.5  # Wavelength units
         self.array_type = "curved"  # Default array type
         self.curvature_angle = 0.0  # Default curvature angle (in degrees)
@@ -116,9 +117,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
 
         # Initialize phased array properties
-        self.num_transmitters = 3
+        self.num_transmitters = 2
         self.frequencies = [1000] * self.num_transmitters  # Default frequency for each transmitter
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
+        self.magnitudes = [1] * self.num_transmitters 
 
         self.beam_forming()
 
@@ -379,10 +381,12 @@ class MainWindow(QtWidgets.QMainWindow):
         # Add or remove rows to match the transmitter count
         while count > current_rows:
             self.add_table_row()
+            self.magnitudes.append(1)
             current_rows += 1
         while count < current_rows:
             self.frequencies.pop()
             self.phases.pop()
+            self.magnitudes.pop()
             self.frequency_phase_table_2.removeRow(current_rows - 1)
             current_rows -= 1
 
@@ -396,9 +400,10 @@ class MainWindow(QtWidgets.QMainWindow):
         row_position = self.frequency_phase_table_2.rowCount()
         self.frequency_phase_table_2.insertRow(row_position)
 
-        # Ensure the frequencies and phases lists have room for the new row
+        # Ensure the frequencies, phases, and magnitudes lists have room for the new row
         self.frequencies.append(1000)  # Default frequency
         self.phases.append(0.0)  # Default phase
+        self.magnitudes.append(1)  # Default magnitude
 
         # Create new spin boxes for frequency and phase
         freq_spinbox = QSpinBox()
@@ -466,33 +471,39 @@ class MainWindow(QtWidgets.QMainWindow):
         Update parameters based on spinbox changes and regenerate plots.
         """
         if mode == "frequency":
-            self.frequencies[row] = value  # Update the frequency for the given transmitter
+            self.frequencies[row] = value  # Update frequency for the transmitter
+            wavelength = 3e8 / self.frequencies[row]  # Wavelength in meters
+            self.element_spacing = wavelength / 2  # Spacing is half the wavelength
         elif mode == "phase":
-            self.phases[row] = value  # Update the phase for the given transmitter
+            self.phases[row] = value  # Update phase for the transmitter
 
         # Recalculate and update the plots
         self.beam_forming()
 
     def beam_forming(self):
         """
-        Generate and display updated heatmap and beam profile based on parameters.
+        Generate and display the beam pattern and ripple wave interference map for the phased array.
         """
-        # Create an instance of the Visualizer
         visualizer = Visualizer()
-
-        # Update the visualizer's state
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
 
-        # Generate updated plots
-        heatmap_fig = visualizer.plot_beam_pattern()
-        phase_mag_fig = visualizer.plot_phase_magnitude()
+        # Generate ripple and beam pattern
+        ripple_wave_fig = visualizer.plot_wave_propagation_pattern(
+            num_transmitters=len(self.frequencies),
+            element_spacing=self.element_spacing,
+            frequency=np.mean(self.frequencies),
+            phases=self.phases
+        )
+        beam_pattern_fig = visualizer.plot_beam_pattern_polar()
 
-        # Display the updated plots
-        self.display_plot(self.beam_plot_view, heatmap_fig)
-        self.display_plot(self.beam_map_view, phase_mag_fig)
+        # Display plots
+        self.display_plot(self.beam_map_view, ripple_wave_fig)  
+        self.display_plot(self.beam_plot_view, beam_pattern_fig)  
 
+       
+    
     def display_plot(self, widget, figure):
         """
         Utility to render a matplotlib plot into a QWidget.
@@ -528,50 +539,3 @@ if __name__ == '__main__':
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
-
-
-
-
-
-
-
-
-    # def beam_forming(self):
-    #     # Create an instance of the Visualizer
-    #     visualizer = beamPlot.Visualizer()
-    #     visualizer.map1 = self.beam_map_view
-    #     visualizer.plot1 = self.beam_plot_view
-
-    #     # Generate beam pattern (heatmap)
-    #     heatmap_fig = visualizer.plot_beam_pattern()
-
-    #     # Generate phase-magnitude plot
-    #     phase_mag_fig = visualizer.plot_phase_magnitude()
-
-    #     # Display the heatmap in beam_plot
-    #     self.display_plot(self.beam_plot_view, heatmap_fig)
-
-    #     # Display the phase-magnitude plot in beam_map
-    #     self.display_plot(self.beam_map_view, phase_mag_fig)
-
-    # def display_plot(self, widget, figure):
-    #     """
-    #     Utility to render a matplotlib plot into a QWidget.
-        
-    #     Parameters:
-    #     - widget: The target QWidget where the plot should be displayed.
-    #     - figure: The matplotlib figure to be rendered.
-    #     """
-    #     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-    #     from PyQt5.QtWidgets import QVBoxLayout
-
-    #     # # Clear any existing layout or children in the widget
-    #     # for i in reversed(range(widget.layout().count())):
-    #     #     widget.layout().itemAt(i).widget().deleteLater()
-
-    #     # Create a new FigureCanvas and add it to the widget
-    #     canvas = FigureCanvas(figure)
-    #     layout = widget.layout() if widget.layout() else QVBoxLayout(widget)
-    #     layout.addWidget(canvas)
-    #     layout.setAlignment(QtCore.Qt.AlignCenter)
-    #     widget.setLayout(layout)
