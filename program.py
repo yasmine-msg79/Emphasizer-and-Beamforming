@@ -165,7 +165,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.min_width = min(width, self.min_width)
                 self.min_height = min(height, self.min_height)
                 print("Min: ",self.min_width, self.min_height)
-                      
+            image_calculations=Image.open(file_name).convert('L')
+            resize_image_calculations=image_calculations.resize((self.min_width,self.min_height))
+            self.current_images[frame-1]=resize_image_calculations
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
@@ -408,8 +410,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
             # Apply these changes
             self.adjust_brightness_contrast(frame_index)
-            # self.compute_ft_components(frame_index)
-            # self.update_ft_component(frame_index)
+            self.compute_ft_components(frame_index)
+            self.update_ft_component(frame_index)
 
             # Track mouse movement
             self.last_mouse_pos = event.pos()
@@ -456,6 +458,11 @@ class MainWindow(QtWidgets.QMainWindow):
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation
         )
+
+       
+        # ptr = pixmap.toImage().bits()
+        # ptr.setsize(self.min_width * self.min_height)
+        # self.current_images[frame] = np.array(ptr).reshape(self.min_height, self.min_width)
         scene.addPixmap(pixmap)
         getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
