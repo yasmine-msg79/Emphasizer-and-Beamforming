@@ -18,12 +18,14 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidge
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox)
 import beamPlot
 from visualizer import Visualizer
+from PIL import Image
 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi('task4.ui', self)
+        
         
         self.min_width = 0
         self.min_height = 0
@@ -137,7 +139,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequencies = [1000] * self.num_transmitters  # Default frequency for each transmitter
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
 
-        self.beam_forming()
+        # self.beam_forming()
 
         # Create spinboxes for the transmitters
         for row in range(self.num_transmitters):
@@ -165,9 +167,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.min_width = min(width, self.min_width)
                 self.min_height = min(height, self.min_height)
                 print("Min: ",self.min_width, self.min_height)
-            image_calculations=Image.open(file_name).convert('L')
-            resize_image_calculations=image_calculations.resize((self.min_width,self.min_height))
-            self.current_images[frame-1]=resize_image_calculations
+                      
+            image_calculations = Image.open(file_name).convert('L')
+            resize_image_calculations = image_calculations.resize((self.min_width ,self.min_height))
+            self.current_images[frame - 1] = resize_image_calculations
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
@@ -176,7 +179,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene1.addPixmap(pixmap)
                 self.scene1.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image1.fitInView(self.scene1.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
+                # self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(0)
                 self.update_ft_component(0)
             
@@ -186,7 +189,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene2.addPixmap(pixmap)
                 self.scene2.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image2.fitInView(self.scene2.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
+                # self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(1)
                 self.update_ft_component(1)
             
@@ -196,7 +199,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene3.addPixmap(pixmap)
                 self.scene3.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
+                # self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(2)
                 self.update_ft_component(2)    
             
@@ -206,7 +209,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene4.addPixmap(pixmap)
                 self.scene4.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image4.fitInView(self.scene4.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
+                # self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(3)
                 self.update_ft_component(3)
        
@@ -249,6 +252,7 @@ class MainWindow(QtWidgets.QMainWindow):
         }
 
 
+    
     def compute_inverse_ft_components(self):
         reconstructed_image = None
 
@@ -276,18 +280,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
-                    resized_magnitude = self.ft_components[i]["FT Magnitude"].reshape(self.min_height, self.min_width)
+                    resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+
+                    # resized_magnitude = self.ft_components[i]["FT Magnitude"].reshape(self.min_height, self.min_width)
                     # resized_magnitude = self.ft_components[i]["FT Magnitude"][:self.min_height, :self.min_width]
                     # resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_phase = self.ft_components[i]["FT Phase"].reshape(self.min_height, self.min_width)
+                    # resized_phase = self.ft_components[i]["FT Phase"].reshape(self.min_height, self.min_width)
 
                     ft_magnitude_sum += resized_magnitude * magnitude_weights[i]
                     ft_phase_sum += resized_phase * phase_weights[i]
 
             # Reconstruct using magnitude and phase
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
-            mixed_image = np.fft.ifft2(np.fft.ifftshift(reconstructed_ft))
-            reconstructed_image = np.abs(mixed_image)
+            # mixed_image = np.fft.ifft2(np.fft.ifftshift(reconstructed_ft))
+            reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
 
         else:
             ft_real_sum = np.zeros((self.min_height, self.min_width))
@@ -307,11 +314,31 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Normalize to range [0, 255]
         if reconstructed_image is not None:
-            reconstructed_image = (255 * (reconstructed_image / np.max(reconstructed_image))).astype(np.uint8)
+            max_val = np.max(reconstructed_image)
+            reconstructed_image = (255 * (reconstructed_image / max_val)).astype(np.uint8) if max_val > 0 else np.zeros_like(reconstructed_image, dtype=np.uint8)
 
+        # Save the reconstructed image as a JPEG
+        # self.save_image_as_jpeg(reconstructed_image, "reconstructed_image.jpg")
+        # return ( self.current_images[0] - reconstructed_image)
+        
+        # return ( self.current_images[0] - reconstructed_image)
         return reconstructed_image
 
-    
+
+    def save_image_as_jpeg(self, image_matrix, filename):
+        """
+        Save a NumPy matrix as a JPEG image.
+
+        Args:
+            image_matrix (np.ndarray): Grayscale image matrix.
+            filename (str): The file name for the saved image.
+        """
+        success = cv2.imwrite(filename, image_matrix)
+        if success:
+            QtWidgets.QMessageBox.information(self, "Success", f"Image saved successfully as {filename}")
+        else:
+            QtWidgets.QMessageBox.warning(self, "Error", "Failed to save the image.")
+
 
     def update_ft_component(self, index):
         if index == 0:
@@ -333,7 +360,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # selected_component = self.Fourier_comboBox_4.itemText(index)
         if selected_component in self.ft_components[index]:
             component_image = self.ft_components[index][selected_component]
-            print(component_image)
             component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
             height, width = component_image.shape
             q_image = QtGui.QImage(component_image.data, width, height, width, QtGui.QImage.Format_Grayscale8)
@@ -343,7 +369,7 @@ class MainWindow(QtWidgets.QMainWindow):
             currentFourierImage.addPixmap(pixmap)
             currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
             self.Gimage1.fitInView(currentFourierImage.sceneRect(), QtCore.Qt.KeepAspectRatio)
-            print(index)
+           
         else:
             QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
 
@@ -363,9 +389,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
     def update_weight(self, frame, value):
         self.weights[frame] = value
-        print("self.weights: ", self.weights)  
         mixed_image = self.compute_inverse_ft_components()
-        print ("mixed Image: ", mixed_image)
         if self.output1.isChecked():
             self.display_output_image(self.output_mixer1, mixed_image)  
         else:
@@ -373,23 +397,27 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
     def display_output_image(self, label, mixed_image):
-        # Convert NumPy array to QImage
+        if label == self.output_mixer1:
+            scene = self.scene_output1 
+            self.scene_output1.clear()
+        else:
+            scene = self.scene_output2 
+            self.scene_output2.clear() 
+        # convert NumPy array to QImage
         height, width = mixed_image.shape
-        bytes_per_line = width
-        # Convert the data to bytes explicitly
+
+        # convert the data to bytes
         image_data = mixed_image.tobytes()
 
-        # Create the QImage
-        q_image = QImage(image_data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+        # create the QImage
+        q_image = QtGui.QImage(image_data, width, height, width, QtGui.QImage.Format_Grayscale8)
+        pixmap = QtGui.QPixmap.fromImage(q_image)
+        
+        pixmap = pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        scene.addPixmap(pixmap)
+        scene.setSceneRect(QtCore.QRectF(pixmap.rect()))
+        label.fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
-        # Display the mixed image in the QGraphicsView
-        scene = QGraphicsScene()
-        pixmap_item = QGraphicsPixmapItem(QPixmap.fromImage(q_image))
-        scene.addItem(pixmap_item)
-
-        # Set the scene to the label
-        label.setScene(scene)
-        label.fitInView(pixmap_item, Qt.KeepAspectRatio)
     def mouse_press(self, event, frame_index):
         """When mouse is pressed, track the active frame."""
         self.mouse_pressed = True
@@ -406,11 +434,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.brightness[frame_index] += delta.y()
             self.contrast[frame_index] += delta.x() * 0.01
             self.contrast[frame_index] = max(0.1, self.contrast[frame_index])  # Avoid invalid values
-            print(f"Adjusting: Brightness={self.brightness[frame_index]}, Contrast={self.contrast[frame_index]}")
+            
 
             # Apply these changes
             self.adjust_brightness_contrast(frame_index)
-            self.compute_ft_components(frame_index)
+            # self.compute_ft_components(frame_index)
             self.update_ft_component(frame_index)
 
             # Track mouse movement
@@ -425,47 +453,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def adjust_brightness_contrast(self, frame):
-        """Apply contrast and brightness adjustment safely to the image."""
-        if frame < 0 or frame >= len(self.current_images):
-            print("Invalid frame index")
-            return
-
-        # Convert image to float32 for safe computation
-        original_image = self.current_images[frame].astype(np.float32)
-
-        # Apply brightness and contrast adjustments
-        adjusted = self.contrast[frame] * original_image + self.brightness[frame]
-
-        # Clip the adjusted values to ensure they are in the valid range
-        adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)
-
-        # Convert numpy array to QPixmap for display
-        pixmap = QtGui.QPixmap.fromImage(
-            QtGui.QImage(
-                adjusted.data,
-                adjusted.shape[1],
-                adjusted.shape[0],
-                adjusted.strides[0],
-                QtGui.QImage.Format_Grayscale8
-            )
-        )
-
-        # Update the associated QGraphicsScene
-        scene = getattr(self, f"scene{frame + 1}")
-        scene.clear()
-        pixmap = pixmap.scaled(
-            getattr(self, f"image{frame + 1}").size(),
-            QtCore.Qt.KeepAspectRatio,
-            QtCore.Qt.SmoothTransformation
-        )
-
+            """Apply the contrast/brightness adjustment to the image."""
        
-        # ptr = pixmap.toImage().bits()
-        # ptr.setsize(self.min_width * self.min_height)
-        # self.current_images[frame] = np.array(ptr).reshape(self.min_height, self.min_width)
-        scene.addPixmap(pixmap)
-        getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            original_image = np.array(self.current_images[frame])
+          
+            # Apply contrast and brightness adjustments
+            adjusted = self.contrast[frame] * original_image + self.brightness[frame]
+            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)  # Ensure values stay within valid range
+            height, width = adjusted.shape
+            image_data = adjusted.tobytes()
+            q_image = QtGui.QImage(image_data,width, height, width, QtGui.QImage.Format_Grayscale8)
+            pixmap = QtGui.QPixmap.fromImage(q_image)
+            # self.current_images[frame] = 
+            # print(self.current_images[frame])
 
+            scene = getattr(self, f"scene{frame + 1}")
+            scene.clear()
+            scene.addPixmap(pixmap)
+            # self.current_images[frame]=pixmap 
+            
+            getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     ############### PART B ###################
 

@@ -1553,8 +1553,8 @@ background-color: rgb(255, 255, 255);</string>
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="output_buttonGroup"/>
   <buttongroup name="components_buttonGroup"/>
   <buttongroup name="region_buttonGroup"/>
-  <buttongroup name="output_buttonGroup"/>
  </buttongroups>
 </ui>
