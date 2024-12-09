@@ -175,6 +175,7 @@ class MainWindow(QtWidgets.QMainWindow):
         }
 
 
+    
     def compute_inverse_ft_components(self):
         reconstructed_image = None
 
@@ -202,18 +203,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
-                    resized_magnitude = self.ft_components[i]["FT Magnitude"].reshape(self.min_height, self.min_width)
+                    resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+
+                    # resized_magnitude = self.ft_components[i]["FT Magnitude"].reshape(self.min_height, self.min_width)
                     # resized_magnitude = self.ft_components[i]["FT Magnitude"][:self.min_height, :self.min_width]
                     # resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_phase = self.ft_components[i]["FT Phase"].reshape(self.min_height, self.min_width)
+                    # resized_phase = self.ft_components[i]["FT Phase"].reshape(self.min_height, self.min_width)
 
                     ft_magnitude_sum += resized_magnitude * magnitude_weights[i]
                     ft_phase_sum += resized_phase * phase_weights[i]
 
             # Reconstruct using magnitude and phase
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
-            mixed_image = np.fft.ifft2(np.fft.ifftshift(reconstructed_ft))
-            reconstructed_image = np.abs(mixed_image)
+            # mixed_image = np.fft.ifft2(np.fft.ifftshift(reconstructed_ft))
+            reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
 
         else:
             ft_real_sum = np.zeros((self.min_height, self.min_width))
@@ -233,9 +237,30 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Normalize to range [0, 255]
         if reconstructed_image is not None:
-            reconstructed_image = (255 * (reconstructed_image / np.max(reconstructed_image))).astype(np.uint8)
+            max_val = np.max(reconstructed_image)
+            reconstructed_image = (255 * (reconstructed_image / max_val)).astype(np.uint8) if max_val > 0 else np.zeros_like(reconstructed_image, dtype=np.uint8)
 
+        # Save the reconstructed image as a JPEG
+        # self.save_image_as_jpeg(reconstructed_image, "reconstructed_image.jpg")
+        # return ( self.current_images[0] - reconstructed_image)
+        
+        # return ( self.current_images[0] - reconstructed_image)
         return reconstructed_image
+
+
+    def save_image_as_jpeg(self, image_matrix, filename):
+        """
+        Save a NumPy matrix as a JPEG image.
+
+        Args:
+            image_matrix (np.ndarray): Grayscale image matrix.
+            filename (str): The file name for the saved image.
+        """
+        success = cv2.imwrite(filename, image_matrix)
+        if success:
+            QtWidgets.QMessageBox.information(self, "Success", f"Image saved successfully as {filename}")
+        else:
+            QtWidgets.QMessageBox.warning(self, "Error", "Failed to save the image.")
 
 
     def update_ft_component(self, index):
@@ -294,25 +319,25 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
     def display_output_image(self, label, mixed_image):
+        if label == self.output_mixer1:
+            scene = self.scene_output1 
+        else:
+            scene = self.scene_output2  
         # Convert NumPy array to QImage
         height, width = mixed_image.shape
-        bytes_per_line = width
+
         # Convert the data to bytes explicitly
         image_data = mixed_image.tobytes()
 
         # Create the QImage
-        q_image = QImage(image_data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+        q_image = QtGui.QImage(image_data, width, height, width, QtGui.QImage.Format_Grayscale8)
+        pixmap = QtGui.QPixmap.fromImage(q_image)
+        
+        pixmap = pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        scene.addPixmap(pixmap)
+        scene.setSceneRect(QtCore.QRectF(pixmap.rect()))
+        label.fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
-        # Display the mixed image in the QGraphicsView
-        scene = QGraphicsScene()
-        pixmap_item = QGraphicsPixmapItem(QPixmap.fromImage(q_image))
-        scene.addItem(pixmap_item)
-
-        # Set the scene to the label
-        label.setScene(scene)
-        label.fitInView(pixmap_item, Qt.KeepAspectRatio)
-
-              
 
 
 if __name__ == '__main__':
