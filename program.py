@@ -78,6 +78,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
 
+        self.Fourier_comboBox_1.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
+        self.Fourier_comboBox_2.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
+        self.Fourier_comboBox_3.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
+        self.Fourier_comboBox_4.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
+        self.region_selecter.valueChanged.connect(self.apply_region)
+        self.in_region_radioButton.toggled.connect(lambda:self.apply_region(self.region_selecter.value()))
+        self.out_region_radioButton.toggled.connect(lambda:self.apply_region(self.region_selecter.value()))
+
+
         ################# PART B #########################
         self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
         self.curvature_angle_spinbox = self.findChild(QtWidgets.QDoubleSpinBox, "doubleSpinBox_curvature_angle_3")
@@ -132,23 +141,24 @@ class MainWindow(QtWidgets.QMainWindow):
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, "Select Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)"
         )
-
         if file_name:
             pixmap = QtGui.QPixmap(file_name)
             image = pixmap.toImage()
             image = image.convertToFormat(QtGui.QImage.Format_Grayscale8)
             pixmap = QPixmap.fromImage(image)
+            
+            # Update min_width and min_height
             if self.min_width == 0 and self.min_height == 0:
                 self.min_width = image.width()
                 self.min_height = image.height()
             else:
                 width = image.width()
                 height = image.height()
-                print("original: ",width, height)
+                print("original: ", width, height)
                 self.min_width = min(width, self.min_width)
                 self.min_height = min(height, self.min_height)
-                print("Min: ",self.min_width, self.min_height)
-                      
+                print("Min: ", self.min_width, self.min_height)
+
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
@@ -160,7 +170,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(0)
                 self.update_ft_component(0)
-            
+
             elif frame == 2:
                 self.scene2.clear()
                 pixmap = pixmap.scaled(self.image2.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
@@ -170,7 +180,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(1)
                 self.update_ft_component(1)
-            
+
             elif frame == 3:
                 self.scene3.clear()
                 pixmap = pixmap.scaled(self.image3.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
@@ -179,8 +189,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(2)
-                self.update_ft_component(2)    
-            
+                self.update_ft_component(2)
+
             elif frame == 4:
                 self.scene4.clear()
                 pixmap = pixmap.scaled(self.image4.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
@@ -190,8 +200,24 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(3)
                 self.update_ft_component(3)
-       
-            
+
+        # # Ensure the image is loaded for the given frame
+        # if self.current_images[frame - 1] is not None:
+
+        #     # Check if in-region or out-region radio button is selected
+        #     if self.in_region_radioButton.isChecked() or self.out_region_radioButton.isChecked():
+        #         # Add a resizable rectangle to the scene
+        #         rect_item = self.addResizableRectangle(
+        #             self.Gimage1.scene(),
+        #             self.current_images[frame - 1],  # Pass the correct current image
+        #             self.region_selecter.value(),
+        #             self.region_selecter.value(),
+        #             self.in_region_radioButton.isChecked()
+        #         )
+
+        # else:
+        #     QtWidgets.QMessageBox.warning(self, "Error", "No image loaded for the selected frame.")
+
     def change_choices_combobox(self):
         for combobox in self.checkboxes:
             if self.magnitude_phase.isChecked():
@@ -366,6 +392,105 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set the scene to the label
         label.setScene(scene)
         label.fitInView(pixmap_item, Qt.KeepAspectRatio)
+
+
+    def apply_region(self, value):
+        """
+        Applies the region mask to the current Fourier component based on the rectangle.
+        The region is adjusted using the region_selector slider.
+        """
+        for frame in range(1, 5):  # Loop through all frames (1-4)
+            if self.current_images[frame - 1] is not None:  # Ensure image is loaded for the frame
+                # Update Fourier component for the current frame
+                self.update_ft_component(frame - 1)
+
+                # Get the image data and scene for the frame
+                img_data = self.current_images[frame - 1]
+                scene = self.get_scene_for_frame(frame)  # Retrieve the scene for the current frame
+
+                # Add a resizable rectangle to the scene
+                if self.out_region_radioButton.isChecked() or self.in_region_radioButton.isChecked():
+                    rect_item = self.addResizableRectangle(
+                        scene,
+                        self.convert_component_to_qimage(img_data),  # Convert the image component
+                        value, 
+                        value,
+                        self.in_region_radioButton
+                    )
+                    self.masked_img_comp = self.extractRegion(rect_item, self.convert_component_to_qimage(img_data), img_data, self.in_region_radioButton)
+
+
+    def extractRegion(self, rect_item, image_component, image_component_array, inner_region_selected):
+        image_component = QGraphicsPixmapItem(QPixmap.fromImage(image_component))
+        rect_scene_pos = rect_item.scenePos()
+        rect_scene_rect = rect_item.rect()
+        rect_image_pos = image_component.mapFromScene(rect_scene_pos)
+        rect_image_rect = image_component.mapFromScene(rect_scene_rect).boundingRect()
+
+        if inner_region_selected.isChecked():
+            mask = np.zeros_like(image_component_array)
+            mask[int(rect_image_pos.y()):int(rect_image_pos.y() + rect_image_rect.height()),
+                int(rect_image_pos.x()):int(rect_image_pos.x() + rect_image_rect.width())] = 1
+        else:
+            mask = np.ones_like(image_component_array)
+            mask[int(rect_image_pos.y()):int(rect_image_pos.y() + rect_image_rect.height()),
+            int(rect_image_pos.x()):int(rect_image_pos.x() + rect_image_rect.width())] = 0
+
+        image_component_array = image_component_array * mask
+        return image_component_array
+
+
+    def convert_component_to_qimage(self, component):
+        """
+        Converts a Fourier component (2D array) to a QImage for display.
+        """
+        component = (component / np.max(component) * 255).astype(np.uint8)
+        height, width = component.shape
+        bytes_per_line = component.strides[0]
+        return QtGui.QImage(component.data, width, height, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+
+
+    def get_scene_for_frame(self, frame):
+        if frame == 1:
+            return self.fourierimage1
+        elif frame == 2:
+            return self.fourierimage2
+        elif frame == 3:
+            return self.fourierimage3
+        elif frame == 4:
+            return self.fourierimage4
+        else:
+            raise ValueError(f"Invalid frame number: {frame}")
+    
+
+    def addResizableRectangle(self, scene,image_component,w,h,inner_rect):
+        width = image_component.width()*(w)*0.01
+        height = image_component.height()*(h)*0.01
+        rect_item = QGraphicsRectItem(0, 0, width, height)
+
+        rect_center_x = (image_component.width() - rect_item.rect().width()) / 2
+        rect_center_y = (image_component.height() - rect_item.rect().height()) / 2
+        rect_item = QGraphicsRectItem(0, 0, width, height)
+        rect_item.setPen(QPen(Qt.yellow))  # Set pen color to yellow
+        brush = QBrush(QColor(255, 255, 0, 50))
+        rect_item.setBrush(brush)
+        rect_item.setPos(rect_center_x, rect_center_y)
+        scene.addItem(rect_item)
+        if not inner_rect.isChecked():
+            brush = QBrush(QColor(0, 0, 0, 50))
+            rect_item.setBrush(brush)
+            rect_item.setPos(rect_center_x, rect_center_y)
+            scene.addItem(rect_item)
+            overlay_path = QPainterPath()
+            overlay_path.addRect(0, 0, image_component.width(), image_component.height())
+            rect_path = QPainterPath()
+            rect_path.addRect(rect_center_x, rect_center_y, width, height)
+            # Subtract rect_path from overlay_path
+            overlay_path -= rect_path
+            # Create a QGraphicsPathItem for the resulting path (difference)
+            difference_item = scene.addPath(overlay_path, QPen(Qt.NoPen), QBrush(QColor(255, 255, 0, 50)))
+        return rect_item
+
 
     ############### PART B ###################
 
