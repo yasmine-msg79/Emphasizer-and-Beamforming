@@ -110,9 +110,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ################# PART B #########################
         self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
-        self.curvature_angle_slider= self.findChild(QtWidgets.QSlider, "curvature_angle_slider")
+        self.frequency_slider = self.findChild(QtWidgets.QSlider, "beam_frequency_slider")
+        self.phase_slider = self.findChild(QtWidgets.QSlider, "beam_phase_slider")
+        self.position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
+        self.curvature_slider= self.findChild(QtWidgets.QSlider, "beam_curvature_slider")
         self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "curvature_angle_label")
         self.no_transmitters_spinbox = self.findChild(QtWidgets.QSpinBox, "spinBox_No_transmitters_3")
+        self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
+        self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
+        self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
+        self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
         self.frequency_phase_table_2 = self.findChild(QtWidgets.QTableWidget, "frequency_phase_table_2")
 
         # Initialize parameters
@@ -122,6 +129,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.element_spacing = 0.5  # Wavelength units
         self.array_type = "curved"  # Default array type
         self.curvature_angle = 0.0  # Default curvature angle (in degrees)
+        self.current_frequency = 0
+        self.current_phase = 0
+        self.current_position = 0
 
 
         # Set the initial state
@@ -133,7 +143,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connect spinbox signal for changing transmitter count
         # self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_rows)
-        # self.curvature_angle_slider.valueChanged.connect(self.update_curvature_angle)
+        self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
+        self.frequency_slider.valueChanged.connect(self.update_frequency)
+        self.phase_slider.valueChanged.connect(self.update_phase)
+        self.position_slider.valueChanged.connect(self.update_position)
 
         # Set up the table
         # self.frequency_phase_table_2.setColumnCount(2)
@@ -152,7 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
         self.magnitudes = [1] * self.num_transmitters 
 
-        # self.beam_forming()
+        self.beam_forming()
 
         # Create spinboxes for the transmitters
         for row in range(self.num_transmitters):
@@ -769,14 +782,16 @@ class MainWindow(QtWidgets.QMainWindow):
         If checked, the radio button text changes to 'Curved', and curvature angle controls are shown.
         If unchecked, the radio button text changes to 'Linear', and curvature angle controls are hidden.
         """
-        # if checked:
-        #     self.linear_radio_button.setText("linear") # Update the label next to the radio button
-        #     self.curvature_angle_label.setVisible(False)  # Show the "Curvature Angle" label
-        #     self.curvature_angle_slider.setVisible(False)  # Show the spinbox
-        # else:
-        #     self.linear_radio_button.setText("curved")  # Update the label next to the radio button
-        #     self.curvature_angle_label.setVisible(True)  # Hide the "Curvature Angle" label
-        #     self.curvature_angle_slider.setVisible(True)  # Hide the spinbox
+        if checked:
+            self.linear_radio_button.setText("linear") # Update the label next to the radio button
+            self.curvature_angle_label.setVisible(False)  # Hide the "Curvature Angle" label
+            self.curvature_lcd.hide()  #hide the lcd
+            self.curvature_slider.hide()  # hide the slider
+        else:
+            self.linear_radio_button.setText("curved")  # Update the label next to the radio button
+            self.curvature_angle_label.setVisible(True)  # Show the "Curvature Angle" label
+            self.curvature_lcd.show() # Show the lcd
+            self.curvature_slider.show()  # Show the slider
 
 
     def add_custom_widget(self, row, col, mode):
@@ -858,8 +873,32 @@ class MainWindow(QtWidgets.QMainWindow):
         Updates the curvature angle for the phased array and recalculates the beamforming pattern.
         """
         self.curvature_angle = value  # Update the curvature angle
+        self.curvature_lcd.display(value)  # Update the LCD display
         self.beam_forming()  # Recalculate the beamforming pattern
 
+    def update_frequency(self, value):
+        """
+        Updates the frequency for the phased array and recalculates the beamforming pattern.
+        """
+        self.current_frequency = value
+        self.frequency_lcd.display(value)  # Update the LCD display
+        self.beam_forming()
+    
+    def update_phase(self, value):
+        """
+        Updates the phase for the phased array and recalculates the beamforming pattern.
+        """
+        self.current_phase = value
+        self.phase_lcd.display(value)  # Update the LCD display
+        self.beam_forming()
+    
+    def update_position(self, value):
+        """
+        Updates the position for the phased array and recalculates the beamforming pattern.
+        """
+        self.current_position = value
+        self.position_lcd.display(value)  # Update the LCD display
+        self.beam_forming()
 
 # Entry point of the application
 if __name__ == '__main__':
