@@ -318,8 +318,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
-                    resized_real = self.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
-                    resized_imaginary = self.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
+                    # padded_array = np.pad(
+                    #     self.ft_components[i]["FT Real"],
+                    #     (0, self.min_height*self.min_width - len(self.ft_components[i]["FT Real"])),
+                    #     mode='constant'
+                    # )
+                    # resized_real = padded_array.reshape(self.min_height, self.min_width)
+                    
+                    # padded_array = np.pad(
+                    #     self.ft_components[i]["FT Imaginary"],
+                    #     (0, self.min_height*self.min_width - len(self.ft_components[i]["FT Imaginary"])),
+                    #     mode='constant'
+                    # )
+                    # resized_imaginary = padded_array.reshape(self.min_height, self.min_width)
+                    # resized_real = self.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
+                    # resized_imaginary = self.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
+                    
+                    resized_real = cv2.resize(self.ft_components[i]["FT Real"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    resized_imaginary = cv2.resize(self.ft_components[i]["FT Imaginary"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
 
                     ft_real_sum += resized_real * real_weights[i]
                     ft_imaginary_sum += resized_imaginary * imaginary_weights[i]
