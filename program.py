@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore, uic   # Added uic import
 import sys
 from PyQt5.QtGui import *
+
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -17,12 +18,14 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidge
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox)
 import beamPlot
 from visualizer import Visualizer
+from PIL import Image
 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi('task4.ui', self)
+        
         
         self.min_width = 0
         self.min_height = 0
@@ -35,14 +38,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.image2.mouseDoubleClickEvent = lambda event: self.open_file(2, event)
         self.image3.mouseDoubleClickEvent = lambda event: self.open_file(3, event)
         self.image4.mouseDoubleClickEvent = lambda event: self.open_file(4, event)
-        self.scene = QtWidgets.QGraphicsScene()
-        self.image1.setScene(self.scene)
+        self.scene1 = QtWidgets.QGraphicsScene()
+        self.image1.setScene(self.scene1)
         self.scene2 = QtWidgets.QGraphicsScene()
         self.image2.setScene(self.scene2)
         self.scene3 = QtWidgets.QGraphicsScene()
         self.image3.setScene(self.scene3)
         self.scene4 = QtWidgets.QGraphicsScene()
         self.image4.setScene(self.scene4)
+        self.scenes = [self.scene1, self.scene2, self.scene3, self.scene4]
+        self.loaded_images = [self.image1,self.image2,self.image3,self.image4]
+        self.loaded_files = [None, None, None, None]
+        
         self.scene_output1 = QtWidgets.QGraphicsScene()
         self.output_mixer1.setScene(self.scene_output1)
         self.scene_output2 = QtWidgets.QGraphicsScene()
@@ -58,18 +65,32 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_images = [None,None,None,None]
         self.output1_image = None
         self.ft_components = [{},{},{},{}]
+        
         self.Fourier_comboBox_1.currentIndexChanged.connect(lambda: self.update_ft_component(0))
         self.Fourier_comboBox_2.currentIndexChanged.connect(lambda: self.update_ft_component(1))
         self.Fourier_comboBox_3.currentIndexChanged.connect(lambda: self.update_ft_component(2))
         self.Fourier_comboBox_4.currentIndexChanged.connect(lambda: self.update_ft_component(3))
         self.checkboxes = [self.Fourier_comboBox_1,self.Fourier_comboBox_2,self.Fourier_comboBox_3,self.Fourier_comboBox_4]
-        
+            
         self.weights = [0,0,0,0]
         self.weight_1.valueChanged.connect(lambda value: self.update_weight(0, value))
         self.weight_2.valueChanged.connect(lambda value: self.update_weight(1, value))
         self.weight_3.valueChanged.connect(lambda value: self.update_weight(2, value))
         self.weight_4.valueChanged.connect(lambda value: self.update_weight(3, value))
         self.weights_sliders = [self.weight_1, self.weight_2,self.weight_3,self.weight_4]
+
+        self.mouse_pressed = False
+        self.active_frame = None
+      
+        self.brightness = [0] * 4  # Assuming 4 frames
+        self.contrast = [1.0] * 4
+
+        for i in range(1, 5):  # Assuming 4 viewports
+            image = getattr(self, f"image{i}")
+            image.setMouseTracking(True)
+            image.mouseMoveEvent = lambda event, i=i: self.mouse_movement(event, i-1)
+            image.mousePressEvent = lambda event, i=i: self.mouse_press(event, i-1)
+            image.mouseReleaseEvent = self.mouse_release
         
         self.change_choices_combobox()
         self.magnitude_phase.toggled.connect(self.change_choices_combobox)
@@ -77,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
-
+    
         ################# PART B #########################
         self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
         self.curvature_angle_spinbox = self.findChild(QtWidgets.QDoubleSpinBox, "doubleSpinBox_curvature_angle_3")
@@ -122,7 +143,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
         self.magnitudes = [1] * self.num_transmitters 
 
-        self.beam_forming()
+        # self.beam_forming()
 
         # Create spinboxes for the transmitters
         for row in range(self.num_transmitters):
@@ -136,6 +157,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         if file_name:
+            self.loaded_files[frame - 1] = file_name
             pixmap = QtGui.QPixmap(file_name)
             image = pixmap.toImage()
             image = image.convertToFormat(QtGui.QImage.Format_Grayscale8)
@@ -150,49 +172,73 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.min_width = min(width, self.min_width)
                 self.min_height = min(height, self.min_height)
                 print("Min: ",self.min_width, self.min_height)
-                      
+                     
+            image_calculations = Image.open(file_name).convert('L')
+            resize_image_calculations = image_calculations.resize((self.min_width ,self.min_height))
+            self.current_images[frame - 1] = resize_image_calculations
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
-                self.scene.clear()
-                pixmap = pixmap.scaled(self.image1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                self.scene.addPixmap(pixmap)
-                self.scene.setSceneRect(QtCore.QRectF(pixmap.rect()))
-                self.image1.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
+                self.scene1.clear()
+                pixmap = pixmap.scaled(self.min_width, self.min_height, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                self.scene1.addPixmap(pixmap)
+                self.scene1.setSceneRect(QtCore.QRectF(pixmap.rect()))
+                self.image1.fitInView(self.scene1.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(0)
                 self.update_ft_component(0)
             
             elif frame == 2:
                 self.scene2.clear()
-                pixmap = pixmap.scaled(self.image2.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(self.min_width, self.min_height, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 self.scene2.addPixmap(pixmap)
                 self.scene2.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image2.fitInView(self.scene2.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(1)
                 self.update_ft_component(1)
             
             elif frame == 3:
                 self.scene3.clear()
-                pixmap = pixmap.scaled(self.image3.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(self.min_width, self.min_height, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 self.scene3.addPixmap(pixmap)
                 self.scene3.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(2)
                 self.update_ft_component(2)    
             
             elif frame == 4:
                 self.scene4.clear()
-                pixmap = pixmap.scaled(self.image4.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(self.min_width, self.min_height, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 self.scene4.addPixmap(pixmap)
                 self.scene4.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image4.fitInView(self.scene4.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.current_images[frame - 1] = np.array(ptr).reshape(self.min_height, self.min_width)
                 self.compute_ft_components(3)
                 self.update_ft_component(3)
-       
+            self.resize_images()      
+            
+            
+    def resize_images(self):
+        for i in range(4):
+            if self.current_images[i] is not None: 
+                # Open and resize the image
+                image = Image.open(self.loaded_files[i]).convert('L')
+                resized_image = image.resize((self.min_width, self.min_height))
+
+                # Convert to NumPy array and then to QImage
+                np_array = np.array(resized_image, dtype=np.uint8)
+                byte_data = np_array.tobytes()
+                qimage = QImage(byte_data, self.min_width, self.min_height, self.min_width, QImage.Format_Grayscale8)
+                
+                # Convert QImage to QPixmap and display it
+                pixmap = QPixmap.fromImage(qimage)
+                self.scenes[i].clear()
+                self.scenes[i].addPixmap(pixmap)
+                self.scenes[i].setSceneRect(QtCore.QRectF(pixmap.rect()))
+                self.loaded_images[i].fitInView(self.scenes[i].sceneRect(), QtCore.Qt.KeepAspectRatio)
+                
+                print(f"Image {i} resized to {self.min_width}x{self.min_height}")
+                # to resize the ft image also     
+                self.update_ft_component(i)
+
             
     def change_choices_combobox(self):
         for combobox in self.checkboxes:
@@ -207,17 +253,17 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.update_ft_component(i) 
                 mixed_image = self.compute_inverse_ft_components()
                 if self.output1.isChecked():
-                    self.display_output_image(self.output_mixer1, mixed_image)  
+                    self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
                 else:
-                    self.display_output_image(self.output_mixer2, mixed_image) 
+                    self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image) 
                     
     
     def change_output_location(self):
         mixed_image = self.compute_inverse_ft_components()
         if self.output1.isChecked():
-            self.display_output_image(self.output_mixer1, mixed_image)  
+            self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
         elif self.output2.isChecked():
-            self.display_output_image(self.output_mixer2, mixed_image)                                
+            self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image)                                
     
 
     def compute_ft_components(self, frame):
@@ -231,7 +277,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "FT Imaginary": np.imag(ft_shifted),
         }
 
-
+    
     def compute_inverse_ft_components(self):
         reconstructed_image = None
 
@@ -259,18 +305,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
-                    resized_magnitude = self.ft_components[i]["FT Magnitude"].reshape(self.min_height, self.min_width)
-                    # resized_magnitude = self.ft_components[i]["FT Magnitude"][:self.min_height, :self.min_width]
-                    # resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_phase = self.ft_components[i]["FT Phase"].reshape(self.min_height, self.min_width)
-
+                    resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     ft_magnitude_sum += resized_magnitude * magnitude_weights[i]
                     ft_phase_sum += resized_phase * phase_weights[i]
 
             # Reconstruct using magnitude and phase
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
-            mixed_image = np.fft.ifft2(np.fft.ifftshift(reconstructed_ft))
-            reconstructed_image = np.abs(mixed_image)
+            reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
 
         else:
             ft_real_sum = np.zeros((self.min_height, self.min_width))
@@ -290,7 +332,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Normalize to range [0, 255]
         if reconstructed_image is not None:
-            reconstructed_image = (255 * (reconstructed_image / np.max(reconstructed_image))).astype(np.uint8)
+            max_val = np.max(reconstructed_image)
+            reconstructed_image = (255 * (reconstructed_image / max_val)).astype(np.uint8) if max_val > 0 else np.zeros_like(reconstructed_image, dtype=np.uint8)
 
         return reconstructed_image
 
@@ -299,33 +342,39 @@ class MainWindow(QtWidgets.QMainWindow):
         if index == 0:
             selected_component = self.Fourier_comboBox_1.currentText()
             currentFourierImage = self.fourierimage1
+            self.update_weight(0, self.weight_1.value())
+            print("frame1")
         elif index == 1:
             selected_component = self.Fourier_comboBox_2.currentText()
             currentFourierImage = self.fourierimage2
+            self.update_weight(1, self.weight_2.value())
+            print("frame2")
         elif index == 2:
             selected_component = self.Fourier_comboBox_3.currentText()
             currentFourierImage = self.fourierimage3
+            self.update_weight(2, self.weight_3.value())
+            print("frame3")
         elif index == 3:
             selected_component = self.Fourier_comboBox_4.currentText()
-            currentFourierImage = self.fourierimage4          
-        # selected_component = self.Fourier_comboBox_4.itemText(index)
+            currentFourierImage = self.fourierimage4
+            self.update_weight(3, self.weight_4.value())          
+
         if selected_component in self.ft_components[index]:
             component_image = self.ft_components[index][selected_component]
-            # print(component_image)
             component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-            height, width = component_image.shape
-            q_image = QtGui.QImage(component_image.data, width, height, width, QtGui.QImage.Format_Grayscale8)
+            q_image = QtGui.QImage(component_image.data, self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
             pixmap = QtGui.QPixmap.fromImage(q_image)
             currentFourierImage.clear()
             pixmap = pixmap.scaled(self.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
             currentFourierImage.addPixmap(pixmap)
             currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
             self.Gimage1.fitInView(currentFourierImage.sceneRect(), QtCore.Qt.KeepAspectRatio)
+           
         else:
             QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
 
     def hide_image_frame_and_label(self):
-        """Hides imageFrame, frame_3, and label; shows everything else."""
+        # Hides imageFrame, frame_3, and label; shows everything else
         self.imageFrame.hide()
         self.frame_3.hide()
         for widget in self.findChildren(QtWidgets.QWidget):
@@ -333,41 +382,94 @@ class MainWindow(QtWidgets.QMainWindow):
                 widget.show()
 
     def show_image_frame_and_label(self):
-        """Shows imageFrame, frame_3, and label; hides everything else."""
+        # Shows imageFrame, frame_3, and label; hides everything else
         self.frame_5.hide()
         self.imageFrame.show()
         self.frame_3.show()
         
-        
     def update_weight(self, frame, value):
         self.weights[frame] = value
-        print("self.weights: ", self.weights)  
         mixed_image = self.compute_inverse_ft_components()
-        print ("mixed Image: ", mixed_image)
         if self.output1.isChecked():
-            self.display_output_image(self.output_mixer1, mixed_image)  
+            self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
         else:
-            self.display_output_image(self.output_mixer2, mixed_image)  
+            self.display_output_image(self.output_mixer2, self.scene_output1, mixed_image)  
         
         
-    def display_output_image(self, label, mixed_image):
-        # Convert NumPy array to QImage
+    def display_output_image(self, label, scene, mixed_image):
+        # Clear the previous output
+        scene.clear()
+        
+        # convert NumPy array to QImage
         height, width = mixed_image.shape
-        bytes_per_line = width
-        # Convert the data to bytes explicitly
+
+        # convert the data to bytes
         image_data = mixed_image.tobytes()
 
-        # Create the QImage
-        q_image = QImage(image_data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+        # create the QImage
+        q_image = QtGui.QImage(image_data, width, height, width, QtGui.QImage.Format_Grayscale8)
+        pixmap = QtGui.QPixmap.fromImage(q_image)
+        
+        pixmap = pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        scene.addPixmap(pixmap)
+        scene.setSceneRect(QtCore.QRectF(pixmap.rect()))
+        label.fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
-        # Display the mixed image in the QGraphicsView
-        scene = QGraphicsScene()
-        pixmap_item = QGraphicsPixmapItem(QPixmap.fromImage(q_image))
-        scene.addItem(pixmap_item)
+    def mouse_press(self, event, frame_index):
+        """When mouse is pressed, track the active frame."""
+        self.mouse_pressed = True
+        self.active_frame = frame_index
+        self.last_mouse_pos = event.pos()
 
-        # Set the scene to the label
-        label.setScene(scene)
-        label.fitInView(pixmap_item, Qt.KeepAspectRatio)
+
+    def mouse_movement(self, event, frame_index):
+        """Adjust brightness/contrast/FT only if dragging with the mouse."""
+        if self.mouse_pressed and self.active_frame == frame_index:
+            delta = event.pos() - self.last_mouse_pos
+
+            # Adjust contrast and brightness dynamically
+            self.brightness[frame_index] += delta.y()
+            self.contrast[frame_index] += delta.x() * 0.01
+            self.contrast[frame_index] = max(0.1, self.contrast[frame_index])  # Avoid invalid values
+            
+
+            # Apply these changes
+            self.adjust_brightness_contrast(frame_index)
+            # self.compute_ft_components(frame_index)
+            self.update_ft_component(frame_index)
+
+            # Track mouse movement
+            self.last_mouse_pos = event.pos()
+
+
+    def mouse_release(self, event):
+        """When mouse is released, reset the tracking state."""
+        self.mouse_pressed = False
+        self.active_frame = None
+        self.last_mouse_pos = None
+
+
+    def adjust_brightness_contrast(self, frame):
+            """Apply the contrast/brightness adjustment to the image."""
+       
+            original_image = np.array(self.current_images[frame])
+          
+            # Apply contrast and brightness adjustments
+            adjusted = self.contrast[frame] * original_image + self.brightness[frame]
+            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)  # Ensure values stay within valid range
+            height, width = adjusted.shape
+            image_data = adjusted.tobytes()
+            q_image = QtGui.QImage(image_data,width, height, width, QtGui.QImage.Format_Grayscale8)
+            pixmap = QtGui.QPixmap.fromImage(q_image)
+            # self.current_images[frame] = 
+            # print(self.current_images[frame])
+
+            scene = getattr(self, f"scene{frame + 1}")
+            scene.clear()
+            scene.addPixmap(pixmap)
+            # self.current_images[frame]=pixmap 
+            
+            getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     ############### PART B ###################
 
