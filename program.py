@@ -110,8 +110,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ################# PART B #########################
         self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
-        self.curvature_angle_spinbox = self.findChild(QtWidgets.QDoubleSpinBox, "doubleSpinBox_curvature_angle_3")
-        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "label_15")
+        self.curvature_angle_slider= self.findChild(QtWidgets.QSlider, "curvature_angle_slider")
+        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "curvature_angle_label")
         self.no_transmitters_spinbox = self.findChild(QtWidgets.QSpinBox, "spinBox_No_transmitters_3")
         self.frequency_phase_table_2 = self.findChild(QtWidgets.QTableWidget, "frequency_phase_table_2")
 
@@ -132,16 +132,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.linear_radio_button.toggled.connect(self.update_radio_button_text)
 
         # Connect spinbox signal for changing transmitter count
-        self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_rows)
-        self.curvature_angle_spinbox.valueChanged.connect(self.update_curvature_angle)
+        # self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_rows)
+        # self.curvature_angle_slider.valueChanged.connect(self.update_curvature_angle)
 
         # Set up the table
-        self.frequency_phase_table_2.setColumnCount(2)
-        self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
-        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.frequency_phase_table_2.setColumnCount(2)
+        # self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
+        # self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)
+        # self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
@@ -699,69 +699,69 @@ class MainWindow(QtWidgets.QMainWindow):
 
     ############### PART B ###################
 
-    def update_transmitter_rows(self):
-        """
-        Updates the number of rows in the frequency and phase table based on the transmitter count.
-        """
-        count = self.no_transmitters_spinbox.value()
-        current_rows = self.frequency_phase_table_2.rowCount()
+    # def update_transmitter_rows(self):
+    #     """
+    #     Updates the number of rows in the frequency and phase table based on the transmitter count.
+    #     """
+    #     count = self.no_transmitters_spinbox.value()
+    #     current_rows = self.frequency_phase_table_2.rowCount()
 
-        # Add or remove rows to match the transmitter count
-        while count > current_rows:
-            self.add_table_row()
-            self.magnitudes.append(1)
-            current_rows += 1
-        while count < current_rows:
-            self.frequencies.pop()
-            self.phases.pop()
-            self.magnitudes.pop()
-            self.frequency_phase_table_2.removeRow(current_rows - 1)
-            current_rows -= 1
+    #     # Add or remove rows to match the transmitter count
+    #     while count > current_rows:
+    #         self.add_table_row()
+    #         self.magnitudes.append(1)
+    #         current_rows += 1
+    #     while count < current_rows:
+    #         self.frequencies.pop()
+    #         self.phases.pop()
+    #         self.magnitudes.pop()
+    #         self.frequency_phase_table_2.removeRow(current_rows - 1)
+    #         current_rows -= 1
 
-        # Recalculate beamforming after updating rows
-        self.beam_forming()
+    #     # Recalculate beamforming after updating rows
+    #     self.beam_forming()
 
-    def add_table_row(self):
-        """
-        Adds a new row with default widgets for frequency and phase.
-        """
-        row_position = self.frequency_phase_table_2.rowCount()
-        self.frequency_phase_table_2.insertRow(row_position)
+    # def add_table_row(self):
+    #     """
+    #     Adds a new row with default widgets for frequency and phase.
+    #     """
+    #     row_position = self.frequency_phase_table_2.rowCount()
+    #     self.frequency_phase_table_2.insertRow(row_position)
 
-        # Ensure the frequencies, phases, and magnitudes lists have room for the new row
-        self.frequencies.append(1000)  # Default frequency
-        self.phases.append(0.0)  # Default phase
-        self.magnitudes.append(1)  # Default magnitude
+    #     # Ensure the frequencies, phases, and magnitudes lists have room for the new row
+    #     self.frequencies.append(1000)  # Default frequency
+    #     self.phases.append(0.0)  # Default phase
+    #     self.magnitudes.append(1)  # Default magnitude
 
-        # Create new spin boxes for frequency and phase
-        freq_spinbox = QSpinBox()
-        freq_spinbox.setMinimum(1)
-        freq_spinbox.setMaximum(10000)
-        freq_spinbox.setValue(self.frequencies[row_position])  # Default frequency value
-        freq_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "frequency", value))
+    #     # Create new spin boxes for frequency and phase
+    #     freq_spinbox = QSpinBox()
+    #     freq_spinbox.setMinimum(1)
+    #     freq_spinbox.setMaximum(10000)
+    #     freq_spinbox.setValue(self.frequencies[row_position])  # Default frequency value
+    #     freq_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "frequency", value))
 
-        phase_spinbox = QDoubleSpinBox()
-        phase_spinbox.setMinimum(-180)
-        phase_spinbox.setMaximum(180)
-        phase_spinbox.setValue(self.phases[row_position])  # Default phase value
-        phase_spinbox.setSingleStep(0.1)
-        phase_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "phase", value))
+    #     phase_spinbox = QDoubleSpinBox()
+    #     phase_spinbox.setMinimum(-180)
+    #     phase_spinbox.setMaximum(180)
+    #     phase_spinbox.setValue(self.phases[row_position])  # Default phase value
+    #     phase_spinbox.setSingleStep(0.1)
+    #     phase_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "phase", value))
 
-        # Add the frequency spin box to the first column
-        freq_layout = QVBoxLayout()
-        freq_layout.addWidget(freq_spinbox)
-        freq_layout.setAlignment(Qt.AlignCenter)
-        freq_widget = QWidget()
-        freq_widget.setLayout(freq_layout)
-        self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
+    #     # Add the frequency spin box to the first column
+    #     freq_layout = QVBoxLayout()
+    #     freq_layout.addWidget(freq_spinbox)
+    #     freq_layout.setAlignment(Qt.AlignCenter)
+    #     freq_widget = QWidget()
+    #     freq_widget.setLayout(freq_layout)
+    #     self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
 
-        # Add the phase spin box to the second column
-        phase_layout = QVBoxLayout()
-        phase_layout.addWidget(phase_spinbox)
-        phase_layout.setAlignment(Qt.AlignCenter)
-        phase_widget = QWidget()
-        phase_widget.setLayout(phase_layout)
-        self.frequency_phase_table_2.setCellWidget(row_position, 1, phase_widget)
+    #     # Add the phase spin box to the second column
+    #     phase_layout = QVBoxLayout()
+    #     phase_layout.addWidget(phase_spinbox)
+    #     phase_layout.setAlignment(Qt.AlignCenter)
+    #     phase_widget = QWidget()
+    #     phase_widget.setLayout(phase_layout)
+    #     self.frequency_phase_table_2.setCellWidget(row_position, 1, phase_widget)
 
     def update_radio_button_text(self, checked):
         """
@@ -769,14 +769,14 @@ class MainWindow(QtWidgets.QMainWindow):
         If checked, the radio button text changes to 'Curved', and curvature angle controls are shown.
         If unchecked, the radio button text changes to 'Linear', and curvature angle controls are hidden.
         """
-        if checked:
-            self.linear_radio_button.setText("linear") # Update the label next to the radio button
-            self.curvature_angle_label.setVisible(False)  # Show the "Curvature Angle" label
-            self.curvature_angle_spinbox.setVisible(False)  # Show the spinbox
-        else:
-            self.linear_radio_button.setText("curved")  # Update the label next to the radio button
-            self.curvature_angle_label.setVisible(True)  # Hide the "Curvature Angle" label
-            self.curvature_angle_spinbox.setVisible(True)  # Hide the spinbox
+        # if checked:
+        #     self.linear_radio_button.setText("linear") # Update the label next to the radio button
+        #     self.curvature_angle_label.setVisible(False)  # Show the "Curvature Angle" label
+        #     self.curvature_angle_slider.setVisible(False)  # Show the spinbox
+        # else:
+        #     self.linear_radio_button.setText("curved")  # Update the label next to the radio button
+        #     self.curvature_angle_label.setVisible(True)  # Hide the "Curvature Angle" label
+        #     self.curvature_angle_slider.setVisible(True)  # Hide the spinbox
 
 
     def add_custom_widget(self, row, col, mode):
@@ -792,7 +792,7 @@ class MainWindow(QtWidgets.QMainWindow):
         widget.valueChanged.connect(lambda value, r=row, c=col, m=mode: self.update_parameters(r, m, value))
 
         # Add the widget to the corresponding cell in the table
-        self.frequency_phase_table_2.setCellWidget(row, col, widget)
+        # self.frequency_phase_table_2.setCellWidget(row, col, widget)
 
     def update_parameters(self, row, mode, value):
         """
