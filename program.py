@@ -136,17 +136,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.linear_radio_button.toggled.connect(self.update_radio_button_text)
 
         # Connect UI elements to methods
-        self.frequency_slider.setMinimum(1000000)
+        self.frequency_slider.setMinimum(1000000000)
         self.frequency_slider.setMaximum(2000000000)
+        self.frequency_slider.setSingleStep(10000000)  # Step size
         self.frequency_slider.valueChanged.connect(self.update_frequency)
         self.phase_slider.setMinimum(-180)
         self.phase_slider.setMaximum(180)
         self.phase_slider.valueChanged.connect(self.update_phase)
         self.curvature_slider.setMinimum(0)
-        self.curvature_slider.setMaximum(180)
+        self.curvature_slider.setMaximum(360)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
-        self.no_transmitters_spinbox.setMaximum(10)
+        self.no_transmitters_spinbox.setMaximum(100)
         self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
 
         # Initialize the plots
@@ -749,7 +750,15 @@ class MainWindow(QtWidgets.QMainWindow):
             phases=self.phases,
             curvature_angle=self.curvature_angle,
         )
-        beam_pattern_fig = visualizer.plot_beam_pattern_polar()
+
+        beam_pattern_fig = visualizer.plot_beam_pattern_polar(
+            num_transmitters=self.num_transmitters,
+            element_spacing=self.element_spacing,
+            frequency=self.frequencies[0],
+            phases=self.phases,
+            # curvature_angle=self.curvature_angle,
+           
+        )
 
         self.display_plot(self.beam_map_view, field_map_fig)
         self.display_plot(self.beam_plot_view, beam_pattern_fig)
