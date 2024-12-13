@@ -1124,7 +1124,7 @@ QSpinBox::down-arrow {
               <widget class="QSlider" name="beam_phase_slider">
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
+                 <width>120</width>
                  <height>0</height>
                 </size>
                </property>
@@ -1167,7 +1167,7 @@ QSlider::add-page:horizontal {
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>20</width>
+                 <width>30</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1394,7 +1394,7 @@ font:11pt &quot;Microsoft Sans Serif&quot;;</string>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>20</width>
+                 <width>30</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1454,6 +1454,12 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
              </item>
              <item row="2" column="3">
               <widget class="QLCDNumber" name="frequency_lcd">
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="styleSheet">
                 <string notr="true">color: rgb(66, 31, 99);
 font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
@@ -1617,7 +1623,7 @@ background-color: rgb(255, 255, 255);</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>160</width>
+             <width>350</width>
              <height>20</height>
             </size>
            </property>

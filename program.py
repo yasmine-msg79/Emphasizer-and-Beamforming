@@ -109,69 +109,49 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         ################# PART B #########################
+        #  Find and initialize UI elements
         self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
         self.frequency_slider = self.findChild(QtWidgets.QSlider, "beam_frequency_slider")
         self.phase_slider = self.findChild(QtWidgets.QSlider, "beam_phase_slider")
-        self.position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
-        self.curvature_slider= self.findChild(QtWidgets.QSlider, "beam_curvature_slider")
-        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "curvature_angle_label")
+        self.curvature_slider = self.findChild(QtWidgets.QSlider, "beam_curvature_slider")
         self.no_transmitters_spinbox = self.findChild(QtWidgets.QSpinBox, "spinBox_No_transmitters_3")
         self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
-        self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
-        self.frequency_phase_table_2 = self.findChild(QtWidgets.QTableWidget, "frequency_phase_table_2")
-        self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
-
-        # Initialize parameters
-        self.frequencies = []
-        self.phases = []
-        self.magnitudes = []
-        self.element_spacing = 0.5  # Wavelength units
-        self.array_type = "Curved"  # Default array type
-        self.curvature_angle = 0.0  # Default curvature angle (in degrees)
-        self.current_frequency = 0
-        self.current_phase = 0
-        self.current_position = 0
-
-
-        # Set the initial state
-        self.linear_radio_button.setChecked(False)  
-        self.linear_radio_button.setText("Curved")  
-
-        self.update_radio_button_text(self.linear_radio_button.isChecked())
-        self.linear_radio_button.toggled.connect(self.update_radio_button_text)
-
-        # Connect spinbox signal for changing transmitter count
-        # self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_rows)
-        self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
-        self.frequency_slider.valueChanged.connect(self.update_frequency)
-        self.phase_slider.valueChanged.connect(self.update_phase)
-        self.position_slider.valueChanged.connect(self.update_position)
-
-        # Set up the table
-        # self.frequency_phase_table_2.setColumnCount(2)
-        # self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
-        # self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        # self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
+        self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
 
-        # Initialize phased array properties
+        # Initialize parameters
         self.num_transmitters = 2
-        self.frequencies = [1000] * self.num_transmitters  # Default frequency for each transmitter
+        self.frequencies = [1000000] * self.num_transmitters  # Default frequency for each transmitter
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
-        self.magnitudes = [1] * self.num_transmitters 
+        self.array_type = "curved"  # Default to curved
+        self.curvature_angle = 0.0  # Default curvature angle
+        self.element_spacing = 0.5  # Default element spacing
 
+        # Set the initial state of radio button
+        self.linear_radio_button.setChecked(False)
+        self.update_radio_button_text(self.linear_radio_button.isChecked())
+        self.linear_radio_button.toggled.connect(self.update_radio_button_text)
+
+        # Connect UI elements to methods
+        self.frequency_slider.setMinimum(1000000)
+        self.frequency_slider.setMaximum(2000000000)
+        self.frequency_slider.valueChanged.connect(self.update_frequency)
+        self.phase_slider.setMinimum(-180)
+        self.phase_slider.setMaximum(180)
+        self.phase_slider.valueChanged.connect(self.update_phase)
+        self.curvature_slider.setMinimum(0)
+        self.curvature_slider.setMaximum(180)
+        self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
+        self.no_transmitters_spinbox.setMinimum(2)
+        self.no_transmitters_spinbox.setMaximum(10)
+        self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
+
+        # Initialize the plots
         self.beam_forming()
-
-        # Create spinboxes for the transmitters
-        for row in range(self.num_transmitters):
-            self.add_custom_widget(row, 0, "frequency")
-            self.add_custom_widget(row, 1, "phase")
 
         
     def open_file(self, frame, mouseevent):
@@ -713,193 +693,82 @@ class MainWindow(QtWidgets.QMainWindow):
 
     ############### PART B ###################
 
-    # def update_transmitter_rows(self):
-    #     """
-    #     Updates the number of rows in the frequency and phase table based on the transmitter count.
-    #     """
-    #     count = self.no_transmitters_spinbox.value()
-    #     current_rows = self.frequency_phase_table_2.rowCount()
-
-    #     # Add or remove rows to match the transmitter count
-    #     while count > current_rows:
-    #         self.add_table_row()
-    #         self.magnitudes.append(1)
-    #         current_rows += 1
-    #     while count < current_rows:
-    #         self.frequencies.pop()
-    #         self.phases.pop()
-    #         self.magnitudes.pop()
-    #         self.frequency_phase_table_2.removeRow(current_rows - 1)
-    #         current_rows -= 1
-
-    #     # Recalculate beamforming after updating rows
-    #     self.beam_forming()
-
-    # def add_table_row(self):
-    #     """
-    #     Adds a new row with default widgets for frequency and phase.
-    #     """
-    #     row_position = self.frequency_phase_table_2.rowCount()
-    #     self.frequency_phase_table_2.insertRow(row_position)
-
-    #     # Ensure the frequencies, phases, and magnitudes lists have room for the new row
-    #     self.frequencies.append(1000)  # Default frequency
-    #     self.phases.append(0.0)  # Default phase
-    #     self.magnitudes.append(1)  # Default magnitude
-
-    #     # Create new spin boxes for frequency and phase
-    #     freq_spinbox = QSpinBox()
-    #     freq_spinbox.setMinimum(1)
-    #     freq_spinbox.setMaximum(10000)
-    #     freq_spinbox.setValue(self.frequencies[row_position])  # Default frequency value
-    #     freq_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "frequency", value))
-
-    #     phase_spinbox = QDoubleSpinBox()
-    #     phase_spinbox.setMinimum(-180)
-    #     phase_spinbox.setMaximum(180)
-    #     phase_spinbox.setValue(self.phases[row_position])  # Default phase value
-    #     phase_spinbox.setSingleStep(0.1)
-    #     phase_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "phase", value))
-
-    #     # Add the frequency spin box to the first column
-    #     freq_layout = QVBoxLayout()
-    #     freq_layout.addWidget(freq_spinbox)
-    #     freq_layout.setAlignment(Qt.AlignCenter)
-    #     freq_widget = QWidget()
-    #     freq_widget.setLayout(freq_layout)
-    #     self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
-
-    #     # Add the phase spin box to the second column
-    #     phase_layout = QVBoxLayout()
-    #     phase_layout.addWidget(phase_spinbox)
-    #     phase_layout.setAlignment(Qt.AlignCenter)
-    #     phase_widget = QWidget()
-    #     phase_widget.setLayout(phase_layout)
-    #     self.frequency_phase_table_2.setCellWidget(row_position, 1, phase_widget)
-
     def update_radio_button_text(self, checked):
-        """
-        Updates the UI based on the radio button state.
-        If checked, the radio button text changes to 'Curved', and curvature angle controls are shown.
-        If unchecked, the radio button text changes to 'Linear', and curvature angle controls are hidden.
-        """
         if checked:
-            self.linear_radio_button.setText("Linear") # Update the label next to the radio button
-            self.curvature_angle_label.setVisible(False)  # Hide the "Curvature Angle" label
-            self.curvature_lcd.hide()  #hide the lcd
-            self.curvature_slider.hide()  # hide the slider
+            self.array_type = "linear"
+            self.linear_radio_button.setText("Linear")
+            self.curvature_slider.hide()
+            self.curvature_lcd.hide()
         else:
-            self.linear_radio_button.setText("Curved")  # Update the label next to the radio button
-            self.curvature_angle_label.setVisible(True)  # Show the "Curvature Angle" label
-            self.curvature_lcd.show() # Show the lcd
-            self.curvature_slider.show()  # Show the slider
+            self.array_type = "curved"
+            self.linear_radio_button.setText("Curved")
+            self.curvature_slider.show()
+            self.curvature_lcd.show()
+        self.beam_forming()
 
+    def update_transmitter_count(self, count):
+        print(f"no transmitters updated: {count}")
+        self.num_transmitters = count
+        self.frequencies = [self.frequencies[0]] * count
+        self.phases = [self.phases[0]] * count
+        self.beam_forming()
 
-    def add_custom_widget(self, row, col, mode):
-        """
-        Add a spinbox to the table for either frequency or phase adjustments.
-        """
-        widget = QtWidgets.QSpinBox() if mode == "frequency" else QtWidgets.QDoubleSpinBox()
-        widget.setMinimum(1 if mode == "frequency" else -180)
-        widget.setMaximum(10000 if mode == "frequency" else 180)
-        widget.setValue(self.frequencies[row] if mode == "frequency" else self.phases[row])
+    def update_frequency(self, value):
+        print(f"Frequency updated: {value}")
+        self.frequencies = [value] * self.num_transmitters
+        self.frequency_lcd.display(value)
+        self.beam_forming()
 
-        # Connect signal to update plots dynamically
-        widget.valueChanged.connect(lambda value, r=row, c=col, m=mode: self.update_parameters(r, m, value))
+    def update_phase(self, value):
+        print(f"Phase updated: {value}")
+        self.phases = [value] * self.num_transmitters
+        self.phase_lcd.display(value)
+        self.beam_forming()
 
-        # Add the widget to the corresponding cell in the table
-        # self.frequency_phase_table_2.setCellWidget(row, col, widget)
-
-    def update_parameters(self, row, mode, value):
-        """
-        Update parameters based on spinbox changes and regenerate plots.
-        """
-        if mode == "frequency":
-            self.frequencies[row] = value  # Update frequency for the transmitter
-            wavelength = 3e8 / self.frequencies[row]  # Wavelength in meters
-            self.element_spacing = wavelength / 2  # Spacing is half the wavelength
-        elif mode == "phase":
-            self.phases[row] = value  # Update phase for the transmitter
-
-        # Recalculate and update the plots
+    def update_curvature_angle(self, value):
+        print(f"curved angle updated: {value}")
+        self.curvature_angle = value
+        self.curvature_lcd.display(value)
         self.beam_forming()
 
     def beam_forming(self):
-        """
-        Generate and display the beam pattern and ripple wave interference map for the phased array.
-        """
+        print(f"self.frequencies updated: {self.frequencies}")
+        print(f"self.phases updated: {self.phases}")
+        print(f"self.array_type updated: {self.array_type}")
+        print(f"self.curvature_angle updated: {self.curvature_angle}")
+
         visualizer = Visualizer()
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
 
-        # Generate ripple and beam pattern
-        ripple_wave_fig = visualizer.plot_wave_propagation_pattern(
-            num_transmitters=len(self.frequencies),
+        # Generate and display the plots
+        field_map_fig = visualizer.plot_field_map(
+            num_transmitters=self.num_transmitters,
             element_spacing=self.element_spacing,
-            frequency=np.mean(self.frequencies),
-            phases=self.phases
+            frequency=self.frequencies[0],
+            phases=self.phases,
+            curvature_angle=self.curvature_angle,
         )
         beam_pattern_fig = visualizer.plot_beam_pattern_polar()
 
-        # Display plots
-        self.display_plot(self.beam_map_view, ripple_wave_fig)  
-        self.display_plot(self.beam_plot_view, beam_pattern_fig)  
+        self.display_plot(self.beam_map_view, field_map_fig)
+        self.display_plot(self.beam_plot_view, beam_pattern_fig)
 
-       
-    
     def display_plot(self, widget, figure):
-        """
-        Utility to render a matplotlib plot into a QWidget.
-        """
         from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
         from PyQt5.QtWidgets import QVBoxLayout
 
-        # Ensure the widget has a layout
         if widget.layout() is None:
             widget.setLayout(QVBoxLayout())
 
-        # Clear any existing widgets in the layout
         layout = widget.layout()
         for i in reversed(range(layout.count())):
             layout.itemAt(i).widget().deleteLater()
 
-        # Create a new FigureCanvas and add it to the layout
         canvas = FigureCanvas(figure)
         layout.addWidget(canvas)
         layout.setAlignment(QtCore.Qt.AlignCenter)
-    
-    def update_curvature_angle(self, value):
-        """
-        Updates the curvature angle for the phased array and recalculates the beamforming pattern.
-        """
-        self.curvature_angle = value  # Update the curvature angle
-        self.curvature_lcd.display(value)  # Update the LCD display
-        self.beam_forming()  # Recalculate the beamforming pattern
-
-    def update_frequency(self, value):
-        """
-        Updates the frequency for the phased array and recalculates the beamforming pattern.
-        """
-        self.current_frequency = value
-        self.frequency_lcd.display(value)  # Update the LCD display
-        self.beam_forming()
-    
-    def update_phase(self, value):
-        """
-        Updates the phase for the phased array and recalculates the beamforming pattern.
-        """
-        self.current_phase = value
-        self.phase_lcd.display(value)  # Update the LCD display
-        self.beam_forming()
-    
-    def update_position(self, value):
-        """
-        Updates the position for the phased array and recalculates the beamforming pattern.
-        """
-        self.current_position = value
-        self.position_lcd.display(value)  # Update the LCD display
-        self.beam_forming()
 
 # Entry point of the application
 if __name__ == '__main__':
