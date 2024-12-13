@@ -119,6 +119,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
         self.beam_position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
+        self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
+
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
@@ -146,14 +148,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.setMinimum(-180)
         self.phase_slider.setMaximum(180)
         self.phase_slider.valueChanged.connect(self.update_phase)
-        self.curvature_slider.setMinimum(0)
+        self.curvature_slider.setMinimum(1)
         self.curvature_slider.setMaximum(360)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
         self.no_transmitters_spinbox.setMaximum(100)
         self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
-        self.beam_position_slider.setMinimum(-15)
-        self.beam_position_slider.setMaximum(15)
+        self.beam_position_slider.setMinimum(-10)
+        self.beam_position_slider.setMaximum(10)
         self.beam_position_slider.setSingleStep(1)
         self.beam_position_slider.valueChanged.connect(self.update_array_position)
 
@@ -746,6 +748,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print(f"Array position updated: {value}")
         # Update both X and Y positions to the same value
         self.array_position = [value, value]
+        self.position_lcd.display(value)
         self.beam_forming()
 
     def beam_forming(self):
@@ -758,7 +761,8 @@ class MainWindow(QtWidgets.QMainWindow):
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
-        
+        visualizer.set_position_offset(self.array_position[0], self.array_position[1])
+
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
             num_transmitters=self.num_transmitters,

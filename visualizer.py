@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5 import QtWidgets
 
 class Visualizer:
     def __init__(self):
@@ -11,18 +9,17 @@ class Visualizer:
         self.array_type = "linear"  
         self.curvature_angle = 0.0  
         self.element_spacing = 0.5  
+        self.position_offset = [0, 0]  # Default position offset (x, y)
 
     def set_frequencies(self, frequencies):
         self.frequencies = frequencies
         if len(self.magnitudes) < len(frequencies):
             self.magnitudes = [1] * len(frequencies) 
         print(f"self.frequencies in visualizer: {self.frequencies}")
-         
 
     def set_phases(self, phases):
         self.phases = phases
         print(f"self.phases in visualizer: {self.phases}")
-
 
     def set_array_type(self, array_type, curvature_angle):
         self.array_type = array_type
@@ -30,47 +27,48 @@ class Visualizer:
         print(f"self.array_type in visualizer : {self.array_type}")
         print(f"self.curvature_angle in visualizer : {self.curvature_angle}")
 
+    def set_position_offset(self, offset_x, offset_y):
+        self.position_offset = [offset_x, offset_y]
+        print(f"self.position_offset: {self.position_offset}")
+
     def calculate_positions(self, num_elements):
+        """
+        Calculate the positions of the transmitters based on the array type (linear/curved),
+        curvature angle, and the position offset.
+        """
         if self.array_type == "linear":
+            # Linear array positions
             x_positions = np.linspace(-num_elements * self.element_spacing / 2,
-                                       num_elements * self.element_spacing / 2,
-                                       num_elements)
+                                    num_elements * self.element_spacing / 2,
+                                    num_elements)
             y_positions = np.zeros_like(x_positions)
         else:
+            # Curved array positions
             curvature = np.radians(self.curvature_angle)
             theta = np.linspace(-curvature / 2, curvature / 2, num_elements)
-            radius = num_elements * self.element_spacing / curvature if curvature != 0 else 0
+            radius = (num_elements * self.element_spacing) / curvature if curvature != 0 else 0
+
+            # Calculate positions on the arc
             x_positions = radius * np.sin(theta)
-            y_positions = radius * np.cos(theta)
+            y_positions = -radius * (1 - np.cos(theta))  # Negative for downward-facing arc
+
+        # Apply position offset
+        x_positions += self.position_offset[0]
+        y_positions += self.position_offset[1]
+
         return x_positions, y_positions
 
-    
     def plot_field_map(self, num_transmitters, element_spacing, frequency, phases, curvature_angle):
         """
-        Generate and plot a heat map in polar coordinates showing constructive and destructive interference.
-
-        Parameters:
-            num_transmitters (int): Number of transmitters.
-            element_spacing (float): Spacing between transmitters (in meters).
-            frequency (float): Frequency of waves (in Hz).
-            phases (list): Phase shifts for each transmitter (in degrees).
-            curvature_angle (float): Curvature angle for curved arrays (in degrees).
+        Generate and plot a heat map in polar coordinates showing constructive and destructive interference,
+        ensuring the effect rotates in place around the red dots (transmitter positions).
         """
         c = 3e8  # Speed of light (m/s)
         wavelength = c / frequency
         k = 2 * np.pi / wavelength  # Wave number
 
-        # Calculate transmitter positions based on curvature angle
-        if curvature_angle == 0:  # Linear array
-            total_width = (num_transmitters - 1) * element_spacing
-            positions_x = np.linspace(-total_width / 2, total_width / 2, num_transmitters)
-            positions_y = np.zeros_like(positions_x)
-        else:  # Curved array
-            curvature = np.radians(curvature_angle)
-            angles = np.linspace(-curvature / 2, curvature / 2, num_transmitters)
-            radius = num_transmitters * element_spacing / curvature
-            positions_x = radius * np.sin(angles)
-            positions_y = radius * (1 - np.cos(angles))
+        # Calculate transmitter positions with offset
+        positions_x, positions_y = self.calculate_positions(num_transmitters)
 
         # Define grid for heat map calculation in polar coordinates
         grid_size = 500  # Number of points along one axis
@@ -87,29 +85,47 @@ class Visualizer:
 
         # Compute the heat map based on interference from each transmitter
         for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
+            # Calculate distance from each grid point to the transmitter
             distance = np.sqrt((X - pos_x) ** 2 + (Y - pos_y) ** 2) + 1e-6  # Avoid division by zero
+
+            # Include phase effect in the wave computation
             phase_shift = np.radians(phases[i]) if i < len(phases) else 0
-            wave = np.exp(1j * (k * distance + phase_shift))
+            wave = np.exp(1j * (k * distance + phase_shift))  # Phase influences the interference pattern
             heat_map += wave
 
         # Calculate interference pattern intensity
         intensity = np.abs(heat_map) ** 2
 
-        # Normalize intensity for consistency with beam pattern
+        # Normalize intensity for visualization
         intensity /= np.max(intensity)
 
-        # Adjust phase contribution to match beam pattern logic by rotating the intensity
+        # Apply phase rotation to shift the pattern around the red dots
         if phases:
-            total_phase_shift = np.mean(np.radians(phases))
-            theta_shift = int(total_phase_shift / (2 * np.pi) * grid_size)
-            intensity = np.roll(intensity, shift=theta_shift, axis=0)
+            total_phase_shift = np.mean(np.radians(phases))  # Compute the mean phase shift
+            theta_shift = int(total_phase_shift / (2 * np.pi) * grid_size)  # Convert phase shift to grid index shift
+
+            for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
+                # Translate the intensity to center on the transmitter position
+                shifted_X = X - pos_x
+                shifted_Y = Y - pos_y
+
+                # Rotate the grid around the origin
+                rotated_X = shifted_X * np.cos(total_phase_shift) - shifted_Y * np.sin(total_phase_shift)
+                rotated_Y = shifted_X * np.sin(total_phase_shift) + shifted_Y * np.cos(total_phase_shift)
+
+                # Rotate the intensity in place
+                intensity = np.roll(intensity, shift=theta_shift, axis=0)
+
+                # Translate the grid back to the transmitter's position
+                X = rotated_X + pos_x
+                Y = rotated_Y + pos_y
 
         # Plot the heat map in polar coordinates
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
         heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
         fig.colorbar(heat_plot, ax=ax, label="Interference Intensity")
 
-        # Overlay transmitter positions
+        # Overlay transmitter positions (red dots)
         transmitter_r = np.sqrt(positions_x**2 + positions_y**2)
         transmitter_theta = np.arctan2(positions_y, positions_x)
         ax.plot(transmitter_theta, transmitter_r, 'ro', markersize=5)  # Transmitter markers
@@ -120,35 +136,15 @@ class Visualizer:
         return fig
 
     def plot_beam_pattern_polar(self, num_transmitters, element_spacing, frequency, phases, curvature_angle):
-        """
-        Generate and plot the beam pattern in polar coordinates, reflecting the intensity and directionality
-        of the transmitted signals based on frequency, phases, and curvature angle.
-
-        Parameters:
-            num_transmitters (int): Number of transmitters.
-            element_spacing (float): Spacing between transmitters (in meters).
-            frequency (float): Frequency of waves (in Hz).
-            phases (list): Phase shifts for each transmitter (in degrees).
-            curvature_angle (float): Curvature angle for curved arrays (in degrees).
-        """
+        # Existing logic
         c = 3e8  # Speed of light (m/s)
         wavelength = c / frequency
         k = 2 * np.pi / wavelength  # Wave number
 
-        # Calculate transmitter positions based on curvature angle
-        if curvature_angle == 0:  # Linear array
-            total_width = (num_transmitters - 1) * element_spacing
-            positions_x = np.linspace(-total_width / 2, total_width / 2, num_transmitters)
-            positions_y = np.zeros_like(positions_x)
-        else:  # Curved array
-            curvature = np.radians(curvature_angle)
-            angles = np.linspace(-curvature / 2, curvature / 2, num_transmitters)
-            radius = num_transmitters * element_spacing / curvature
-            positions_x = radius * np.sin(angles)
-            positions_y = radius * (1 - np.cos(angles))
+        # Calculate transmitter positions with offset
+        positions_x, positions_y = self.calculate_positions(num_transmitters)
 
         # Define angular range for beam pattern calculation
-        theta = np.linspace(0, 2 * np.pi, 360)
         angles = np.linspace(0, 2 * np.pi, 360)  # Angular directions
 
         # Initialize the beam pattern
