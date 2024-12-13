@@ -121,13 +121,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
         self.frequency_phase_table_2 = self.findChild(QtWidgets.QTableWidget, "frequency_phase_table_2")
+        self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
 
         # Initialize parameters
         self.frequencies = []
         self.phases = []
         self.magnitudes = []
         self.element_spacing = 0.5  # Wavelength units
-        self.array_type = "curved"  # Default array type
+        self.array_type = "Curved"  # Default array type
         self.curvature_angle = 0.0  # Default curvature angle (in degrees)
         self.current_frequency = 0
         self.current_phase = 0
@@ -783,12 +784,12 @@ class MainWindow(QtWidgets.QMainWindow):
         If unchecked, the radio button text changes to 'Linear', and curvature angle controls are hidden.
         """
         if checked:
-            self.linear_radio_button.setText("linear") # Update the label next to the radio button
+            self.linear_radio_button.setText("Linear") # Update the label next to the radio button
             self.curvature_angle_label.setVisible(False)  # Hide the "Curvature Angle" label
             self.curvature_lcd.hide()  #hide the lcd
             self.curvature_slider.hide()  # hide the slider
         else:
-            self.linear_radio_button.setText("curved")  # Update the label next to the radio button
+            self.linear_radio_button.setText("Curved")  # Update the label next to the radio button
             self.curvature_angle_label.setVisible(True)  # Show the "Curvature Angle" label
             self.curvature_lcd.show() # Show the lcd
             self.curvature_slider.show()  # Show the slider
