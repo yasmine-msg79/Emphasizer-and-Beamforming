@@ -46,7 +46,7 @@ class Visualizer:
             raise ValueError("No elements in the phased array for plotting beam pattern.")
 
         # Angular range for the plot (0° to 180°)
-        angles = np.linspace(0, np.pi, 360)  # From 0° to 180° in radians
+        angles = np.linspace(0, 2 * np.pi, 360)  # From 0° to 180° in radians
         c = 3e8  # Speed of light in m/s
         wavelength = c / self.frequencies[0]  # Wavelength based on the first frequency
         k = 2 * np.pi / wavelength  # Wave number
@@ -71,12 +71,12 @@ class Visualizer:
         AF_dB = 20 * np.log10(np.abs(AF) + 1e-12)
 
         # Create the polar plot
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 6))
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
         ax.plot(angles, AF_dB, color="blue", linewidth=2)
         ax.set_theta_zero_location("E")  # East as 0 degrees (horizontal line on the right)
         ax.set_theta_direction(1)  # Anti-clockwise direction
         ax.set_thetamin(0)  # Start at 0 degrees (horizontal line on the right)
-        ax.set_thetamax(180)  # End at 180 degrees (horizontal line on the left)
+        ax.set_thetamax(360)  # End at 180 degrees (horizontal line on the left)
         ax.set_ylim(np.min(AF_dB) - 5, np.max(AF_dB) + 5)  # Dynamic range
         ax.set_title(f"Beam Pattern with {num_elements} Elements", va='bottom')
         ax.grid(True)
@@ -131,10 +131,10 @@ class Visualizer:
         )
 
         # Plot the field map
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(8, 8))
         field_plot = ax.imshow(
             normalized_field_intensity,
-            extent=(-grid_size / 2, grid_size / 2, -grid_size / 2, grid_size / 2),
+            extent=(-grid_size, grid_size, -grid_size / 2, grid_size / 2),
             cmap="RdBu_r",
             origin="lower",
             interpolation="none",
