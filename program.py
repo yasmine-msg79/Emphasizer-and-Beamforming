@@ -118,6 +118,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
+        self.beam_position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
@@ -130,6 +131,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.array_type = "curved"  # Default to curved
         self.curvature_angle = 0.0  # Default curvature angle
         self.element_spacing = 0.5  # Default element spacing
+        self.array_position = [0, 0]  # Default position of the array
 
         # Set the initial state of radio button
         self.linear_radio_button.setChecked(False)
@@ -150,6 +152,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.no_transmitters_spinbox.setMinimum(2)
         self.no_transmitters_spinbox.setMaximum(100)
         self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
+        self.beam_position_slider.setMinimum(-15)
+        self.beam_position_slider.setMaximum(15)
+        self.beam_position_slider.setSingleStep(1)
+        self.beam_position_slider.valueChanged.connect(self.update_array_position)
+
 
         # Initialize the plots
         self.beam_forming()
@@ -697,11 +704,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_radio_button_text(self, checked):
         if checked:
             self.array_type = "linear"
+            self.curvature_angle_previous = self.curvature_angle
+            self.curvature_angle = 0
             self.linear_radio_button.setText("Linear")
             self.curvature_slider.hide()
             self.curvature_lcd.hide()
         else:
             self.array_type = "curved"
+            self.curvature_angle = getattr(self, 'curvature_angle_previous', 0)
             self.linear_radio_button.setText("Curved")
             self.curvature_slider.show()
             self.curvature_lcd.show()
@@ -732,6 +742,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curvature_lcd.display(value)
         self.beam_forming()
 
+    def update_array_position(self, value):
+        print(f"Array position updated: {value}")
+        # Update both X and Y positions to the same value
+        self.array_position = [value, value]
+        self.beam_forming()
+
     def beam_forming(self):
         print(f"self.frequencies updated: {self.frequencies}")
         print(f"self.phases updated: {self.phases}")
@@ -742,7 +758,7 @@ class MainWindow(QtWidgets.QMainWindow):
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
-
+        
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
             num_transmitters=self.num_transmitters,
@@ -757,10 +773,9 @@ class MainWindow(QtWidgets.QMainWindow):
             element_spacing=self.element_spacing,
             frequency=self.frequencies[0],
             phases=self.phases,
-            # curvature_angle=self.curvature_angle,
-           
+            curvature_angle=self.curvature_angle,
         )
-
+        
         self.display_plot(self.beam_map_view, field_map_fig)
         self.display_plot(self.beam_plot_view, beam_pattern_fig)
 
