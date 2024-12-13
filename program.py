@@ -121,6 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
+        self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
 
         # Initialize parameters
         self.num_transmitters = 2
