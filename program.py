@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import QHeaderView
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidgetItem, QSpinBox, QVBoxLayout, QDoubleSpinBox, QHeaderView
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox)
-import beamPlot
+import scenarios
 from visualizer import Visualizer
 from PIL import Image
 
@@ -118,7 +118,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
-
+        self.position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
         self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
@@ -149,6 +149,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.no_transmitters_spinbox.setMinimum(2)
         self.no_transmitters_spinbox.setMaximum(10)
         self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
+        self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
 
         # Initialize the plots
         self.beam_forming()
@@ -769,6 +770,36 @@ class MainWindow(QtWidgets.QMainWindow):
         canvas = FigureCanvas(figure)
         layout.addWidget(canvas)
         layout.setAlignment(QtCore.Qt.AlignCenter)
+
+    def update_scenario_parameters(self):
+        scenario = self.scenario_combobox.currentText()
+        parameters = scenarios.ScenarioParameters()
+        if scenario == "5G":
+            parameters.update_parameters("5G")
+            parameters.display_parameters()
+        elif scenario == "Ultrasound":
+            parameters.update_parameters("Ultrasound")
+            parameters.display_parameters()
+        elif scenario == "Tumor Ablation":
+            parameters.update_parameters("Tumor Ablation")
+            parameters.display_parameters()
+        else:
+            parameters.update_parameters("Custom")
+            parameters.display_parameters()
+        
+        self.frequency_slider.setValue(parameters.frequency)
+        self.phase_slider.setValue(parameters.phase)
+        self.curvature_slider.setValue(parameters.curvature_angle)
+        self.position_slider.setValue(parameters.position_between_transmitters)
+        self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
+
+        print(f"Scenario updated: {scenario}")
+        print(f"self.frequencies updated: {self.frequencies}")
+        print(f"self.phases updated: {self.phases}")
+        print(f"self.array_type updated: {self.array_type}")
+        print(f"self.curvature_angle updated: {self.curvature_angle}")
+
+        self.beam_forming()
 
 # Entry point of the application
 if __name__ == '__main__':
