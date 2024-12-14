@@ -119,8 +119,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
+        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "curvature_angle_label")
         self.beam_position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
         self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
+        self.beam_position_y_slider = self.findChild(QtWidgets.QSlider, "position_y_slider")
+        self.position_y_lcd = self.findChild(QtWidgets.QLCDNumber, "position_y_lcd")
+        self.curvature_unit_label = self.findChild(QtWidgets.QLabel, "label_12")
 
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
@@ -158,7 +162,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_slider.setMinimum(-10)
         self.beam_position_slider.setMaximum(10)
         self.beam_position_slider.setSingleStep(1)
-        self.beam_position_slider.valueChanged.connect(self.update_array_position)
+        self.beam_position_slider.valueChanged.connect(self.update_array_Xposition)
+        self.beam_position_y_slider.setMinimum(-10)
+        self.beam_position_y_slider.setMaximum(10)
+        self.beam_position_y_slider.setSingleStep(1)
+        self.beam_position_y_slider.valueChanged.connect(self.update_array_Yposition)
 
         self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
 
@@ -715,12 +723,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.linear_radio_button.setText("Linear")
             self.curvature_slider.hide()
             self.curvature_lcd.hide()
+            self.curvature_angle_label.hide()
+            self.curvature_unit_label.hide()
         else:
             self.array_type = "curved"
             self.curvature_angle = getattr(self, 'curvature_angle_previous', 0)
             self.linear_radio_button.setText("Curved")
             self.curvature_slider.show()
             self.curvature_lcd.show()
+            self.curvature_angle_label.show()
+            self.curvature_unit_label.show()
         self.beam_forming()
 
     def update_transmitter_count(self, count):
@@ -733,7 +745,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_frequency(self, value):
         print(f"Frequency updated: {value}")
         self.frequencies = [value] * self.num_transmitters
-        self.frequency_lcd.display(value)
+        self.frequency_lcd.display(value//1000000)
         self.beam_forming()
 
     def update_phase(self, value):
@@ -748,11 +760,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curvature_lcd.display(value)
         self.beam_forming()
 
-    def update_array_position(self, value):
-        print(f"Array position updated: {value}")
-        # Update both X and Y positions to the same value
-        self.array_position = [value, value]
+    def update_array_Xposition(self, value):
+        print(f"Array position x updated: {value}")
+        self.array_position[0] = [value]
         self.position_lcd.display(value)
+        self.beam_forming()
+
+    def update_array_Yposition(self,value):
+        print(f"Array position y updated: {value}")
+        self.array_position[1] = [value]
+        self.position_y_lcd.display(value)
         self.beam_forming()
 
     def beam_forming(self):
@@ -821,8 +838,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_slider.setValue(parameters.frequency)
         self.phase_slider.setValue(parameters.phase)
         self.curvature_slider.setValue(parameters.curvature_angle)
-        self.position_slider.setValue(parameters.position_between_transmitters)
+        self.beam_position_slider.setValue(parameters.position_between_transmitters)
         self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
+        self.beam_position_slider.setValue(parameters.positionX)
+        self.beam_position_y_slider.setValue(parameters.positionY)
 
         print(f"Scenario updated: {scenario}")
         print(f"self.frequencies updated: {self.frequencies}")
