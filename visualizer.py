@@ -1,99 +1,180 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 class Visualizer:
     def __init__(self):
-        self.frequencies = []
-        self.phases = []
-        self.array_type = "linear"
-        self.curvature_angle = 0.0
-        self.element_spacing = 0.5  # Default spacing in wavelength units
+        self.frequencies = [] 
+        self.phases = []  
+        self.magnitudes = []  
+        self.array_type = "linear"  
+        self.curvature_angle = 0.0  
+        self.element_spacing = 0.5  
+        self.position_offset = [0, 0]  # Default position offset (x, y)
 
     def set_frequencies(self, frequencies):
         self.frequencies = frequencies
+        if len(self.magnitudes) < len(frequencies):
+            self.magnitudes = [1] * len(frequencies) 
+        print(f"self.frequencies in visualizer: {self.frequencies}")
 
     def set_phases(self, phases):
         self.phases = phases
+        print(f"self.phases in visualizer: {self.phases}")
 
     def set_array_type(self, array_type, curvature_angle):
         self.array_type = array_type
         self.curvature_angle = curvature_angle
+        print(f"self.array_type in visualizer : {self.array_type}")
+        print(f"self.curvature_angle in visualizer : {self.curvature_angle}")
 
-    def calculate_positions(self):
+    def set_position_offset(self, offset_x, offset_y):
+        self.position_offset = [offset_x, offset_y]
+        print(f"self.position_offset: {self.position_offset}")
+
+    def calculate_positions(self, num_elements):
         """
-        Calculate element positions based on array type and curvature angle.
+        Calculate the positions of the transmitters based on the array type (linear/curved),
+        curvature angle, and the position offset.
         """
-        num_elements = len(self.frequencies)
         if self.array_type == "linear":
-            # Linear array along the x-axis
-            return np.array([(n * self.element_spacing, 0) for n in range(num_elements)])
-        else:  # Curved array
+            # Linear array positions
+            x_positions = np.linspace(-num_elements * self.element_spacing / 2,
+                                    num_elements * self.element_spacing / 2,
+                                    num_elements)
+            y_positions = np.zeros_like(x_positions)
+        else:
+            # Curved array positions
             curvature = np.radians(self.curvature_angle)
             theta = np.linspace(-curvature / 2, curvature / 2, num_elements)
-            return np.column_stack((np.sin(theta), np.cos(theta))) * num_elements * self.element_spacing
+            radius = (num_elements * self.element_spacing) / curvature if curvature != 0 else 0
 
+            # Calculate positions on the arc
+            x_positions = radius * np.sin(theta)
+            y_positions = -radius * (1 - np.cos(theta))  # Negative for downward-facing arc
 
-    def plot_beam_pattern(self):
-            """
-            Generate and return the heatmap for the beamforming pattern.
-            """
-            import numpy as np
-            import matplotlib.pyplot as plt
+        # Apply position offset
+        x_positions += self.position_offset[0]
+        y_positions += self.position_offset[1]
 
-            k = 2 * np.pi  # Wavenumber (normalized for simplicity)
+        return x_positions, y_positions
 
-            # Calculate element positions
-            positions = self.calculate_positions()
-
-            # Spatial grid
-            x = np.linspace(-2, 2, 300)
-            y = np.linspace(-2, 2, 300)
-            X, Y = np.meshgrid(x, y)
-            field = np.zeros_like(X, dtype=complex)
-
-            # Sum contributions from all elements
-            for (px, py), freq, phase in zip(positions, self.frequencies, self.phases):
-                r = np.sqrt((X - px)**2 + (Y - py)**2)
-                field += np.exp(1j * (k * r + np.radians(phase)))
-
-            # Calculate intensity
-            intensity = np.abs(field)**2
-
-            # Plot heatmap
-            fig, ax = plt.subplots(figsize=(6, 6))
-            c = ax.contourf(X, Y, intensity, levels=50, cmap="viridis")
-            fig.colorbar(c, ax=ax).set_label("Signal Intensity")
-            ax.set_title("Beamforming Heatmap")
-            ax.set_xlabel("X (wavelength units)")
-            ax.set_ylabel("Y (wavelength units)")
-            return fig
-
-    def plot_phase_magnitude(self):
+    def plot_field_map(self, num_transmitters, element_spacing, frequency, phases, curvature_angle):
         """
-        Generate and return the phase-magnitude plot for the transmitters.
+        Generate and plot a heat map in polar coordinates showing constructive and destructive interference,
+        ensuring the effect rotates in place around the red dots (transmitter positions).
         """
-        import matplotlib.pyplot as plt
+        c = 3e8  # Speed of light (m/s)
+        wavelength = c / frequency
+        k = 2 * np.pi / wavelength  # Wave number
 
-        num_elements = len(self.frequencies)
-        if num_elements == 0:
-            raise ValueError("No elements in the phased array for plotting phase-magnitude.")
+        # Calculate transmitter positions with offset
+        positions_x, positions_y = self.calculate_positions(num_transmitters)
 
-        # Generate data for plotting
-        x = range(1, num_elements + 1)  # Transmitter indices
-        phases = self.phases  # Phases (degrees)
-        magnitudes = [1] * num_elements  # Magnitudes are typically uniform (can be adjusted)
+        # Define grid for heat map calculation in polar coordinates
+        grid_size = 500  # Number of points along one axis
+        r = np.linspace(0, 15, grid_size)
+        theta = np.linspace(0, 2 * np.pi, grid_size)
+        R, Theta = np.meshgrid(r, theta)
 
-        # Plot the phase vs. magnitude
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.plot(x, phases, label="Phase (degrees)", marker="o")
-        ax.stem(x, magnitudes, linefmt="g-", markerfmt="go", basefmt="r-", label="Magnitude")
+        # Convert polar grid to Cartesian coordinates
+        X = R * np.cos(Theta)
+        Y = R * np.sin(Theta)
 
-        # Add labels and title
-        ax.set_title("Phase vs Magnitude")
-        ax.set_xlabel("Transmitter Index")
-        ax.set_ylabel("Value")
-        ax.legend()
+        # Initialize the heat map
+        heat_map = np.zeros_like(X, dtype=complex)
+
+        # Compute the heat map based on interference from each transmitter
+        for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
+            # Calculate distance from each grid point to the transmitter
+            distance = np.sqrt((X - pos_x) ** 2 + (Y - pos_y) ** 2) + 1e-6  # Avoid division by zero
+
+            # Include phase effect in the wave computation
+            phase_shift = np.radians(phases[i]) if i < len(phases) else 0
+            wave = np.exp(1j * (k * distance + phase_shift))  # Phase influences the interference pattern
+            heat_map += wave
+
+        # Calculate interference pattern intensity
+        intensity = np.abs(heat_map) ** 2
+
+        # Normalize intensity for visualization
+        intensity /= np.max(intensity)
+
+        # Apply phase rotation to shift the pattern around the red dots
+        if phases:
+            total_phase_shift = np.mean(np.radians(phases))  # Compute the mean phase shift
+            theta_shift = int(total_phase_shift / (2 * np.pi) * grid_size)  # Convert phase shift to grid index shift
+
+            for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
+                # Translate the intensity to center on the transmitter position
+                shifted_X = X - pos_x
+                shifted_Y = Y - pos_y
+
+                # Rotate the grid around the origin
+                rotated_X = shifted_X * np.cos(total_phase_shift) - shifted_Y * np.sin(total_phase_shift)
+                rotated_Y = shifted_X * np.sin(total_phase_shift) + shifted_Y * np.cos(total_phase_shift)
+
+                # Rotate the intensity in place
+                intensity = np.roll(intensity, shift=theta_shift, axis=0)
+
+                # Translate the grid back to the transmitter's position
+                X = rotated_X + pos_x
+                Y = rotated_Y + pos_y
+
+        # Plot the heat map in polar coordinates
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
+        heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
+        fig.colorbar(heat_plot, ax=ax, label="Interference Intensity")
+
+        # Overlay transmitter positions (red dots)
+        transmitter_r = np.sqrt(positions_x**2 + positions_y**2)
+        transmitter_theta = np.arctan2(positions_y, positions_x)
+        ax.plot(transmitter_theta, transmitter_r, 'ro', markersize=5)  # Transmitter markers
+
+        ax.set_title(f"Heat Map in Polar Coordinates ({num_transmitters} Transmitters, {frequency:.1f} Hz)", fontsize=14)
+        ax.set_rlabel_position(-22.5)  # Move radial labels to avoid overlap
+
+        return fig
+
+    def plot_beam_pattern_polar(self, num_transmitters, element_spacing, frequency, phases, curvature_angle):
+        # Existing logic
+        c = 3e8  # Speed of light (m/s)
+        wavelength = c / frequency
+        k = 2 * np.pi / wavelength  # Wave number
+
+        # Calculate transmitter positions with offset
+        positions_x, positions_y = self.calculate_positions(num_transmitters)
+
+        # Define angular range for beam pattern calculation
+        angles = np.linspace(0, 2 * np.pi, 360)  # Angular directions
+
+        # Initialize the beam pattern
+        beam_pattern = np.zeros_like(angles, dtype=complex)
+
+        # Compute the beam pattern based on contributions from each transmitter
+        for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
+            for idx, angle in enumerate(angles):
+                x = pos_x * np.cos(angle) + pos_y * np.sin(angle)
+                phase_shift = np.radians(phases[i]) if i < len(phases) else 0
+                wave = np.exp(1j * (k * x + phase_shift))
+                beam_pattern[idx] += wave
+
+        # Calculate intensity of the beam pattern
+        intensity = np.abs(beam_pattern) ** 2
+
+        # Normalize intensity for consistency
+        intensity /= np.max(intensity)
+
+        # Apply phase rotation to match the heat map logic
+        if phases:
+            total_phase_shift = np.mean(np.radians(phases))
+            theta_shift = int(total_phase_shift / (2 * np.pi) * len(angles))
+            intensity = np.roll(intensity, shift=theta_shift)
+
+        # Create the polar plot
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
+        ax.plot(angles, intensity, color="blue", linewidth=2)
+
+        ax.set_title(f"Beam Pattern ({num_transmitters} Transmitters, {frequency:.1f} Hz)", fontsize=14)
         ax.grid(True)
 
         return fig

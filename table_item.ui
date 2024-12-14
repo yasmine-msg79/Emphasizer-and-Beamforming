@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!-- <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>sliderSpinWidget</class>
  <widget class="QWidget" name="sliderSpinWidget">
@@ -82,4 +82,4 @@ QSpinBox::down-arrow {
  </widget>
  <resources/>
  <connections/>
-</ui>
+</ui> -->

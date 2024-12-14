@@ -34,32 +34,3 @@ class Visualizer:
         ax.set_title("Phase-Magnitude Plot")
         ax.legend()
         return fig
-import matplotlib.pyplot as plt
-import numpy as np
-
-class Visualizer:
-    def plot_beam_pattern(self):
-        """Generate the beamforming heatmap plot."""
-        x = np.linspace(-10, 10, 100)
-        y = np.linspace(-10, 10, 100)
-        X, Y = np.meshgrid(x, y)
-        Z = np.sin(np.sqrt(X**2 + Y**2))  # Example beamforming pattern
-
-        fig, ax = plt.subplots(figsize=(6, 4))
-        heatmap = ax.imshow(Z, extent=[-10, 10, -10, 10], origin='lower', cmap='viridis')
-        ax.set_title("Beamforming Heatmap")
-        plt.colorbar(heatmap, ax=ax)
-        return fig
-
-    def plot_phase_magnitude(self):
-        """Generate the phase-magnitude plot."""
-        x = np.linspace(0, 10, 500)
-        phase = np.sin(x)
-        magnitude = np.cos(x)
-
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.plot(x, phase, label='Phase')
-        ax.plot(x, magnitude, label='Magnitude')
-        ax.set_title("Phase-Magnitude Plot")
-        ax.legend()
-        return fig
