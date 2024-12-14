@@ -59,6 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fourierimage4 = QtWidgets.QGraphicsScene()
         self.Gimage4.setScene(self.fourierimage4)
         self.current_images = [None,None,None,None]
+        self.preserved_images= [None,None,None,None]
         self.output1_image = None
         self.ft_components = [{},{},{},{}]
         self.Fourier_comboBox_1.currentIndexChanged.connect(lambda: self.update_ft_component(0))
@@ -80,7 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.brightness = [0] * 4  # Assuming 4 frames
         self.contrast = [1.0] * 4
 
-        for i in range(1, 5):  # Assuming 4 viewports
+        for i in range(1, 5):  
             image = getattr(self, f"image{i}")
             image.setMouseTracking(True)
             image.mouseMoveEvent = lambda event, i=i: self.mouse_movement(event, i-1)
@@ -171,6 +172,7 @@ class MainWindow(QtWidgets.QMainWindow):
             image_calculations = Image.open(file_name).convert('L')
             resize_image_calculations = image_calculations.resize((self.min_width ,self.min_height))
             self.current_images[frame - 1] = resize_image_calculations
+            self.preserved_images[frame-1]=resize_image_calculations
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
@@ -419,60 +421,61 @@ class MainWindow(QtWidgets.QMainWindow):
         label.fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     def mouse_press(self, event, frame_index):
-        """When mouse is pressed, track the active frame."""
         self.mouse_pressed = True
         self.active_frame = frame_index
         self.last_mouse_pos = event.pos()
 
 
     def mouse_movement(self, event, frame_index):
-        """Adjust brightness/contrast/FT only if dragging with the mouse."""
         if self.mouse_pressed and self.active_frame == frame_index:
             delta = event.pos() - self.last_mouse_pos
 
             # Adjust contrast and brightness dynamically
             self.brightness[frame_index] += delta.y()
             self.contrast[frame_index] += delta.x() * 0.01
-            self.contrast[frame_index] = max(0.1, self.contrast[frame_index])  # Avoid invalid values
-            
-
-            # Apply these changes
+            self.contrast[frame_index] = max(0.1, self.contrast[frame_index]) 
             self.adjust_brightness_contrast(frame_index)
-            # self.compute_ft_components(frame_index)
+            print(frame_index)
+            self.compute_ft_components(frame_index)
             self.update_ft_component(frame_index)
-
-            # Track mouse movement
             self.last_mouse_pos = event.pos()
 
 
     def mouse_release(self, event):
-        """When mouse is released, reset the tracking state."""
         self.mouse_pressed = False
         self.active_frame = None
         self.last_mouse_pos = None
 
 
     def adjust_brightness_contrast(self, frame):
-            """Apply the contrast/brightness adjustment to the image."""
-       
-            original_image = np.array(self.current_images[frame])
+            # print(self.current_images[frame])
+            # previous_image=self.current_images[frame]
+            original_image = np.array(self.preserved_images[frame])
           
             # Apply contrast and brightness adjustments
             adjusted = self.contrast[frame] * original_image + self.brightness[frame]
-            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)  # Ensure values stay within valid range
+           
+           
+            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8) 
             height, width = adjusted.shape
             image_data = adjusted.tobytes()
-            q_image = QtGui.QImage(image_data,width, height, width, QtGui.QImage.Format_Grayscale8)
+            q_image = QtGui.QImage(image_data,self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
             pixmap = QtGui.QPixmap.fromImage(q_image)
-            # self.current_images[frame] = 
-            # print(self.current_images[frame])
+            print(self.current_images[frame])
+            print(q_image)
+            print(pixmap)
+            # print(image_data)
 
             scene = getattr(self, f"scene{frame + 1}")
             scene.clear()
             scene.addPixmap(pixmap)
-            # self.current_images[frame]=pixmap 
+           
+            
             
             getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            pil_image = Image.fromarray(adjusted, mode="L")
+            self.current_images[frame]=pil_image
+            print(self.current_images[frame])
 
     ############### PART B ###################
 
