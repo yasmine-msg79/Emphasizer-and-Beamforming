@@ -38,6 +38,7 @@ class ScenarioParameters:
         self.num_transmitters = 2   
 
 
+
     def update_parameters(self, scenario):
         """
         Updates the parameters based on the selected scenario.
@@ -60,18 +61,3 @@ class ScenarioParameters:
         print(f"Position Between Transmitters: {self.position_between_transmitters}")
         print(f"Number of Transmitters: {self.num_transmitters}")
 
-
-# Example Usage
-parameters = ScenarioParameters()
-
-# Update for 5G Scenario
-parameters.update_parameters("5G")
-parameters.display_parameters()
-
-# Update for Ultrasound Scenario
-parameters.update_parameters("Ultrasound")
-parameters.display_parameters()
-
-# Update for Tumor Ablation Scenario
-parameters.update_parameters("Tumor Ablation")
-parameters.display_parameters()

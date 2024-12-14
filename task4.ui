@@ -1120,6 +1120,19 @@ QSpinBox::down-arrow {
                </property>
               </spacer>
              </item>
+             <item row="11" column="0">
+              <spacer name="horizontalSpacer_12">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
              <item row="5" column="1">
               <widget class="QSlider" name="beam_phase_slider">
                <property name="minimumSize">
@@ -1222,7 +1235,7 @@ font:11pt &quot;Microsoft Sans Serif&quot;;</string>
 font:11pt &quot;Microsoft Sans Serif&quot;;</string>
                </property>
                <property name="text">
-                <string>Distance</string>
+                <string>Position - X</string>
                </property>
               </widget>
              </item>
@@ -1260,6 +1273,39 @@ QSlider::add-page:horizontal {
     border-radius: 4px;
 }
 </string>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="1">
+              <widget class="QSlider" name="position_y_slider">
+               <property name="styleSheet">
+                <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}</string>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -1323,6 +1369,9 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
                </property>
                <property name="frameShape">
                 <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="smallDecimalPoint">
+                <bool>true</bool>
                </property>
                <property name="digitCount">
                 <number>4</number>
@@ -1418,6 +1467,9 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
                <property name="frameShape">
                 <enum>QFrame::NoFrame</enum>
                </property>
+               <property name="smallDecimalPoint">
+                <bool>true</bool>
+               </property>
                <property name="digitCount">
                 <number>4</number>
                </property>
@@ -1443,6 +1495,9 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
                </property>
                <property name="frameShape">
                 <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="smallDecimalPoint">
+                <bool>true</bool>
                </property>
                <property name="digitCount">
                 <number>4</number>
@@ -1560,6 +1615,50 @@ QSlider::add-page:horizontal {
                </property>
                <property name="invertedControls">
                 <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="4">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="10" column="1">
+              <widget class="QLabel" name="label_4">
+               <property name="styleSheet">
+                <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+               </property>
+               <property name="text">
+                <string>Position - Y</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="3">
+              <widget class="QLCDNumber" name="lcdNumber">
+               <property name="styleSheet">
+                <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="smallDecimalPoint">
+                <bool>true</bool>
+               </property>
+               <property name="digitCount">
+                <number>4</number>
+               </property>
+               <property name="segmentStyle">
+                <enum>QLCDNumber::Flat</enum>
                </property>
               </widget>
              </item>
