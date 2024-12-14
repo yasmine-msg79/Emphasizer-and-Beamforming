@@ -63,6 +63,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fourierimage4 = QtWidgets.QGraphicsScene()
         self.Gimage4.setScene(self.fourierimage4)
         self.current_images = [None,None,None,None]
+        self.preserved_images= [None,None,None,None]
         self.output1_image = None
         self.ft_components = [{},{},{},{}]
         
@@ -85,7 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.brightness = [0] * 4  # Assuming 4 frames
         self.contrast = [1.0] * 4
 
-        for i in range(1, 5):  # Assuming 4 viewports
+        for i in range(1, 5):  
             image = getattr(self, f"image{i}")
             image.setMouseTracking(True)
             image.mouseMoveEvent = lambda event, i=i: self.mouse_movement(event, i-1)
@@ -118,7 +119,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
-        self.position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
+        self.beam_position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
+        self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
+
+
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
         self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
@@ -130,6 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.array_type = "curved"  # Default to curved
         self.curvature_angle = 0.0  # Default curvature angle
         self.element_spacing = 0.5  # Default element spacing
+        self.array_position = [0, 0]  # Default position of the array
 
         # Set the initial state of radio button
         self.linear_radio_button.setChecked(False)
@@ -137,18 +142,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.linear_radio_button.toggled.connect(self.update_radio_button_text)
 
         # Connect UI elements to methods
-        self.frequency_slider.setMinimum(1000000)
+        self.frequency_slider.setMinimum(1000000000)
         self.frequency_slider.setMaximum(2000000000)
+        self.frequency_slider.setSingleStep(10000000)  # Step size
         self.frequency_slider.valueChanged.connect(self.update_frequency)
         self.phase_slider.setMinimum(-180)
         self.phase_slider.setMaximum(180)
         self.phase_slider.valueChanged.connect(self.update_phase)
-        self.curvature_slider.setMinimum(0)
-        self.curvature_slider.setMaximum(180)
+        self.curvature_slider.setMinimum(1)
+        self.curvature_slider.setMaximum(360)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
-        self.no_transmitters_spinbox.setMaximum(10)
+        self.no_transmitters_spinbox.setMaximum(100)
         self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
+        self.beam_position_slider.setMinimum(-10)
+        self.beam_position_slider.setMaximum(10)
+        self.beam_position_slider.setSingleStep(1)
+        self.beam_position_slider.valueChanged.connect(self.update_array_position)
+
         self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
 
         # Initialize the plots
@@ -181,6 +192,7 @@ class MainWindow(QtWidgets.QMainWindow):
             image_calculations = Image.open(file_name).convert('L')
             resize_image_calculations = image_calculations.resize((self.min_width ,self.min_height))
             self.current_images[frame - 1] = resize_image_calculations
+            self.preserved_images[frame-1]=resize_image_calculations
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
@@ -439,60 +451,61 @@ class MainWindow(QtWidgets.QMainWindow):
         label.fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     def mouse_press(self, event, frame_index):
-        """When mouse is pressed, track the active frame."""
         self.mouse_pressed = True
         self.active_frame = frame_index
         self.last_mouse_pos = event.pos()
 
 
     def mouse_movement(self, event, frame_index):
-        """Adjust brightness/contrast/FT only if dragging with the mouse."""
         if self.mouse_pressed and self.active_frame == frame_index:
             delta = event.pos() - self.last_mouse_pos
 
             # Adjust contrast and brightness dynamically
             self.brightness[frame_index] += delta.y()
             self.contrast[frame_index] += delta.x() * 0.01
-            self.contrast[frame_index] = max(0.1, self.contrast[frame_index])  # Avoid invalid values
-            
-
-            # Apply these changes
+            self.contrast[frame_index] = max(0.1, self.contrast[frame_index]) 
             self.adjust_brightness_contrast(frame_index)
-            # self.compute_ft_components(frame_index)
+            print(frame_index)
+            self.compute_ft_components(frame_index)
             self.update_ft_component(frame_index)
-
-            # Track mouse movement
             self.last_mouse_pos = event.pos()
 
 
     def mouse_release(self, event):
-        """When mouse is released, reset the tracking state."""
         self.mouse_pressed = False
         self.active_frame = None
         self.last_mouse_pos = None
 
 
     def adjust_brightness_contrast(self, frame):
-            """Apply the contrast/brightness adjustment to the image."""
-       
-            original_image = np.array(self.current_images[frame])
+            # print(self.current_images[frame])
+            # previous_image=self.current_images[frame]
+            original_image = np.array(self.preserved_images[frame])
           
             # Apply contrast and brightness adjustments
             adjusted = self.contrast[frame] * original_image + self.brightness[frame]
-            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)  # Ensure values stay within valid range
+           
+           
+            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8) 
             height, width = adjusted.shape
             image_data = adjusted.tobytes()
-            q_image = QtGui.QImage(image_data,width, height, width, QtGui.QImage.Format_Grayscale8)
+            q_image = QtGui.QImage(image_data,self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
             pixmap = QtGui.QPixmap.fromImage(q_image)
-            # self.current_images[frame] = 
-            # print(self.current_images[frame])
+            print(self.current_images[frame])
+            print(q_image)
+            print(pixmap)
+            # print(image_data)
 
             scene = getattr(self, f"scene{frame + 1}")
             scene.clear()
             scene.addPixmap(pixmap)
-            # self.current_images[frame]=pixmap 
+           
+            
             
             getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            pil_image = Image.fromarray(adjusted, mode="L")
+            self.current_images[frame]=pil_image
+            print(self.current_images[frame])
 
 
     def apply_region(self, value):
@@ -697,11 +710,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_radio_button_text(self, checked):
         if checked:
             self.array_type = "linear"
+            self.curvature_angle_previous = self.curvature_angle
+            self.curvature_angle = 0
             self.linear_radio_button.setText("Linear")
             self.curvature_slider.hide()
             self.curvature_lcd.hide()
         else:
             self.array_type = "curved"
+            self.curvature_angle = getattr(self, 'curvature_angle_previous', 0)
             self.linear_radio_button.setText("Curved")
             self.curvature_slider.show()
             self.curvature_lcd.show()
@@ -732,6 +748,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curvature_lcd.display(value)
         self.beam_forming()
 
+    def update_array_position(self, value):
+        print(f"Array position updated: {value}")
+        # Update both X and Y positions to the same value
+        self.array_position = [value, value]
+        self.position_lcd.display(value)
+        self.beam_forming()
+
     def beam_forming(self):
         print(f"self.frequencies updated: {self.frequencies}")
         print(f"self.phases updated: {self.phases}")
@@ -742,6 +765,7 @@ class MainWindow(QtWidgets.QMainWindow):
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
+        visualizer.set_position_offset(self.array_position[0], self.array_position[1])
 
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
@@ -751,8 +775,15 @@ class MainWindow(QtWidgets.QMainWindow):
             phases=self.phases,
             curvature_angle=self.curvature_angle,
         )
-        beam_pattern_fig = visualizer.plot_beam_pattern_polar()
 
+        beam_pattern_fig = visualizer.plot_beam_pattern_polar(
+            num_transmitters=self.num_transmitters,
+            element_spacing=self.element_spacing,
+            frequency=self.frequencies[0],
+            phases=self.phases,
+            curvature_angle=self.curvature_angle,
+        )
+        
         self.display_plot(self.beam_map_view, field_map_fig)
         self.display_plot(self.beam_plot_view, beam_pattern_fig)
 
