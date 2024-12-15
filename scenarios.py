@@ -12,30 +12,30 @@ class ScenarioParameters:
         self.positionY = 0
 
     def set_5g_parameters(self):
-        self.frequency = 1400000000  # Frequency in MHz
-        self.phase = 180  # Phase in radians (e.g., π)
-        self.curvature_angle = 45  # Degrees
+        self.frequency = 800000000  # Frequency in MHz
+        self.phase = 45  
+        self.curvature_angle = 30  # Degrees
         self.position_between_transmitters = 100000  # Distance in micrometers
-        self.num_transmitters = 32  # Example for massive MIMO
+        self.num_transmitters = 8  # Example for massive MIMO
 
     def set_ultrasound_parameters(self):
-        self.frequency = 2000000000  # Frequency in kHz
-        self.phase = 90  # Phase in radians (e.g., π/2)
-        self.curvature_angle = 30  # Degrees
+        self.frequency = 1500000000  # Frequency in kHz
+        self.phase = -90  
+        self.curvature_angle = 20  # Degrees
         self.position_between_transmitters = 3000  # Distance in micrometers
-        self.num_transmitters = 8  # Example for ultrasound transducers
+        self.num_transmitters = 32 # Example for ultrasound transducers
 
     def set_tumor_ablation_parameters(self):
-        self.frequency = 1000000000  # Frequency in kHz
-        self.phase = 75  # Phase in radians (e.g., 2π)
-        self.curvature_angle = 60  # Degrees
+        self.frequency = 500000000  # Frequency in kHz
+        self.phase = 180 
+        self.curvature_angle = 10  # Degrees
         self.position_between_transmitters = 50000  # Distance in micrometers
         self.num_transmitters = 16  # Example for tumor ablation
 
     def reset_parameters(self):
-        self.frequency = 0
+        self.frequency = 1000000000
         self.phase = 0
-        self.curvature_angle = 0
+        self.curvature_angle = 30
         self.position_between_transmitters = 0
         self.num_transmitters = 2   
         self.positionX =0

@@ -133,10 +133,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialize parameters
         self.num_transmitters = 2
-        self.frequencies = [1000000] * self.num_transmitters  # Default frequency for each transmitter
+        self.frequencies = [1000000000] * self.num_transmitters  # Default frequency for each transmitter
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
         self.array_type = "curved"  # Default to curved
-        self.curvature_angle = 0.0  # Default curvature angle
+        self.curvature_angle = 30  # Default curvature angle
         self.element_spacing = 0.5  # Default element spacing
         self.array_position = [0, 0]  # Default position of the array
 
@@ -144,17 +144,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.linear_radio_button.setChecked(False)
         self.update_radio_button_text(self.linear_radio_button.isChecked())
         self.linear_radio_button.toggled.connect(self.update_radio_button_text)
+        self.scenario_combobox.currentText() == "Open Scenario"
+        self.update_scenario_parameters()
 
         # Connect UI elements to methods
-        self.frequency_slider.setMinimum(1000000000)
+        self.frequency_slider.setMinimum(500000000)
         self.frequency_slider.setMaximum(2000000000)
         self.frequency_slider.setSingleStep(10000000)  # Step size
+        # self.frequency_slider.setValue(1000000000)
         self.frequency_slider.valueChanged.connect(self.update_frequency)
         self.phase_slider.setMinimum(-180)
         self.phase_slider.setMaximum(180)
+        self.phase_slider.setValue(0)
         self.phase_slider.valueChanged.connect(self.update_phase)
         self.curvature_slider.setMinimum(1)
-        self.curvature_slider.setMaximum(360)
+        self.curvature_slider.setMaximum(60)
+        # self.curvature_slider.setValue(30)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
         self.no_transmitters_spinbox.setMaximum(100)
@@ -727,7 +732,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.curvature_unit_label.hide()
         else:
             self.array_type = "curved"
-            self.curvature_angle = getattr(self, 'curvature_angle_previous', 0)
+            self.curvature_angle = getattr(self, 'curvature_angle_previous', 30)
             self.linear_radio_button.setText("Curved")
             self.curvature_slider.show()
             self.curvature_lcd.show()

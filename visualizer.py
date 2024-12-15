@@ -7,7 +7,7 @@ class Visualizer:
         self.phases = []  
         self.magnitudes = []  
         self.array_type = "linear"  
-        self.curvature_angle = 0.0  
+        self.curvature_angle = 30 
         self.element_spacing = 0.5  
         self.position_offset = [0, 0]  # Default position offset (x, y)
 

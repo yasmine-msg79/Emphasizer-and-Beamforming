@@ -1285,6 +1285,18 @@ QSlider::add-page:horizontal {
 }
 </string>
                </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>60</number>
+               </property>
+               <property name="value">
+                <number>30</number>
+               </property>
+               <property name="sliderPosition">
+                <number>30</number>
+               </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -1487,6 +1499,9 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
                <property name="segmentStyle">
                 <enum>QLCDNumber::Flat</enum>
                </property>
+               <property name="value" stdset="0">
+                <double>30.000000000000000</double>
+               </property>
               </widget>
              </item>
              <item row="5" column="3">
@@ -1541,6 +1556,9 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
                </property>
                <property name="segmentStyle">
                 <enum>QLCDNumber::Flat</enum>
+               </property>
+               <property name="value" stdset="0">
+                <double>1000.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1615,8 +1633,20 @@ QSlider::add-page:horizontal {
 }
 </string>
                </property>
+               <property name="minimum">
+                <number>500000000</number>
+               </property>
                <property name="maximum">
-                <number>100</number>
+                <number>2000000000</number>
+               </property>
+               <property name="singleStep">
+                <number>100000000</number>
+               </property>
+               <property name="pageStep">
+                <number>100000000</number>
+               </property>
+               <property name="value">
+                <number>1000000000</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -1692,28 +1722,6 @@ font:11pt &quot;Microsoft Sans Serif&quot;;</string>
                </property>
                <property name="text">
                 <string>°</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="4">
-              <widget class="QLabel" name="label_13">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>mm</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="4">
-              <widget class="QLabel" name="label_15">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>mm</string>
                </property>
               </widget>
              </item>
