@@ -723,16 +723,20 @@ class MainWindow(QtWidgets.QMainWindow):
             parameters.update_parameters("Custom")
             parameters.display_parameters()
         
-        self.frequency_slider.setValue(parameters.frequency)
-        self.phase_slider.setValue(parameters.phase)
-        self.curvature_slider.setValue(parameters.curvature_angle)
-        self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
         self.array_type = parameters.array_geometry
         if self.array_type == "linear":
             self.linear_radio_button.setChecked(True)
         else:
             self.linear_radio_button.setChecked(False)  
         self.update_radio_button_text(self.linear_radio_button.isChecked())
+        self.frequency_slider.setValue(parameters.frequency)
+        self.phase_slider.setValue(parameters.phase)
+        self.curvature_slider.setValue(parameters.curvature_angle)
+        self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
+        self.beam_position_slider.setValue(0)
+        self.beam_position_y_slider.setValue(0)
+        
+       
 
         print(f"Scenario updated: {scenario}")
         print(f"self.frequencies updated: {self.frequencies}")
