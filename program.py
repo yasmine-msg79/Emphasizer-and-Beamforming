@@ -713,8 +713,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if scenario == "5G":
             parameters.update_parameters("5G")
             parameters.display_parameters()
-        elif scenario == "Ultrasound":
-            parameters.update_parameters("Ultrasound")
+        elif scenario == "Airborne Radar":
+            parameters.update_parameters("Airborne Radar")
             parameters.display_parameters()
         elif scenario == "Tumor Ablation":
             parameters.update_parameters("Tumor Ablation")
@@ -726,10 +726,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_slider.setValue(parameters.frequency)
         self.phase_slider.setValue(parameters.phase)
         self.curvature_slider.setValue(parameters.curvature_angle)
-        self.beam_position_slider.setValue(parameters.position_between_transmitters)
         self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
-        self.beam_position_slider.setValue(parameters.positionX)
-        self.beam_position_y_slider.setValue(parameters.positionY)
+        self.array_type = parameters.array_geometry
+        if self.array_type == "linear":
+            self.linear_radio_button.setChecked(True)
+        else:
+            self.linear_radio_button.setChecked(False)  
+        self.update_radio_button_text(self.linear_radio_button.isChecked())
 
         print(f"Scenario updated: {scenario}")
         print(f"self.frequencies updated: {self.frequencies}")
