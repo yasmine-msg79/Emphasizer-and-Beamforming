@@ -22,22 +22,12 @@ class ResizableRectangle(QGraphicsRectItem):
         self.resize_handle_size = 10
         self.resizing = False
         self.cursor_in_resize = False
-
-        # Start and end points for the rectangle
-        self.rect_start = QPointF(x, y)  # Top-left corner
-        self.rect_end = QPointF(x + width, y + height)  # Bottom-right corner
-
-    def paint(self, painter, option, widget):
-        """
-        Custom painting for the rectangle with rounded corners and a transparent fill.
-        """
-        painter.setRenderHint(QPainter.Antialiasing)
-        rect = self.rect()
-        path = QPainterPath()
-        path.addRoundedRect(rect, self.border_radius, self.border_radius)
-        painter.setBrush(self.brush())
-        painter.setPen(self.pen())
-        painter.drawPath(path)
+        ResizableRectangle.linked_rectangles.append(self)  # Add rectangle to shared list
+        self.bounding_rect = self.sceneBoundingRect()
+        self.x_min = x
+        self.x_max = x + width
+        self.y_min = y
+        self.y_max = y + height
 
     def hoverMoveEvent(self, event):
         """
@@ -65,14 +55,54 @@ class ResizableRectangle(QGraphicsRectItem):
         """
         if self.resizing:
             delta = event.pos() - self.start_pos
-            new_width = max(self.rect().width() + delta.x(), self.resize_handle_size)
-            new_height = max(self.rect().height() + delta.y(), self.resize_handle_size)
+            delta_width = delta.x()
+            delta_height = delta.y()
 
-            # Update the rectangle's size
-            self.setRect(QRectF(self.rect().topLeft(), QSizeF(new_width, new_height)))
+            new_width = max(self.rect().width() + delta_width, self.resize_handle_size)
+            new_height = max(self.rect().height() + delta_height, self.resize_handle_size)
+
+            # Notify the scene about geometry change
+            self.prepareGeometryChange()
+
+            new_rect = QRectF(self.rect().topLeft(), QSizeF(new_width, new_height))
+            self.setRect(new_rect)
             self.start_pos = event.pos()
+
+            # Force the scene to update
+            if self.scene():
+                self.scene().update()
+
+            # self.sync_with_linked_rectangles()  # Sync changes
+
+            # Debug: Print updated geometry
+            print("Rect:", self.rect())
+            rect = self.rect()  # Call the rect method to get the QRectF object
+
+            # Now extract the values
+            self.x_min = int(rect.x())  # Leftmost x
+            self.x_max = int(rect.x() + new_width)  # Rightmost x
+            self.y_min = int(rect.y())  # Topmost y
+            self.y_max = int(rect.y() + new_height)  # Bottommost y
+            print("Classsss///**x_min, y_min:",  self.x_min,  self.y_min, "x_max, y_max",  self.x_max,  self.y_max)  
         else:
             super().mouseMoveEvent(event)
+
+
+    # def mouseMoveEvent(self, event):
+    #     if self.resizing:
+    #         delta = event.pos() - self.start_pos
+    #         delta_width = delta.x()
+    #         delta_height = delta.y()
+
+    #         new_width = max(self.rect().width() + delta_width, self.resize_handle_size)
+    #         new_height = max(self.rect().height() + delta_height, self.resize_handle_size)
+    #         new_rect = QRectF(self.rect().topLeft(), QSizeF(new_width, new_height))
+    #         self.setRect(new_rect)
+    #         self.start_pos = event.pos()
+
+    #         self.sync_with_linked_rectangles()  # Sync changes
+    #     else:
+    #         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         """
@@ -135,7 +165,3 @@ class ResizableRectangle(QGraphicsRectItem):
         # Apply the mask to the image data
         cropped_data = image_data * mask
         return cropped_data
-
-
-
-#
