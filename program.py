@@ -1,9 +1,10 @@
 from PyQt5 import QtWidgets, QtGui, QtCore, uic   # Added uic import
 import sys
 from PyQt5.QtGui import *
-
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
 import numpy as np
 import cv2
+
 import matplotlib.pyplot as plt
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
@@ -16,9 +17,10 @@ from PyQt5.QtWidgets import QHeaderView
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidgetItem, QSpinBox, QVBoxLayout, QDoubleSpinBox, QHeaderView
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox)
-import beamPlot
+import scenarios
 from visualizer import Visualizer
 from PIL import Image
+from regionSelector import ResizableRectangle
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -63,6 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fourierimage4 = QtWidgets.QGraphicsScene()
         self.Gimage4.setScene(self.fourierimage4)
         self.current_images = [None,None,None,None]
+        self.preserved_images= [None,None,None,None]
         self.output1_image = None
         self.ft_components = [{},{},{},{}]
         
@@ -85,7 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.brightness = [0] * 4  # Assuming 4 frames
         self.contrast = [1.0] * 4
 
-        for i in range(1, 5):  # Assuming 4 viewports
+        for i in range(1, 5):  
             image = getattr(self, f"image{i}")
             image.setMouseTracking(True)
             image.mouseMoveEvent = lambda event, i=i: self.mouse_movement(event, i-1)
@@ -99,78 +102,93 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output1.toggled.connect(self.change_output_location)
         self.output2.toggled.connect(self.change_output_location)
 
-        self.Fourier_comboBox_1.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
-        self.Fourier_comboBox_2.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
-        self.Fourier_comboBox_3.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
-        self.Fourier_comboBox_4.currentIndexChanged.connect(lambda:self.apply_region(self.region_selecter.value()))
-        self.region_selecter.valueChanged.connect(self.apply_region)
-        self.in_region_radioButton.toggled.connect(lambda:self.apply_region(self.region_selecter.value()))
-        self.out_region_radioButton.toggled.connect(lambda:self.apply_region(self.region_selecter.value()))
+        self.image1_loaded = False 
+        self.image2_loaded = False 
+        self.image3_loaded = False 
+        self.image4_loaded = False 
+
+        # # Add selection rectangles to Fourier scenes
+        self.linked_rectangles = []
+        self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect2 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect3 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect4 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rects = [self.rect1, self.rect2, self.rect3,self.rect4]
+
+        # Inside your main setup method (e.g., __init__ or a setupUi wrapper)
+        self.in_region_radioButton.toggled.connect(self.handle_region_change)
+        self.out_region_radioButton.toggled.connect(self.handle_region_change)
 
 
         ################# PART B #########################
+        #  Find and initialize UI elements
         self.linear_radio_button = self.findChild(QtWidgets.QRadioButton, "linear_radio_button_3")
         self.frequency_slider = self.findChild(QtWidgets.QSlider, "beam_frequency_slider")
         self.phase_slider = self.findChild(QtWidgets.QSlider, "beam_phase_slider")
-        self.position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
-        self.curvature_slider= self.findChild(QtWidgets.QSlider, "beam_curvature_slider")
-        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "curvature_angle_label")
+        self.curvature_slider = self.findChild(QtWidgets.QSlider, "beam_curvature_slider")
         self.no_transmitters_spinbox = self.findChild(QtWidgets.QSpinBox, "spinBox_No_transmitters_3")
         self.frequency_lcd = self.findChild(QtWidgets.QLCDNumber, "frequency_lcd")
         self.phase_lcd = self.findChild(QtWidgets.QLCDNumber, "phase_lcd")
-        self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
         self.curvature_lcd = self.findChild(QtWidgets.QLCDNumber, "curvature_lcd")
-        self.frequency_phase_table_2 = self.findChild(QtWidgets.QTableWidget, "frequency_phase_table_2")
+        self.curvature_angle_label = self.findChild(QtWidgets.QLabel, "curvature_angle_label")
+        self.beam_position_slider = self.findChild(QtWidgets.QSlider, "beam_position_slider")
+        self.position_lcd = self.findChild(QtWidgets.QLCDNumber, "position_lcd")
+        self.beam_position_y_slider = self.findChild(QtWidgets.QSlider, "position_y_slider")
+        self.position_y_lcd = self.findChild(QtWidgets.QLCDNumber, "position_y_lcd")
+        self.curvature_unit_label = self.findChild(QtWidgets.QLabel, "label_12")
 
-        # Initialize parameters
-        self.frequencies = []
-        self.phases = []
-        self.magnitudes = []
-        self.element_spacing = 0.5  # Wavelength units
-        self.array_type = "curved"  # Default array type
-        self.curvature_angle = 0.0  # Default curvature angle (in degrees)
-        self.current_frequency = 0
-        self.current_phase = 0
-        self.current_position = 0
-
-
-        # Set the initial state
-        self.linear_radio_button.setChecked(False)  
-        self.linear_radio_button.setText("Curved")  
-
-        self.update_radio_button_text(self.linear_radio_button.isChecked())
-        self.linear_radio_button.toggled.connect(self.update_radio_button_text)
-
-        # Connect spinbox signal for changing transmitter count
-        # self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_rows)
-        self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
-        self.frequency_slider.valueChanged.connect(self.update_frequency)
-        self.phase_slider.valueChanged.connect(self.update_phase)
-        self.position_slider.valueChanged.connect(self.update_position)
-
-        # Set up the table
-        # self.frequency_phase_table_2.setColumnCount(2)
-        # self.frequency_phase_table_2.setHorizontalHeaderLabels(["Frequency", "Phase"])
-        # self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        # self.frequency_phase_table_2.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # self.frequency_phase_table_2.verticalHeader().setDefaultSectionSize(60)
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
         self.beam_plot_view = self.findChild(QtWidgets.QWidget, "beam_plot")
+        self.scenario_combobox = self.findChild(QtWidgets.QComboBox, "comboBox_Open_scenario")
 
-        # Initialize phased array properties
+        # Initialize parameters
         self.num_transmitters = 2
-        self.frequencies = [1000] * self.num_transmitters  # Default frequency for each transmitter
+        self.frequencies = [1000000000] * self.num_transmitters  # Default frequency for each transmitter
         self.phases = [0] * self.num_transmitters  # Default phase for each transmitter
-        self.magnitudes = [1] * self.num_transmitters 
+        self.array_type = "curved"  # Default to curved
+        self.curvature_angle = 30  # Default curvature angle
+        self.element_spacing = 0.5  # Default element spacing
+        self.array_position = [0, 0]  # Default position of the array
 
+        # Set the initial state of radio button
+        self.linear_radio_button.setChecked(False)
+        self.update_radio_button_text(self.linear_radio_button.isChecked())
+        self.linear_radio_button.toggled.connect(self.update_radio_button_text)
+        self.scenario_combobox.currentText() == "Open Scenario"
+        self.update_scenario_parameters()
+
+        # Connect UI elements to methods
+        self.frequency_slider.setMinimum(500000000)
+        self.frequency_slider.setMaximum(2000000000)
+        self.frequency_slider.setSingleStep(10000000)  # Step size
+        # self.frequency_slider.setValue(1000000000)
+        self.frequency_slider.valueChanged.connect(self.update_frequency)
+        self.phase_slider.setMinimum(-180)
+        self.phase_slider.setMaximum(180)
+        self.phase_slider.setValue(0)
+        self.phase_slider.valueChanged.connect(self.update_phase)
+        self.curvature_slider.setMinimum(1)
+        self.curvature_slider.setMaximum(180)
+        # self.curvature_slider.setValue(30)
+        self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
+        self.no_transmitters_spinbox.setMinimum(2)
+        self.no_transmitters_spinbox.setMaximum(100)
+        self.no_transmitters_spinbox.valueChanged.connect(self.update_transmitter_count)
+        self.beam_position_slider.setMinimum(-10)
+        self.beam_position_slider.setMaximum(10)
+        self.beam_position_slider.setSingleStep(1)
+        self.beam_position_slider.valueChanged.connect(self.update_array_Xposition)
+        self.beam_position_y_slider.setMinimum(-10)
+        self.beam_position_y_slider.setMaximum(10)
+        self.beam_position_y_slider.setSingleStep(1)
+        self.beam_position_y_slider.valueChanged.connect(self.update_array_Yposition)
+
+        self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
+
+        # Initialize the plots
         self.beam_forming()
-
-        # Create spinboxes for the transmitters
-        for row in range(self.num_transmitters):
-            self.add_custom_widget(row, 0, "frequency")
-            self.add_custom_widget(row, 1, "phase")
 
         
     def open_file(self, frame, mouseevent):
@@ -183,7 +201,7 @@ class MainWindow(QtWidgets.QMainWindow):
             image = pixmap.toImage()
             image = image.convertToFormat(QtGui.QImage.Format_Grayscale8)
             pixmap = QPixmap.fromImage(image)
-            
+
             # Update min_width and min_height
             if self.min_width == 0 and self.min_height == 0:
                 self.min_width = image.width()
@@ -199,7 +217,7 @@ class MainWindow(QtWidgets.QMainWindow):
             image_calculations = Image.open(file_name).convert('L')
             resize_image_calculations = image_calculations.resize((self.min_width ,self.min_height))
             self.current_images[frame - 1] = resize_image_calculations
-            print(self.current_images[frame - 1])
+            self.preserved_images[frame-1]=resize_image_calculations
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
@@ -210,6 +228,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image1.fitInView(self.scene1.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(0)
                 self.update_ft_component(0)
+                # self.add_rectangle_to_frame(1) 
+                self.image1_loaded = True  
 
             elif frame == 2:
                 self.scene2.clear()
@@ -219,6 +239,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image2.fitInView(self.scene2.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(1)
                 self.update_ft_component(1)
+                # self.add_rectangle_to_frame(2) 
+                self.image2_loaded = True
 
             elif frame == 3:
                 self.scene3.clear()
@@ -228,6 +250,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(2)
                 self.update_ft_component(2)
+                # self.add_rectangle_to_frame(3) 
+                self.image3_loaded = True
 
             elif frame == 4:
                 self.scene4.clear()
@@ -237,9 +261,26 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image4.fitInView(self.scene4.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(3)
                 self.update_ft_component(3)
-            self.resize_images()      
-            
-            
+                # self.add_rectangle_to_frame(4) 
+                self.image4_loaded = True
+            self.resize_images()   
+    
+    # def add_rectangle_to_frame(self, frame):
+    #     # self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)
+    #     self.linked_rectangles.append(self.rectangle)
+        
+    #     if frame == 1:
+    #         self.fourierimage1.addItem(self.rectangle)
+    #     elif frame == 2:
+    #         self.fourierimage2.addItem(self.rectangle)
+    #     elif frame == 3:
+    #         self.fourierimage3.addItem(self.rectangle)
+    #     elif frame == 4:
+    #         self.fourierimage4.addItem(self.rectangle)
+    #     else:
+    #         print(f"Frame {frame} is not supported.")
+
+                
     def resize_images(self):
         for i in range(4):
             if self.current_images[i] is not None: 
@@ -263,24 +304,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # to resize the ft image also     
                 self.update_ft_component(i)
 
-            
 
-        # # Ensure the image is loaded for the given frame
-        # if self.current_images[frame - 1] is not None:
-
-        #     # Check if in-region or out-region radio button is selected
-        #     if self.in_region_radioButton.isChecked() or self.out_region_radioButton.isChecked():
-        #         # Add a resizable rectangle to the scene
-        #         rect_item = self.addResizableRectangle(
-        #             self.Gimage1.scene(),
-        #             self.current_images[frame - 1],  # Pass the correct current image
-        #             self.region_selecter.value(),
-        #             self.region_selecter.value(),
-        #             self.in_region_radioButton.isChecked()
-        #         )
-
-        # else:
-        #     QtWidgets.QMessageBox.warning(self, "Error", "No image loaded for the selected frame.")
 
     def change_choices_combobox(self):
         for combobox in self.checkboxes:
@@ -322,7 +346,6 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def compute_inverse_ft_components(self):
         reconstructed_image = None
-
         # Normalize slider weights
         magnitude_weights = [
             slider.value() / 100 if combobox.currentText() == "FT Magnitude" else 0
@@ -340,49 +363,106 @@ class MainWindow(QtWidgets.QMainWindow):
             slider.value() / 100 if combobox.currentText() == "FT Imaginary" else 0
             for slider, combobox in zip(self.weights_sliders, self.checkboxes)
         ]
-
         if self.magnitude_phase.isChecked():
             ft_magnitude_sum = np.zeros((self.min_height, self.min_width))
             ft_phase_sum = np.zeros((self.min_height, self.min_width))
+ 
+            # Assuming a single rectangle for now
+            # rect_bounds = self.rectangle.sceneBoundingRect()
+            # x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
+            # x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
+            # print(f"Updated Bounds: {bounding_rect.left()}, {bounding_rect.top()}, {bounding_rect.right()}, {bounding_rect.bottom()}")
+
+            # bounding_rect = self.rect1.sceneBoundingRect()
+            # x_min = self.rects[0].x_min    # Leftmost x
+            # x_max = self.rects[0].x_max   # Rightmost x
+            # y_min = self.rects[0].y_min      # Topmost y
+            # y_max = self.rects[0].y_max  # Bottommost y
+            # print(f"self.rectangle in inverse ft: {self.rectangle}")
+            # print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
+
+            # # Ensure bounds are within the image size
+            # x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+            # y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+            # if self.in_region_radioButton.isChecked():
+            #     mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 1
+            # else:
+            #     mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 0
+
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
+                    x_min = self.rects[i].x_min    # Leftmost x
+                    x_max = self.rects[i].x_max   # Rightmost x
+                    y_min = self.rects[i].y_min     # Topmost y
+                    y_max = self.rects[i].y_max  # Bottommost y
+                    print(f"self.rectangle in inverse ft: {self.rectangle}")
+                    print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
+
+                    # Ensure bounds are within the image size
+                    x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+                    y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+                    if self.in_region_radioButton.isChecked():
+                        mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 1
+                    else:
+                        mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 0
+                        
                     resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    ft_magnitude_sum += resized_magnitude * magnitude_weights[i]
+                    ft_magnitude_sum += resized_magnitude * magnitude_weights[i] 
                     ft_phase_sum += resized_phase * phase_weights[i]
-
             # Reconstruct using magnitude and phase
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
+            reconstructed_ft *= mask
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
+            # reconstructed_image *= mask
 
         else:
             ft_real_sum = np.zeros((self.min_height, self.min_width))
             ft_imaginary_sum = np.zeros((self.min_height, self.min_width))
 
+            rect_bounds = self.rectangle.sceneBoundingRect()
+            x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
+            x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
+            print(f"self.rectangle in inverse ft: {self.rectangle}")
+
+            # Ensure bounds are within the image size
+            x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+            y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+            if self.in_region_radioButton.isChecked():
+                mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+                mask[y_min:y_max, x_min:x_max] = 1
+            else:
+                mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+                mask[y_min:y_max, x_min:x_max] = 0
+
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
-                    # padded_array = np.pad(
-                    #     self.ft_components[i]["FT Real"],
-                    #     (0, self.min_height*self.min_width - len(self.ft_components[i]["FT Real"])),
-                    #     mode='constant'
-                    # )
-                    # resized_real = padded_array.reshape(self.min_height, self.min_width)
-                    
-                    # padded_array = np.pad(
-                    #     self.ft_components[i]["FT Imaginary"],
-                    #     (0, self.min_height*self.min_width - len(self.ft_components[i]["FT Imaginary"])),
-                    #     mode='constant'
-                    # )
-                    # resized_imaginary = padded_array.reshape(self.min_height, self.min_width)
-                    # resized_real = self.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
-                    # resized_imaginary = self.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
-                    
-                    resized_real = cv2.resize(self.ft_components[i]["FT Real"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_imaginary = cv2.resize(self.ft_components[i]["FT Imaginary"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    x_min = self.rects[i].x_min    # Leftmost x
+                    x_max = self.rects[i].x_max   # Rightmost x
+                    y_min = self.rects[i].y_min     # Topmost y
+                    y_max = self.rects[i].y_max  # Bottommost y
+                    print(f"self.rectangle in inverse ft: {self.rectangle}")
+                    print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
 
-                    ft_real_sum += resized_real * real_weights[i]
-                    ft_imaginary_sum += resized_imaginary * imaginary_weights[i]
+                    # Ensure bounds are within the image size
+                    x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+                    y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+                    if self.in_region_radioButton.isChecked():
+                        mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 1
+                    else:
+                        mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 0
+                        
+                    resized_real = self.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
+                    resized_imaginary = self.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
+                    ft_real_sum += resized_real * real_weights[i] * mask
+                    ft_imaginary_sum += resized_imaginary * imaginary_weights[i] * mask
 
             # Reconstruct using real and imaginary parts
             mixed_image = np.fft.ifft2(ft_real_sum + 1j * ft_imaginary_sum)
@@ -394,6 +474,7 @@ class MainWindow(QtWidgets.QMainWindow):
             reconstructed_image = (255 * (reconstructed_image / max_val)).astype(np.uint8) if max_val > 0 else np.zeros_like(reconstructed_image, dtype=np.uint8)
 
         return reconstructed_image
+    
 
 
     def update_ft_component(self, index):
@@ -415,7 +496,7 @@ class MainWindow(QtWidgets.QMainWindow):
         elif index == 3:
             selected_component = self.Fourier_comboBox_4.currentText()
             currentFourierImage = self.fourierimage4
-            self.update_weight(3, self.weight_4.value())          
+            self.update_weight(3, self.weight_4.value()) 
 
         if selected_component in self.ft_components[index]:
             component_image = self.ft_components[index][selected_component]
@@ -426,10 +507,45 @@ class MainWindow(QtWidgets.QMainWindow):
             pixmap = pixmap.scaled(self.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
             currentFourierImage.addPixmap(pixmap)
             currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
+
+            # self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)  # Adjust parameters as needed
+            # currentFourierImage.addItem(self.rectangle)
+            # self.rectangles = [
+            #     ResizableRectangle(x=10, y=10, width=100, height=100),
+            #     ResizableRectangle(x=10, y=10, width=100, height=100),
+            #     ResizableRectangle(x=10, y=10, width=100, height=100),
+            #     ResizableRectangle(x=10, y=10, width=100, height=100)
+            # ]
+            # self.rectangle = self.rectangles[0]
+
+            # currentFourierImage.addItem(self.rectangles[index])
+
+            
+            self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+            self.rect1.linked_rectangles = self.rects  # Share the same list
+            self.rects[index] = self.rect1
+            currentFourierImage.addItem(self.rect1)
+
+
+            print(f"self.rectangle in update ft: {self.rectangle}")
+
+            print(f"rectangles:{self.linked_rectangles}")
+
             self.Gimage1.fitInView(currentFourierImage.sceneRect(), QtCore.Qt.KeepAspectRatio)
            
         else:
             QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
+
+    def handle_region_change(self):
+        # Check which radio button is selected
+        if self.in_region_radioButton.isChecked():
+            print("Processing inner region.")
+        elif self.out_region_radioButton.isChecked():
+            print("Processing outer region.")
+
+        # Update the output location with the selected region
+        self.change_output_location()
+
 
     def hide_image_frame_and_label(self):
         # Hides imageFrame, frame_3, and label; shows everything else
@@ -474,447 +590,203 @@ class MainWindow(QtWidgets.QMainWindow):
         label.fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     def mouse_press(self, event, frame_index):
-        """When mouse is pressed, track the active frame."""
         self.mouse_pressed = True
         self.active_frame = frame_index
         self.last_mouse_pos = event.pos()
 
 
     def mouse_movement(self, event, frame_index):
-        """Adjust brightness/contrast/FT only if dragging with the mouse."""
         if self.mouse_pressed and self.active_frame == frame_index:
             delta = event.pos() - self.last_mouse_pos
 
             # Adjust contrast and brightness dynamically
             self.brightness[frame_index] += delta.y()
             self.contrast[frame_index] += delta.x() * 0.01
-            self.contrast[frame_index] = max(0.1, self.contrast[frame_index])  # Avoid invalid values
-            
-
-            # Apply these changes
+            self.contrast[frame_index] = max(0.1, self.contrast[frame_index]) 
             self.adjust_brightness_contrast(frame_index)
-            # self.compute_ft_components(frame_index)
+            print(frame_index)
+            self.compute_ft_components(frame_index)
             self.update_ft_component(frame_index)
-
-            # Track mouse movement
             self.last_mouse_pos = event.pos()
 
 
     def mouse_release(self, event):
-        """When mouse is released, reset the tracking state."""
         self.mouse_pressed = False
         self.active_frame = None
         self.last_mouse_pos = None
 
 
     def adjust_brightness_contrast(self, frame):
-            """Apply the contrast/brightness adjustment to the image."""
-       
-            original_image = np.array(self.current_images[frame])
+            # print(self.current_images[frame])
+            # previous_image=self.current_images[frame]
+            original_image = np.array(self.preserved_images[frame])
           
             # Apply contrast and brightness adjustments
             adjusted = self.contrast[frame] * original_image + self.brightness[frame]
-            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8)  # Ensure values stay within valid range
+           
+           
+            adjusted = np.clip(adjusted, 0, 255).astype(np.uint8) 
             height, width = adjusted.shape
             image_data = adjusted.tobytes()
-            q_image = QtGui.QImage(image_data,width, height, width, QtGui.QImage.Format_Grayscale8)
+            q_image = QtGui.QImage(image_data,self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
             pixmap = QtGui.QPixmap.fromImage(q_image)
-            # self.current_images[frame] = 
-            # print(self.current_images[frame])
+            print(self.current_images[frame])
+            print(q_image)
+            print(pixmap)
+            # print(image_data)
 
             scene = getattr(self, f"scene{frame + 1}")
             scene.clear()
             scene.addPixmap(pixmap)
-            # self.current_images[frame]=pixmap 
+           
+            
             
             getattr(self, f"image{frame + 1}").fitInView(scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            pil_image = Image.fromarray(adjusted, mode="L")
+            self.current_images[frame]=pil_image
+            print(self.current_images[frame])
 
 
-    def apply_region(self, value):
-        """
-        Applies the region mask to the current Fourier component based on the rectangle.
-        The region is adjusted using the region_selector slider.
-        """
-        for frame in range(1, 5):  # Loop through all frames (1-4)
-            if self.current_images[frame - 1] is not None:  # Ensure image is loaded for the frame
-                # Update Fourier component for the current frame
-                self.update_ft_component(frame - 1)
-
-                # Get the image data and scene for the frame
-                img_data = self.current_images[frame - 1]
-                scene = self.get_scene_for_frame(frame)  # Retrieve the scene for the current frame
-
-                # Add a resizable rectangle to the scene
-                if self.out_region_radioButton.isChecked() or self.in_region_radioButton.isChecked():
-                    rect_item = self.addResizableRectangle(
-                        scene,
-                        self.convert_component_to_qimage(img_data),  # Convert the image component
-                        value, 
-                        value,
-                        self.in_region_radioButton
-                    )
-                    self.masked_img_comp = self.extractRegion(rect_item, self.convert_component_to_qimage(img_data), img_data, self.in_region_radioButton)
-
-
-    def extractRegion(self, rect_item, image_component, image_component_array, inner_region_selected):
-        image_component = QGraphicsPixmapItem(QPixmap.fromImage(image_component))
-        rect_scene_pos = rect_item.scenePos()
-        rect_scene_rect = rect_item.rect()
-        rect_image_pos = image_component.mapFromScene(rect_scene_pos)
-        rect_image_rect = image_component.mapFromScene(rect_scene_rect).boundingRect()
-
-        if inner_region_selected.isChecked():
-            mask = np.zeros_like(image_component_array)
-            mask[int(rect_image_pos.y()):int(rect_image_pos.y() + rect_image_rect.height()),
-                int(rect_image_pos.x()):int(rect_image_pos.x() + rect_image_rect.width())] = 1
-        else:
-            mask = np.ones_like(image_component_array)
-            mask[int(rect_image_pos.y()):int(rect_image_pos.y() + rect_image_rect.height()),
-            int(rect_image_pos.x()):int(rect_image_pos.x() + rect_image_rect.width())] = 0
-
-        image_component_array = image_component_array * mask
-        return image_component_array
-
-
-    def convert_component_to_qimage(self, component):
-        """
-        Converts a Fourier component (2D array) to a QImage for display.
-        """
-        component = (component / np.max(component) * 255).astype(np.uint8)
-        height, width = component.shape
-        bytes_per_line = component.strides[0]
-        return QtGui.QImage(component.data, width, height, bytes_per_line, QtGui.QImage.Format_Grayscale8)
-
-
-    def get_scene_for_frame(self, frame):
-        if frame == 1:
-            return self.fourierimage1
-        elif frame == 2:
-            return self.fourierimage2
-        elif frame == 3:
-            return self.fourierimage3
-        elif frame == 4:
-            return self.fourierimage4
-        else:
-            raise ValueError(f"Invalid frame number: {frame}")
     
-
-    def addResizableRectangle(self, scene,image_component,w,h,inner_rect):
-        width = image_component.width()*(w)*0.01
-        height = image_component.height()*(h)*0.01
-        rect_item = QGraphicsRectItem(0, 0, width, height)
-
-        rect_center_x = (image_component.width() - rect_item.rect().width()) / 2
-        rect_center_y = (image_component.height() - rect_item.rect().height()) / 2
-        rect_item = QGraphicsRectItem(0, 0, width, height)
-        rect_item.setPen(QPen(Qt.yellow))  # Set pen color to yellow
-        brush = QBrush(QColor(255, 255, 0, 50))
-        rect_item.setBrush(brush)
-        rect_item.setPos(rect_center_x, rect_center_y)
-        scene.addItem(rect_item)
-        if not inner_rect.isChecked():
-            brush = QBrush(QColor(0, 0, 0, 50))
-            rect_item.setBrush(brush)
-            rect_item.setPos(rect_center_x, rect_center_y)
-            scene.addItem(rect_item)
-            overlay_path = QPainterPath()
-            overlay_path.addRect(0, 0, image_component.width(), image_component.height())
-            rect_path = QPainterPath()
-            rect_path.addRect(rect_center_x, rect_center_y, width, height)
-            # Subtract rect_path from overlay_path
-            overlay_path -= rect_path
-            # Create a QGraphicsPathItem for the resulting path (difference)
-            difference_item = scene.addPath(overlay_path, QPen(Qt.NoPen), QBrush(QColor(255, 255, 0, 50)))
-        return rect_item
-
-
-
-    def apply_region(self, value):
-        """
-        Applies the region mask to the current Fourier component based on the rectangle.
-        The region is adjusted using the region_selector slider.
-        """
-        for frame in range(1, 5):  # Loop through all frames (1-4)
-            if self.current_images[frame - 1] is not None:  # Ensure image is loaded for the frame
-                # Update Fourier component for the current frame
-                self.update_ft_component(frame - 1)
-
-                # Get the image data and scene for the frame
-                img_data = self.current_images[frame - 1]
-                scene = self.get_scene_for_frame(frame)  # Retrieve the scene for the current frame
-
-                # Add a resizable rectangle to the scene
-                if self.out_region_radioButton.isChecked() or self.in_region_radioButton.isChecked():
-                    rect_item = self.addResizableRectangle(
-                        scene,
-                        self.convert_component_to_qimage(img_data),  # Convert the image component
-                        value, 
-                        value,
-                        self.in_region_radioButton
-                    )
-                    self.masked_img_comp = self.extractRegion(rect_item, self.convert_component_to_qimage(img_data), img_data, self.in_region_radioButton)
-
-
-    def extractRegion(self, rect_item, image_component, image_component_array, inner_region_selected):
-        image_component = QGraphicsPixmapItem(QPixmap.fromImage(image_component))
-        rect_scene_pos = rect_item.scenePos()
-        rect_scene_rect = rect_item.rect()
-        rect_image_pos = image_component.mapFromScene(rect_scene_pos)
-        rect_image_rect = image_component.mapFromScene(rect_scene_rect).boundingRect()
-
-        if inner_region_selected.isChecked():
-            mask = np.zeros_like(image_component_array)
-            mask[int(rect_image_pos.y()):int(rect_image_pos.y() + rect_image_rect.height()),
-                int(rect_image_pos.x()):int(rect_image_pos.x() + rect_image_rect.width())] = 1
-        else:
-            mask = np.ones_like(image_component_array)
-            mask[int(rect_image_pos.y()):int(rect_image_pos.y() + rect_image_rect.height()),
-            int(rect_image_pos.x()):int(rect_image_pos.x() + rect_image_rect.width())] = 0
-
-        image_component_array = image_component_array * mask
-        return image_component_array
-
-
-    def convert_component_to_qimage(self, component):
-        """
-        Converts a Fourier component (2D array) to a QImage for display.
-        """
-        component = (component / np.max(component) * 255).astype(np.uint8)
-        height, width = component.shape
-        bytes_per_line = component.strides[0]
-        return QtGui.QImage(component.data, width, height, bytes_per_line, QtGui.QImage.Format_Grayscale8)
-
-
-    def get_scene_for_frame(self, frame):
-        if frame == 1:
-            return self.fourierimage1
-        elif frame == 2:
-            return self.fourierimage2
-        elif frame == 3:
-            return self.fourierimage3
-        elif frame == 4:
-            return self.fourierimage4
-        else:
-            raise ValueError(f"Invalid frame number: {frame}")
-    
-
-    def addResizableRectangle(self, scene,image_component,w,h,inner_rect):
-        width = image_component.width()*(w)*0.01
-        height = image_component.height()*(h)*0.01
-        rect_item = QGraphicsRectItem(0, 0, width, height)
-
-        rect_center_x = (image_component.width() - rect_item.rect().width()) / 2
-        rect_center_y = (image_component.height() - rect_item.rect().height()) / 2
-        rect_item = QGraphicsRectItem(0, 0, width, height)
-        rect_item.setPen(QPen(Qt.yellow))  # Set pen color to yellow
-        brush = QBrush(QColor(255, 255, 0, 50))
-        rect_item.setBrush(brush)
-        rect_item.setPos(rect_center_x, rect_center_y)
-        scene.addItem(rect_item)
-        if not inner_rect.isChecked():
-            brush = QBrush(QColor(0, 0, 0, 50))
-            rect_item.setBrush(brush)
-            rect_item.setPos(rect_center_x, rect_center_y)
-            scene.addItem(rect_item)
-            overlay_path = QPainterPath()
-            overlay_path.addRect(0, 0, image_component.width(), image_component.height())
-            rect_path = QPainterPath()
-            rect_path.addRect(rect_center_x, rect_center_y, width, height)
-            # Subtract rect_path from overlay_path
-            overlay_path -= rect_path
-            # Create a QGraphicsPathItem for the resulting path (difference)
-            difference_item = scene.addPath(overlay_path, QPen(Qt.NoPen), QBrush(QColor(255, 255, 0, 50)))
-        return rect_item
-
-
     ############### PART B ###################
 
-    # def update_transmitter_rows(self):
-    #     """
-    #     Updates the number of rows in the frequency and phase table based on the transmitter count.
-    #     """
-    #     count = self.no_transmitters_spinbox.value()
-    #     current_rows = self.frequency_phase_table_2.rowCount()
-
-    #     # Add or remove rows to match the transmitter count
-    #     while count > current_rows:
-    #         self.add_table_row()
-    #         self.magnitudes.append(1)
-    #         current_rows += 1
-    #     while count < current_rows:
-    #         self.frequencies.pop()
-    #         self.phases.pop()
-    #         self.magnitudes.pop()
-    #         self.frequency_phase_table_2.removeRow(current_rows - 1)
-    #         current_rows -= 1
-
-    #     # Recalculate beamforming after updating rows
-    #     self.beam_forming()
-
-    # def add_table_row(self):
-    #     """
-    #     Adds a new row with default widgets for frequency and phase.
-    #     """
-    #     row_position = self.frequency_phase_table_2.rowCount()
-    #     self.frequency_phase_table_2.insertRow(row_position)
-
-    #     # Ensure the frequencies, phases, and magnitudes lists have room for the new row
-    #     self.frequencies.append(1000)  # Default frequency
-    #     self.phases.append(0.0)  # Default phase
-    #     self.magnitudes.append(1)  # Default magnitude
-
-    #     # Create new spin boxes for frequency and phase
-    #     freq_spinbox = QSpinBox()
-    #     freq_spinbox.setMinimum(1)
-    #     freq_spinbox.setMaximum(10000)
-    #     freq_spinbox.setValue(self.frequencies[row_position])  # Default frequency value
-    #     freq_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "frequency", value))
-
-    #     phase_spinbox = QDoubleSpinBox()
-    #     phase_spinbox.setMinimum(-180)
-    #     phase_spinbox.setMaximum(180)
-    #     phase_spinbox.setValue(self.phases[row_position])  # Default phase value
-    #     phase_spinbox.setSingleStep(0.1)
-    #     phase_spinbox.valueChanged.connect(lambda value, row=row_position: self.update_parameters(row, "phase", value))
-
-    #     # Add the frequency spin box to the first column
-    #     freq_layout = QVBoxLayout()
-    #     freq_layout.addWidget(freq_spinbox)
-    #     freq_layout.setAlignment(Qt.AlignCenter)
-    #     freq_widget = QWidget()
-    #     freq_widget.setLayout(freq_layout)
-    #     self.frequency_phase_table_2.setCellWidget(row_position, 0, freq_widget)
-
-    #     # Add the phase spin box to the second column
-    #     phase_layout = QVBoxLayout()
-    #     phase_layout.addWidget(phase_spinbox)
-    #     phase_layout.setAlignment(Qt.AlignCenter)
-    #     phase_widget = QWidget()
-    #     phase_widget.setLayout(phase_layout)
-    #     self.frequency_phase_table_2.setCellWidget(row_position, 1, phase_widget)
-
     def update_radio_button_text(self, checked):
-        """
-        Updates the UI based on the radio button state.
-        If checked, the radio button text changes to 'Curved', and curvature angle controls are shown.
-        If unchecked, the radio button text changes to 'Linear', and curvature angle controls are hidden.
-        """
         if checked:
-            self.linear_radio_button.setText("linear") # Update the label next to the radio button
-            self.curvature_angle_label.setVisible(False)  # Hide the "Curvature Angle" label
-            self.curvature_lcd.hide()  #hide the lcd
-            self.curvature_slider.hide()  # hide the slider
+            self.array_type = "linear"
+            self.curvature_angle_previous = self.curvature_angle
+            self.curvature_angle = 0
+            self.linear_radio_button.setText("Linear")
+            self.curvature_slider.hide()
+            self.curvature_lcd.hide()
+            self.curvature_angle_label.hide()
+            self.curvature_unit_label.hide()
         else:
-            self.linear_radio_button.setText("curved")  # Update the label next to the radio button
-            self.curvature_angle_label.setVisible(True)  # Show the "Curvature Angle" label
-            self.curvature_lcd.show() # Show the lcd
-            self.curvature_slider.show()  # Show the slider
+            self.array_type = "curved"
+            self.curvature_angle = getattr(self, 'curvature_angle_previous', 30)
+            self.linear_radio_button.setText("Curved")
+            self.curvature_slider.show()
+            self.curvature_lcd.show()
+            self.curvature_angle_label.show()
+            self.curvature_unit_label.show()
+        self.beam_forming()
 
+    def update_transmitter_count(self, count):
+        print(f"no transmitters updated: {count}")
+        self.num_transmitters = count
+        self.frequencies = [self.frequencies[0]] * count
+        self.phases = [self.phases[0]] * count
+        self.beam_forming()
 
-    def add_custom_widget(self, row, col, mode):
-        """
-        Add a spinbox to the table for either frequency or phase adjustments.
-        """
-        widget = QtWidgets.QSpinBox() if mode == "frequency" else QtWidgets.QDoubleSpinBox()
-        widget.setMinimum(1 if mode == "frequency" else -180)
-        widget.setMaximum(10000 if mode == "frequency" else 180)
-        widget.setValue(self.frequencies[row] if mode == "frequency" else self.phases[row])
+    def update_frequency(self, value):
+        print(f"Frequency updated: {value}")
+        self.frequencies = [value] * self.num_transmitters
+        self.frequency_lcd.display(value//1000000)
+        self.beam_forming()
 
-        # Connect signal to update plots dynamically
-        widget.valueChanged.connect(lambda value, r=row, c=col, m=mode: self.update_parameters(r, m, value))
+    def update_phase(self, value):
+        print(f"Phase updated: {value}")
+        self.phases = [value] * self.num_transmitters
+        self.phase_lcd.display(value)
+        self.beam_forming()
 
-        # Add the widget to the corresponding cell in the table
-        # self.frequency_phase_table_2.setCellWidget(row, col, widget)
+    def update_curvature_angle(self, value):
+        print(f"curved angle updated: {value}")
+        self.curvature_angle = value
+        self.curvature_lcd.display(value)
+        self.beam_forming()
 
-    def update_parameters(self, row, mode, value):
-        """
-        Update parameters based on spinbox changes and regenerate plots.
-        """
-        if mode == "frequency":
-            self.frequencies[row] = value  # Update frequency for the transmitter
-            wavelength = 3e8 / self.frequencies[row]  # Wavelength in meters
-            self.element_spacing = wavelength / 2  # Spacing is half the wavelength
-        elif mode == "phase":
-            self.phases[row] = value  # Update phase for the transmitter
+    def update_array_Xposition(self, value):
+        print(f"Array position x updated: {value}")
+        self.array_position[0] = [value]
+        self.position_lcd.display(value)
+        self.beam_forming()
 
-        # Recalculate and update the plots
+    def update_array_Yposition(self,value):
+        print(f"Array position y updated: {value}")
+        self.array_position[1] = [value]
+        self.position_y_lcd.display(value)
         self.beam_forming()
 
     def beam_forming(self):
-        """
-        Generate and display the beam pattern and ripple wave interference map for the phased array.
-        """
+        print(f"self.frequencies updated: {self.frequencies}")
+        print(f"self.phases updated: {self.phases}")
+        print(f"self.array_type updated: {self.array_type}")
+        print(f"self.curvature_angle updated: {self.curvature_angle}")
+
         visualizer = Visualizer()
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
-
-        # Generate ripple and beam pattern
-        ripple_wave_fig = visualizer.plot_wave_propagation_pattern(
-            num_transmitters=len(self.frequencies),
+        visualizer.set_position_offset(self.array_position[0], self.array_position[1])
+        
+        # Generate and display the plots
+        field_map_fig = visualizer.plot_field_map(
+            num_transmitters=self.num_transmitters,
             element_spacing=self.element_spacing,
-            frequency=np.mean(self.frequencies),
-            phases=self.phases
+            frequency=self.frequencies[0],
+            phases=self.phases,
+            curvature_angle=self.curvature_angle,
         )
-        beam_pattern_fig = visualizer.plot_beam_pattern_polar()
 
-        # Display plots
-        self.display_plot(self.beam_map_view, ripple_wave_fig)  
-        self.display_plot(self.beam_plot_view, beam_pattern_fig)  
+        beam_pattern_fig = visualizer.plot_beam_pattern_polar(
+            num_transmitters=self.num_transmitters,
+            element_spacing=self.element_spacing,
+            frequency=self.frequencies[0],
+            phases=self.phases,
+            curvature_angle=self.curvature_angle,
+        )
+        
+        self.display_plot(self.beam_map_view, field_map_fig)
+        self.display_plot(self.beam_plot_view, beam_pattern_fig) 
 
-       
-    
     def display_plot(self, widget, figure):
-        """
-        Utility to render a matplotlib plot into a QWidget.
-        """
         from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
         from PyQt5.QtWidgets import QVBoxLayout
 
-        # Ensure the widget has a layout
         if widget.layout() is None:
             widget.setLayout(QVBoxLayout())
 
-        # Clear any existing widgets in the layout
         layout = widget.layout()
         for i in reversed(range(layout.count())):
             layout.itemAt(i).widget().deleteLater()
 
-        # Create a new FigureCanvas and add it to the layout
         canvas = FigureCanvas(figure)
         layout.addWidget(canvas)
         layout.setAlignment(QtCore.Qt.AlignCenter)
-    
-    def update_curvature_angle(self, value):
-        """
-        Updates the curvature angle for the phased array and recalculates the beamforming pattern.
-        """
-        self.curvature_angle = value  # Update the curvature angle
-        self.curvature_lcd.display(value)  # Update the LCD display
-        self.beam_forming()  # Recalculate the beamforming pattern
 
-    def update_frequency(self, value):
-        """
-        Updates the frequency for the phased array and recalculates the beamforming pattern.
-        """
-        self.current_frequency = value
-        self.frequency_lcd.display(value)  # Update the LCD display
-        self.beam_forming()
-    
-    def update_phase(self, value):
-        """
-        Updates the phase for the phased array and recalculates the beamforming pattern.
-        """
-        self.current_phase = value
-        self.phase_lcd.display(value)  # Update the LCD display
-        self.beam_forming()
-    
-    def update_position(self, value):
-        """
-        Updates the position for the phased array and recalculates the beamforming pattern.
-        """
-        self.current_position = value
-        self.position_lcd.display(value)  # Update the LCD display
+    def update_scenario_parameters(self):
+        scenario = self.scenario_combobox.currentText()
+        parameters = scenarios.ScenarioParameters()
+        if scenario == "5G":
+            parameters.update_parameters("5G")
+            parameters.display_parameters()
+        elif scenario == "Airborne Radar":
+            parameters.update_parameters("Airborne Radar")
+            parameters.display_parameters()
+        elif scenario == "Tumor Ablation":
+            parameters.update_parameters("Tumor Ablation")
+            parameters.display_parameters()
+        else:
+            parameters.update_parameters("Custom")
+            parameters.display_parameters()
+        
+        self.frequency_slider.setValue(parameters.frequency)
+        self.phase_slider.setValue(parameters.phase)
+        self.curvature_slider.setValue(parameters.curvature_angle)
+        self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
+        self.array_type = parameters.array_geometry
+        if self.array_type == "linear":
+            self.linear_radio_button.setChecked(True)
+        else:
+            self.linear_radio_button.setChecked(False)  
+        self.update_radio_button_text(self.linear_radio_button.isChecked())
+
+        print(f"Scenario updated: {scenario}")
+        print(f"self.frequencies updated: {self.frequencies}")
+        print(f"self.phases updated: {self.phases}")
+        print(f"self.array_type updated: {self.array_type}")
+        print(f"self.curvature_angle updated: {self.curvature_angle}")
+
         self.beam_forming()
 
 # Entry point of the application
