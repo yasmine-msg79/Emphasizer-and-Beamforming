@@ -670,7 +670,8 @@ class MainWindow(QtWidgets.QMainWindow):
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
-
+        visualizer.set_position_offset(self.array_position[0], self.array_position[1])
+        
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
             num_transmitters=self.num_transmitters,
