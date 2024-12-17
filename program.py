@@ -199,6 +199,7 @@ class MainWindow(QtWidgets.QMainWindow):
             image_calculations = Image.open(file_name).convert('L')
             resize_image_calculations = image_calculations.resize((self.min_width ,self.min_height))
             self.current_images[frame - 1] = resize_image_calculations
+            print(self.current_images[frame - 1])
             ptr = image.bits()
             ptr.setsize(self.min_width * self.min_height)
             if frame == 1:
