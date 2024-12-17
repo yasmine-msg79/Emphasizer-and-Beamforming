@@ -258,21 +258,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 # self.add_rectangle_to_frame(4) 
                 self.image4_loaded = True
             self.resize_images()   
-    
-    # def add_rectangle_to_frame(self, frame):
-    #     # self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)
-    #     self.linked_rectangles.append(self.rectangle)
-        
-    #     if frame == 1:
-    #         self.fourierimage1.addItem(self.rectangle)
-    #     elif frame == 2:
-    #         self.fourierimage2.addItem(self.rectangle)
-    #     elif frame == 3:
-    #         self.fourierimage3.addItem(self.rectangle)
-    #     elif frame == 4:
-    #         self.fourierimage4.addItem(self.rectangle)
-    #     else:
-    #         print(f"Frame {frame} is not supported.")
 
                 
     def resize_images(self):
@@ -362,32 +347,44 @@ class MainWindow(QtWidgets.QMainWindow):
             ft_magnitude_sum = np.zeros((self.min_height, self.min_width))
             ft_phase_sum = np.zeros((self.min_height, self.min_width))
  
-            # Assuming a single rectangle for now
-            rect_bounds = self.rectangle.sceneBoundingRect()
-            x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
-            x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
-            print(f"self.rectangle in inverse ft: {self.rectangle}")
+            # # Assuming a single rectangle for now
+            # rect_bounds = self.rectangle.sceneBoundingRect()
+            # x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
+            # x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
+            # print(f"self.rectangle in inverse ft: {self.rectangle}")
 
-            # Ensure bounds are within the image size
-            x_min, x_max = max(0, x_min), min(self.min_width, x_max)
-            y_min, y_max = max(0, y_min), min(self.min_height, y_max)
-            if self.in_region_radioButton.isChecked():
-                mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
-                mask[y_min:y_max, x_min:x_max] = 1
-            else:
-                mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
-                mask[y_min:y_max, x_min:x_max] = 0
+            # # Ensure bounds are within the image size
+            # x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+            # y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+
+            # Extract mask and bounds
+            # rect_bounds, mask = self.rectangle.get_rectangle_bounds(
+            #     (self.min_height, self.min_width), in_region=self.in_region_radioButton.isChecked()
+            # )
+            # print(f"Rectangle bounds: {rect_bounds}")
+            # if self.in_region_radioButton.isChecked():
+            #     mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 1
+            # else:
+            #     mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 0
 
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
                     resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    ft_magnitude_sum += resized_magnitude * magnitude_weights[i] * mask
-                    ft_phase_sum += resized_phase * phase_weights[i] * mask
+                    # ft_magnitude_sum += resized_magnitude * magnitude_weights[i] * mask
+                    # ft_phase_sum += resized_phase * phase_weights[i] * mask
+                    magnitude_cropped = self.rectangle.extract_region_data(resized_magnitude, 
+                                                                       self.in_region_radioButton.isChecked())
+                    phase_cropped = self.rectangle.extract_region_data(resized_phase, 
+                                                                    self.in_region_radioButton.isChecked())
+
+                    ft_magnitude_sum += magnitude_cropped * magnitude_weights[i]
+                    ft_phase_sum += phase_cropped * phase_weights[i]
             # Reconstruct using magnitude and phase
-            # reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
-            reconstructed_ft = ft_magnitude_sum * np.exp(1j * ft_phase_sum)
+            reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
 
         else:
@@ -426,6 +423,7 @@ class MainWindow(QtWidgets.QMainWindow):
             reconstructed_image = (255 * (reconstructed_image / max_val)).astype(np.uint8) if max_val > 0 else np.zeros_like(reconstructed_image, dtype=np.uint8)
 
         return reconstructed_image
+    
     
 
 
@@ -477,6 +475,7 @@ class MainWindow(QtWidgets.QMainWindow):
             rect.linked_rectangles = rects  # Share the same list
             rects.append(rect)
             currentFourierImage.addItem(rect)
+            rect.update()
 
 
             print(f"self.rectangle in update ft: {self.rectangle}")
