@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
 import numpy as np
 import cv2
+
 import matplotlib.pyplot as plt
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
@@ -164,7 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.setValue(0)
         self.phase_slider.valueChanged.connect(self.update_phase)
         self.curvature_slider.setMinimum(1)
-        self.curvature_slider.setMaximum(60)
+        self.curvature_slider.setMaximum(180)
         # self.curvature_slider.setValue(30)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
@@ -668,7 +669,8 @@ class MainWindow(QtWidgets.QMainWindow):
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
-
+        visualizer.set_position_offset(self.array_position[0], self.array_position[1])
+        
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
             num_transmitters=self.num_transmitters,
@@ -710,8 +712,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if scenario == "5G":
             parameters.update_parameters("5G")
             parameters.display_parameters()
-        elif scenario == "Ultrasound":
-            parameters.update_parameters("Ultrasound")
+        elif scenario == "Airborne Radar":
+            parameters.update_parameters("Airborne Radar")
             parameters.display_parameters()
         elif scenario == "Tumor Ablation":
             parameters.update_parameters("Tumor Ablation")
@@ -720,13 +722,20 @@ class MainWindow(QtWidgets.QMainWindow):
             parameters.update_parameters("Custom")
             parameters.display_parameters()
         
+        self.array_type = parameters.array_geometry
+        if self.array_type == "linear":
+            self.linear_radio_button.setChecked(True)
+        else:
+            self.linear_radio_button.setChecked(False)  
+        self.update_radio_button_text(self.linear_radio_button.isChecked())
         self.frequency_slider.setValue(parameters.frequency)
         self.phase_slider.setValue(parameters.phase)
         self.curvature_slider.setValue(parameters.curvature_angle)
-        self.beam_position_slider.setValue(parameters.position_between_transmitters)
         self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
-        self.beam_position_slider.setValue(parameters.positionX)
-        self.beam_position_y_slider.setValue(parameters.positionY)
+        self.beam_position_slider.setValue(0)
+        self.beam_position_y_slider.setValue(0)
+        
+       
 
         print(f"Scenario updated: {scenario}")
         print(f"self.frequencies updated: {self.frequencies}")
