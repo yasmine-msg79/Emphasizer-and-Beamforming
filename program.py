@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 
 import numpy as np
 import cv2
+
 import matplotlib.pyplot as plt
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
@@ -158,7 +159,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.setValue(0)
         self.phase_slider.valueChanged.connect(self.update_phase)
         self.curvature_slider.setMinimum(1)
-        self.curvature_slider.setMaximum(60)
+        self.curvature_slider.setMaximum(180)
         # self.curvature_slider.setValue(30)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)

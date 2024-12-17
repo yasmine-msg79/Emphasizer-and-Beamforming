@@ -103,29 +103,14 @@ class Visualizer:
         if phases:
             total_phase_shift = np.mean(np.radians(phases))  # Compute the mean phase shift
             theta_shift = int(total_phase_shift / (2 * np.pi) * grid_size)  # Convert phase shift to grid index shift
-
-            for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
-                # Translate the intensity to center on the transmitter position
-                shifted_X = X - pos_x
-                shifted_Y = Y - pos_y
-
-                # Rotate the grid around the origin
-                rotated_X = shifted_X * np.cos(total_phase_shift) - shifted_Y * np.sin(total_phase_shift)
-                rotated_Y = shifted_X * np.sin(total_phase_shift) + shifted_Y * np.cos(total_phase_shift)
-
-                # Rotate the intensity in place
-                intensity = np.roll(intensity, shift=theta_shift, axis=0)
-
-                # Translate the grid back to the transmitter's position
-                X = rotated_X + pos_x
-                Y = rotated_Y + pos_y
+            intensity = np.roll(intensity, shift=theta_shift, axis=0)
 
         # Plot the heat map in polar coordinates
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(5, 8))
         heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
         fig.colorbar(heat_plot, ax=ax, label="Interference Intensity")
         ax.set_title("") 
-        fig.text(0.12, 0.5, "Field Map", va="center", ha="center", fontsize=16)
+        # fig.text(0.25, 0.5, "Field Map", va="center", ha="center", fontsize=16)
 
 
         # Overlay transmitter positions (red dots)
@@ -175,7 +160,7 @@ class Visualizer:
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(9, 8))
         ax.plot(angles, intensity, color="blue", linewidth=2)
         ax.set_title("") 
-        fig.text(0.21, 0.5, "Beam Pattern", va="center", ha="center", fontsize=16)
+        # fig.text(0.21, 0.5, "Beam Pattern", va="center", ha="center", fontsize=16)
         ax.grid(True)
 
         return fig
