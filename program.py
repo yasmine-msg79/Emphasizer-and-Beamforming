@@ -184,7 +184,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_slider.setMaximum(10)
         self.beam_position_slider.setSingleStep(1)
         self.beam_position_slider.valueChanged.connect(self.update_array_Xposition)
-        self.beam_position_y_slider.setMinimum(-10)
+        self.beam_position_y_slider.setMinimum(0)
         self.beam_position_y_slider.setMaximum(10)
         self.beam_position_y_slider.setSingleStep(1)
         self.beam_position_y_slider.valueChanged.connect(self.update_array_Yposition)

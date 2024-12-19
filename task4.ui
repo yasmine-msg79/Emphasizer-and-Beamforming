@@ -1481,6 +1481,12 @@ font:11pt &quot;Microsoft Sans Serif&quot;;</string>
          </item>
          <item row="2" column="7">
           <widget class="QLCDNumber" name="phase_lcd">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="font">
             <font>
              <family>Microsoft Sans Serif</family>
@@ -1530,6 +1536,12 @@ font:11pt &quot;Microsoft Sans Serif&quot;;</string>
          </item>
          <item row="2" column="6">
           <widget class="QSlider" name="beam_phase_slider">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>200</width>
