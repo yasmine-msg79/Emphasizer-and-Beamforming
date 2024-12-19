@@ -14,7 +14,7 @@ class ScenarioParameters:
         self.frequency = 1000000000  # Frequency in MHz
         self.phase = 0 
         self.curvature_angle = 30  # Degrees
-        self.position_between_transmitters = 100000  # Distance in micrometers
+        self.position_between_transmitters = 1  # Distance in micrometers
         self.num_transmitters = 16  # Example for massive MIMO
         self.array_geometry = "linear"
 
@@ -22,7 +22,7 @@ class ScenarioParameters:
         self.frequency = 1600000000  # Frequency in kHz
         self.phase = 90
         self.curvature_angle = 30  # Degrees
-        self.position_between_transmitters = 3000  # Distance in micrometers
+        self.position_between_transmitters = 0.8  # Distance in micrometers
         self.num_transmitters = 32 # Example for ultrasound transducers
         self.array_geometry = "linear"
 
@@ -30,7 +30,7 @@ class ScenarioParameters:
         self.frequency = 2000000000  # Frequency in kHz
         self.phase = 0 
         self.curvature_angle = 60  # Degrees
-        self.position_between_transmitters = 50000  # Distance in micrometers
+        self.position_between_transmitters = 0.1  # Distance in micrometers
         self.num_transmitters = 4  # Example for tumor ablation
         self.array_geometry = "curved"
 
@@ -38,7 +38,7 @@ class ScenarioParameters:
         self.frequency = 1000000000
         self.phase = 0
         self.curvature_angle = 30
-        self.position_between_transmitters = 0
+        self.position_between_transmitters = 0.5
         self.num_transmitters = 2  
         self.array_geometry = "curved" 
        

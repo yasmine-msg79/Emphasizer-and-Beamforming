@@ -132,6 +132,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_y_slider = self.findChild(QtWidgets.QSlider, "position_y_slider")
         self.position_y_lcd = self.findChild(QtWidgets.QLCDNumber, "position_y_lcd")
         self.curvature_unit_label = self.findChild(QtWidgets.QLabel, "label_12")
+        self.spacing_slider = self.findChild(QtWidgets.QSlider, "spacing_slider")
+        self.spacing_lcd = self.findChild(QtWidgets.QLCDNumber, "spacing_lcd")
 
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
@@ -179,6 +181,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_y_slider.setMaximum(10)
         self.beam_position_y_slider.setSingleStep(1)
         self.beam_position_y_slider.valueChanged.connect(self.update_array_Yposition)
+
+        self.spacing_slider.setMinimum(1)
+        self.spacing_slider.setMaximum(15)
+        self.spacing_slider.setSingleStep(1)
+        self.spacing_slider.setValue(5)
+        self.spacing_slider.valueChanged.connect(self.update_spacing)
 
         self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
 
@@ -660,6 +668,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.position_y_lcd.display(value)
         self.beam_forming()
 
+    def update_spacing(self, value):
+        print(f"Element spacing updated: {value}")
+        self.element_spacing = value // 10
+        self.spacing_lcd.display(value)
+        self.beam_forming()
+
     def beam_forming(self):
         print(f"self.frequencies updated: {self.frequencies}")
         print(f"self.phases updated: {self.phases}")
@@ -671,6 +685,7 @@ class MainWindow(QtWidgets.QMainWindow):
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
         visualizer.set_position_offset(self.array_position[0], self.array_position[1])
+        visualizer.set_element_spacing(self.element_spacing)
         
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
@@ -733,6 +748,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.setValue(parameters.phase)
         self.curvature_slider.setValue(parameters.curvature_angle)
         self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
+        self.spacing_slider.setValue(int(parameters.position_between_transmitters * 10))
         self.beam_position_slider.setValue(0)
         self.beam_position_y_slider.setValue(0)
         
