@@ -31,6 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.min_width = 0
         self.min_height = 0
+        self.used_height = 657
+        self.used_width = 458
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
@@ -110,6 +112,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # # Add selection rectangles to Fourier scenes
         self.linked_rectangles = []
         self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect2 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect3 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect4 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rects = [self.rect1, self.rect2, self.rect3,self.rect4]
 
         # Inside your main setup method (e.g., __init__ or a setupUi wrapper)
         self.in_region_radioButton.toggled.connect(self.handle_region_change)
@@ -231,7 +238,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image1.fitInView(self.scene1.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(0)
                 self.update_ft_component(0)
-                # self.add_rectangle_to_frame(1) 
+                self.add_rectangle_to_frame(0) 
                 self.image1_loaded = True  
 
             elif frame == 2:
@@ -242,7 +249,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image2.fitInView(self.scene2.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(1)
                 self.update_ft_component(1)
-                # self.add_rectangle_to_frame(2) 
+                self.add_rectangle_to_frame(1) 
                 self.image2_loaded = True
 
             elif frame == 3:
@@ -253,7 +260,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(2)
                 self.update_ft_component(2)
-                # self.add_rectangle_to_frame(3) 
+                self.add_rectangle_to_frame(2) 
                 self.image3_loaded = True
 
             elif frame == 4:
@@ -264,24 +271,43 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.image4.fitInView(self.scene4.sceneRect(), QtCore.Qt.KeepAspectRatio)
                 self.compute_ft_components(3)
                 self.update_ft_component(3)
-                # self.add_rectangle_to_frame(4) 
+                self.add_rectangle_to_frame(3) 
                 self.image4_loaded = True
             self.resize_images()   
     
-    # def add_rectangle_to_frame(self, frame):
-    #     # self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)
-    #     self.linked_rectangles.append(self.rectangle)
-        
-    #     if frame == 1:
-    #         self.fourierimage1.addItem(self.rectangle)
-    #     elif frame == 2:
-    #         self.fourierimage2.addItem(self.rectangle)
-    #     elif frame == 3:
-    #         self.fourierimage3.addItem(self.rectangle)
-    #     elif frame == 4:
-    #         self.fourierimage4.addItem(self.rectangle)
-    #     else:
-    #         print(f"Frame {frame} is not supported.")
+    def add_rectangle_to_frame(self, frame):
+        print("self.scene1.sceneRect():",self.image1.width()) 
+        if frame == 0:
+            currentFourierImage = self.fourierimage1
+            print("frame1")
+        elif frame == 1:
+            currentFourierImage = self.fourierimage2
+            print("frame2")
+        elif frame == 2:
+            selected_component = self.Fourier_comboBox_3.currentText()
+            currentFourierImage = self.fourierimage3
+            self.update_weight(2, self.weight_3.value())
+            print("frame3")
+        elif frame == 3:
+            selected_component = self.Fourier_comboBox_4.currentText()
+            currentFourierImage = self.fourierimage4
+            self.update_weight(3, self.weight_4.value()) 
+
+        # if selected_component in self.ft_components[frame]:
+        print("def add_rectangle_to_frame(self, frame):**********")
+            # component_image = self.ft_components[frame][selected_component]
+            # component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            # q_image = QtGui.QImage(component_image.data, self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
+            # pixmap = QtGui.QPixmap.fromImage(q_image)
+            # currentFourierImage.clear()
+            # pixmap = pixmap.scaled(self.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            # currentFourierImage.addPixmap(pixmap)
+            # currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
+            
+        self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect1.linked_rectangles = self.rects  # Share the same list
+        self.rects[frame] = self.rect1
+        currentFourierImage.addItem(self.rect1)
 
                 
     def resize_images(self):
@@ -290,7 +316,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # Open and resize the image
                 image = Image.open(self.loaded_files[i]).convert('L')
                 resized_image = image.resize((self.min_width, self.min_height))
-
+               
                 # Convert to NumPy array and then to QImage
                 np_array = np.array(resized_image, dtype=np.uint8)
                 byte_data = np_array.tobytes()
@@ -302,6 +328,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scenes[i].addPixmap(pixmap)
                 self.scenes[i].setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.loaded_images[i].fitInView(self.scenes[i].sceneRect(), QtCore.Qt.KeepAspectRatio)
+                
+                self.used_width = self.loaded_images[i].width()
+                self.used_height = self.loaded_images[i].height()
+                print("self.used_width: ",self.used_width)
                 
                 print(f"Image {i} resized to {self.min_width}x{self.min_height}")
                 # to resize the ft image also     
@@ -366,38 +396,65 @@ class MainWindow(QtWidgets.QMainWindow):
             slider.value() / 100 if combobox.currentText() == "FT Imaginary" else 0
             for slider, combobox in zip(self.weights_sliders, self.checkboxes)
         ]
-
         if self.magnitude_phase.isChecked():
             ft_magnitude_sum = np.zeros((self.min_height, self.min_width))
             ft_phase_sum = np.zeros((self.min_height, self.min_width))
  
             # Assuming a single rectangle for now
-            rect_bounds = self.rectangle.sceneBoundingRect()
-            x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
-            x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
-            print(f"self.rectangle in inverse ft: {self.rectangle}")
+            # rect_bounds = self.rectangle.sceneBoundingRect()
+            # x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
+            # x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
+            # print(f"Updated Bounds: {bounding_rect.left()}, {bounding_rect.top()}, {bounding_rect.right()}, {bounding_rect.bottom()}")
 
-            # Ensure bounds are within the image size
-            x_min, x_max = max(0, x_min), min(self.min_width, x_max)
-            y_min, y_max = max(0, y_min), min(self.min_height, y_max)
-            if self.in_region_radioButton.isChecked():
-                mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
-                mask[y_min:y_max, x_min:x_max] = 1
-            else:
-                mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
-                mask[y_min:y_max, x_min:x_max] = 0
+            # bounding_rect = self.rect1.sceneBoundingRect()
+            # x_min = self.rects[0].x_min    # Leftmost x
+            # x_max = self.rects[0].x_max   # Rightmost x
+            # y_min = self.rects[0].y_min      # Topmost y
+            # y_max = self.rects[0].y_max  # Bottommost y
+            # print(f"self.rectangle in inverse ft: {self.rectangle}")
+            # print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
+
+            # # Ensure bounds are within the image size
+            # x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+            # y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+            # if self.in_region_radioButton.isChecked():
+            #     mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 1
+            # else:
+            #     mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 0
 
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
+                    x_min = self.rects[i].x_min    # Leftmost x
+                    x_max = self.rects[i].x_max   # Rightmost x
+                    y_min = self.rects[i].y_min     # Topmost y
+                    y_max = self.rects[i].y_max  # Bottommost y
+                    print(f"self.rectangle in inverse ft: {self.rectangle}")
+                    print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
+                    print("self.min_width:", self.min_width, "self.min_height", self.min_height)
+
+                    # Ensure bounds are within the image size
+                    x_min, x_max = max(0, x_min), min(self.used_width, x_max)
+                    y_min, y_max = max(0, y_min), min(self.used_height, y_max)
+                    if self.in_region_radioButton.isChecked():
+                        mask = np.zeros(( self.used_width,self.used_height), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 1
+                    else:
+                        mask = np.ones((self.used_width,self.used_height), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 0
+                        
+                    mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    ft_magnitude_sum += resized_magnitude * magnitude_weights[i] * mask
-                    ft_phase_sum += resized_phase * phase_weights[i] * mask
+                    ft_magnitude_sum += resized_magnitude * magnitude_weights[i] 
+                    ft_phase_sum += resized_phase * phase_weights[i]
             # Reconstruct using magnitude and phase
-            # reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
-            reconstructed_ft = ft_magnitude_sum * np.exp(1j * ft_phase_sum)
+            reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
+            reconstructed_ft *= mask
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
+            # reconstructed_image *= mask
 
         else:
             ft_real_sum = np.zeros((self.min_height, self.min_width))
@@ -408,18 +465,36 @@ class MainWindow(QtWidgets.QMainWindow):
             x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
             print(f"self.rectangle in inverse ft: {self.rectangle}")
 
-            # Ensure bounds are within the image size
-            x_min, x_max = max(0, x_min), min(self.min_width, x_max)
-            y_min, y_max = max(0, y_min), min(self.min_height, y_max)
-            if self.in_region_radioButton.isChecked():
-                mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
-                mask[y_min:y_max, x_min:x_max] = 1
-            else:
-                mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
-                mask[y_min:y_max, x_min:x_max] = 0
+            # # Ensure bounds are within the image size
+            # x_min, x_max = max(0, x_min), min(self.min_width, x_max)
+            # y_min, y_max = max(0, y_min), min(self.min_height, y_max)
+            # if self.in_region_radioButton.isChecked():
+            #     mask = np.zeros((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 1
+            # else:
+            #     mask = np.ones((self.min_height, self.min_width), dtype=np.uint8)
+            #     mask[y_min:y_max, x_min:x_max] = 0
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
+                    x_min = self.rects[i].x_min    # Leftmost x
+                    x_max = self.rects[i].x_max   # Rightmost x
+                    y_min = self.rects[i].y_min     # Topmost y
+                    y_max = self.rects[i].y_max  # Bottommost y
+                    print(f"self.rectangle in inverse ft: {self.rectangle}")
+                    print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
+                    print("self.min_width:", self.min_width, "self.min_height", self.min_height)
+                    # Ensure bounds are within the image size
+                    x_min, x_max = max(0, x_min), min(self.used_width, x_max)
+                    y_min, y_max = max(0, y_min), min(self.used_height, y_max)
+                    if self.in_region_radioButton.isChecked():
+                        mask = np.zeros(( self.used_width,self.used_height), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 1
+                    else:
+                        mask = np.ones((self.used_width,self.used_height), dtype=np.uint8)
+                        mask[y_min:y_max, x_min:x_max] = 0
+                        
+                    mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_real = self.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
                     resized_imaginary = self.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
                     ft_real_sum += resized_real * real_weights[i] * mask
@@ -481,11 +556,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
             # currentFourierImage.addItem(self.rectangles[index])
 
-            rects = []
-            rect = ResizableRectangle(x=10, y=10, width=100, height=100)
-            rect.linked_rectangles = rects  # Share the same list
-            rects.append(rect)
-            currentFourierImage.addItem(rect)
+            
+            self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+            self.rect1.linked_rectangles = self.rects  # Share the same list
+            self.rects[index] = self.rect1
+            currentFourierImage.addItem(self.rect1)
 
 
             print(f"self.rectangle in update ft: {self.rectangle}")
