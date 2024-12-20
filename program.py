@@ -167,7 +167,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_slider.setMinimum(500000000)
         self.frequency_slider.setMaximum(2000000000)
         self.frequency_slider.setSingleStep(10000000)  # Step size
-        # self.frequency_slider.setValue(1000000000)
         self.frequency_slider.valueChanged.connect(self.update_frequency)
         self.phase_slider.setMinimum(-180)
         self.phase_slider.setMaximum(180)
@@ -175,7 +174,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.valueChanged.connect(self.update_phase)
         self.curvature_slider.setMinimum(1)
         self.curvature_slider.setMaximum(180)
-        # self.curvature_slider.setValue(30)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
         self.no_transmitters_spinbox.setMaximum(100)
@@ -190,9 +188,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_y_slider.valueChanged.connect(self.update_array_Yposition)
 
         self.spacing_slider.setMinimum(1)
-        self.spacing_slider.setMaximum(15)
+        self.spacing_slider.setMaximum(200)
         self.spacing_slider.setSingleStep(1)
-        self.spacing_slider.setValue(5)
+        self.spacing_slider.setValue(50)
         self.spacing_slider.valueChanged.connect(self.update_spacing)
 
         self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
@@ -744,17 +742,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_forming()
 
     def update_spacing(self, value):
-        print(f"Element spacing updated: {value}")
-        self.element_spacing = value // 10
-        self.spacing_lcd.display(value)
+        spacing = value / 100.0
+        self.element_spacing = spacing
+        print(f"Element spacing updated: {spacing:.2f}")
+        self.spacing_lcd.setDigitCount(4)  # Ensure enough space for decimal display
+        self.spacing_lcd.display(f"{spacing:.2f}")  # Show decimal value
         self.beam_forming()
 
     def beam_forming(self):
-        print(f"self.frequencies updated: {self.frequencies}")
-        print(f"self.phases updated: {self.phases}")
-        print(f"self.array_type updated: {self.array_type}")
-        print(f"self.curvature_angle updated: {self.curvature_angle}")
-
         visualizer = Visualizer()
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)

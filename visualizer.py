@@ -8,7 +8,7 @@ class Visualizer:
         self.magnitudes = []  
         self.array_type = "linear"  
         self.curvature_angle = 30 
-        self.element_spacing = 0.5  
+        self.element_spacing = 50  
         self.position_offset = [0, 0]  # Default position offset (x, y)
 
     def set_frequencies(self, frequencies):
@@ -109,22 +109,6 @@ class Visualizer:
             theta_shift = int(total_phase_shift / (2 * np.pi) * grid_size)  # Convert phase shift to grid index shift
             intensity = np.roll(intensity, shift=theta_shift, axis=0)
 
-
-            # for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
-            #     # Translate the intensity to center on the transmitter position
-            #     shifted_X = X - pos_x
-            #     shifted_Y = Y - pos_y
-
-            #     # Rotate the grid around the origin
-            #     rotated_X = shifted_X * np.cos(total_phase_shift) - shifted_Y * np.sin(total_phase_shift)
-            #     rotated_Y = shifted_X * np.sin(total_phase_shift) + shifted_Y * np.cos(total_phase_shift)
-
-            #     # Rotate the intensity in place
-
-            #     # Translate the grid back to the transmitter's position
-            #     X = rotated_X + pos_x
-            #     Y = rotated_Y + pos_y
-
         # Plot the heat map in polar coordinates
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24, 18))
         ax.set_aspect(0.8)
@@ -133,8 +117,6 @@ class Visualizer:
         heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
         fig.colorbar(heat_plot, ax=ax, label="Interference Intensity", fraction=0.046, pad=0.12)
         ax.set_title("Field Map") 
-        # fig.text(0.25, 0.5, "Field Map", va="center", ha="center", fontsize=16)
-
 
         # Overlay transmitter positions (red dots)
         transmitter_r = np.sqrt(positions_x**2 + positions_y**2)
@@ -185,7 +167,6 @@ class Visualizer:
         ax.set_thetamax(180)
         ax.plot(angles, intensity, color="blue", linewidth=2)
         ax.set_title("Beam Pattern") 
-        # fig.text(0.21, 0.5, "Beam Pattern", va="center", ha="center", fontsize=16)
         ax.grid(True)
 
         return fig
