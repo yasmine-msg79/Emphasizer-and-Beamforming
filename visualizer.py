@@ -103,22 +103,23 @@ class Visualizer:
         if phases:
             total_phase_shift = np.mean(np.radians(phases))  # Compute the mean phase shift
             theta_shift = int(total_phase_shift / (2 * np.pi) * grid_size)  # Convert phase shift to grid index shift
+            intensity = np.roll(intensity, shift=theta_shift, axis=0)
 
-            for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
-                # Translate the intensity to center on the transmitter position
-                shifted_X = X - pos_x
-                shifted_Y = Y - pos_y
 
-                # Rotate the grid around the origin
-                rotated_X = shifted_X * np.cos(total_phase_shift) - shifted_Y * np.sin(total_phase_shift)
-                rotated_Y = shifted_X * np.sin(total_phase_shift) + shifted_Y * np.cos(total_phase_shift)
+            # for i, (pos_x, pos_y) in enumerate(zip(positions_x, positions_y)):
+            #     # Translate the intensity to center on the transmitter position
+            #     shifted_X = X - pos_x
+            #     shifted_Y = Y - pos_y
 
-                # Rotate the intensity in place
-                intensity = np.roll(intensity, shift=theta_shift, axis=0)
+            #     # Rotate the grid around the origin
+            #     rotated_X = shifted_X * np.cos(total_phase_shift) - shifted_Y * np.sin(total_phase_shift)
+            #     rotated_Y = shifted_X * np.sin(total_phase_shift) + shifted_Y * np.cos(total_phase_shift)
 
-                # Translate the grid back to the transmitter's position
-                X = rotated_X + pos_x
-                Y = rotated_Y + pos_y
+            #     # Rotate the intensity in place
+
+            #     # Translate the grid back to the transmitter's position
+            #     X = rotated_X + pos_x
+            #     Y = rotated_Y + pos_y
 
         # Plot the heat map in polar coordinates
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
