@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtCore import QSizeF
+from PyQt5.QtCore import QSizeF, pyqtSignal
 class ResizableRectangle(QGraphicsRectItem):
     linked_rectangles = []  # Shared list of linked rectangles
+    geometryChanged = pyqtSignal(QRectF)
 
     def __init__(self, x=0, y=0, width=80, height=80):
         super().__init__(x, y, width, height)
@@ -61,6 +62,9 @@ class ResizableRectangle(QGraphicsRectItem):
             print("Rect:", self.rect())
             rect = self.rect()  # Call the rect method to get the QRectF object
 
+            # Emit geometry change signal
+            # self.geometryChanged.emit(self.rect())
+
             # Now extract the values
             self.x_min = int(rect.x())  # Leftmost x
             self.x_max = int(rect.x() + new_width)  # Rightmost x
@@ -68,7 +72,30 @@ class ResizableRectangle(QGraphicsRectItem):
             self.y_max = int(rect.y() + new_height)  # Bottommost y
             print("Classsss///**x_min, y_min:",  self.x_min,  self.y_min, "x_max, y_max",  self.x_max,  self.y_max)  
         else:
-            super().mouseMoveEvent(event)
+            # Handle movement
+            delta = event.scenePos() - self.start_pos
+            self.start_pos = event.scenePos()
+
+            self.moveBy(delta.x(), delta.y())
+            # Update boundaries
+            self.x_min = int(self.rect().x())
+            self.x_max = int(self.rect().x() + self.rect().width())
+            self.y_min = int(self.rect().y())
+            self.y_max = int(self.rect().y() + self.rect().height())
+
+            # Emit geometry change signal
+            # self.geometryChanged.emit(self.rect())
+
+            self.sync_with_linked_rectangles()
+            
+    def moveBy(self, dx, dy):
+        # Move the current rectangle
+        self.setRect(self.rect().translated(dx, dy))
+
+        # Propagate movement to linked rectangles
+        for rect in self.linked_rectangles:
+            if rect is not self:
+                rect.setRect(rect.rect().translated(dx, dy))
 
 
     # def mouseMoveEvent(self, event):
@@ -101,3 +128,10 @@ class ResizableRectangle(QGraphicsRectItem):
 
         for rect in valid_rectangles:
             rect.setRect(self.rect())
+
+    @staticmethod
+    def center_on_images(image_width, image_height):
+        center_x = (image_width - 80) / 2  # Rectangle width is 80
+        center_y = (image_height - 80) / 2  # Rectangle height is 80
+        for rect in ResizableRectangle.linked_rectangles:
+            rect.setRect(center_x, center_y, 80, 80)

@@ -24,552 +24,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="3" column="1">
-     <widget class="QFrame" name="imageFrame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="9" column="6">
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="switch_button">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>140</horstretch>
-             <verstretch>30</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>115</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(123, 79, 149);
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-border-radius: 10px;
-color: rgb(255, 255, 255);
-font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
-           </property>
-           <property name="text">
-            <string>Switch mode</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="19" column="4">
-        <widget class="QComboBox" name="Fourier_comboBox_3">
-         <property name="styleSheet">
-          <string notr="true">QComboBox {
-    color: rgb(255, 255, 255);
-    background-color: #7B4F95;  /* Background color */
-    border: 1px solid #1C1C1C;
-    border-radius: 15px;  /* Rounded corners */
-    padding: 5px;
-    font-size: 14px;
-}
-QComboBox::drop-down {
-   
-	color: #ffffff;
-    border-radius: 10px;  /* Rounded corners for the arrow box */
-    background-color: #7B4F95;
-    width: 30px;
-}
-
-QComboBox::down-arrow {
-    width: 15px;
-    height: 15px;
-    color: white;  /* Arrow color */
-}
-
-QComboBox QAbstractItemView {
-    border: 1px solid #7B4F95;
-    selection-background-color: #7B4F95;  /* Selected item background color */
-    background-color: #7B4F95;  /* Dropdown background color */
-    color: white;
-    border-radius: 10px;
-}</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>FT Magnitude</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Phase</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="16" column="4">
-        <widget class="QGraphicsView" name="Gimage3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="Glabel1">
-         <property name="font">
-          <font>
-           <family>Microsoft Sans Serif</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(66, 31, 99);
-font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Fourier Transform</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QGraphicsView" name="image1">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="6">
-        <widget class="QGraphicsView" name="image4">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="6">
-        <widget class="QGraphicsView" name="Gimage4">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="1">
-        <widget class="QSlider" name="weight_1">
-         <property name="styleSheet">
-          <string notr="true">QSlider::groove:vertical {
-    width: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-QSlider::handle:vertical {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: 0 -6px;
-    border-radius: 10px;
-}
-QSlider::sub-page:vertical {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-QSlider::add-page:vertical {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="19" column="0">
-        <widget class="QComboBox" name="Fourier_comboBox_1">
-         <property name="styleSheet">
-          <string notr="true">QComboBox {
-    color: rgb(255, 255, 255);
-    background-color: #7B4F95;  /* Background color */
-    border: 1px solid #1C1C1C;
-    border-radius: 15px;  /* Rounded corners */
-    padding: 5px;
-    font-size: 14px;
-}
-QComboBox::drop-down {
-   
-	color: #ffffff;
-    border-radius: 10px;  /* Rounded corners for the arrow box */
-    background-color: #7B4F95;
-    width: 30px;
-}
-
-QComboBox::down-arrow {
-    width: 15px;
-    height: 15px;
-    color: white;  /* Arrow color */
-}
-
-QComboBox QAbstractItemView {
-    border: 1px solid #7B4F95;
-    selection-background-color: #7B4F95;  /* Selected item background color */
-    background-color: #7B4F95;  /* Dropdown background color */
-    color: white;
-    border-radius: 10px;
-}</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>FT Magnitude</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Phase</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="16" column="2">
-        <widget class="QGraphicsView" name="Gimage2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="19" column="2">
-        <widget class="QComboBox" name="Fourier_comboBox_2">
-         <property name="styleSheet">
-          <string notr="true">QComboBox {
-    color: rgb(255, 255, 255);
-    background-color: #7B4F95;  /* Background color */
-    border: 1px solid #1C1C1C;
-    border-radius: 15px;  /* Rounded corners */
-    padding: 5px;
-    font-size: 14px;
-}
-QComboBox::drop-down {
-   
-	color: #ffffff;
-    border-radius: 10px;  /* Rounded corners for the arrow box */
-    background-color: #7B4F95;
-    width: 30px;
-}
-
-QComboBox::down-arrow {
-    width: 15px;
-    height: 15px;
-    color: white;  /* Arrow color */
-}
-
-QComboBox QAbstractItemView {
-    border: 1px solid #7B4F95;
-    selection-background-color: #7B4F95;  /* Selected item background color */
-    background-color: #7B4F95;  /* Dropdown background color */
-    color: white;
-    border-radius: 10px;
-}</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>FT Magnitude</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Phase</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="16" column="0">
-        <widget class="QGraphicsView" name="Gimage1">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="mouseTracking">
-          <bool>true</bool>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <family>Microsoft Sans Serif</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(66, 31, 99);
-font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Input Table</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="2">
-        <widget class="QGraphicsView" name="image2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="4">
-        <widget class="QGraphicsView" name="image3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="7">
-        <widget class="QSlider" name="weight_4">
-         <property name="styleSheet">
-          <string notr="true">QSlider::groove:vertical {
-    width: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-QSlider::handle:vertical {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: 0 -6px;
-    border-radius: 10px;
-}
-QSlider::sub-page:vertical {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-QSlider::add-page:vertical {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="5">
-        <widget class="QSlider" name="weight_3">
-         <property name="styleSheet">
-          <string notr="true">QSlider::groove:vertical {
-    width: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-QSlider::handle:vertical {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: 0 -6px;
-    border-radius: 10px;
-}
-QSlider::sub-page:vertical {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-QSlider::add-page:vertical {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-
-</string>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="3">
-        <widget class="QSlider" name="weight_2">
-         <property name="styleSheet">
-          <string notr="true">QSlider::groove:vertical {
-    width: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-QSlider::handle:vertical {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: 0 -6px;
-    border-radius: 10px;
-}
-QSlider::sub-page:vertical {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-QSlider::add-page:vertical {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="19" column="6">
-        <widget class="QComboBox" name="Fourier_comboBox_4">
-         <property name="styleSheet">
-          <string notr="true">QComboBox {
-    color: rgb(255, 255, 255);
-    background-color: #7B4F95;  /* Background color */
-    border: 1px solid #1C1C1C;
-    border-radius: 15px;  /* Rounded corners */
-    padding: 5px;
-    font-size: 14px;
-}
-QComboBox::drop-down {
-   
-	color: #ffffff;
-    border-radius: 10px;  /* Rounded corners for the arrow box */
-    background-color: #7B4F95;
-    width: 30px;
-}
-
-QComboBox::down-arrow {
-    width: 15px;
-    height: 15px;
-    color: white;  /* Arrow color */
-}
-
-QComboBox QAbstractItemView {
-    border: 1px solid #7B4F95;
-    selection-background-color: #7B4F95;  /* Selected item background color */
-    background-color: #7B4F95;  /* Dropdown background color */
-    color: white;
-    border-radius: 10px;
-}</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>FT Magnitude</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FT Phase</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="4" column="1">
      <widget class="QFrame" name="frame_3">
       <property name="styleSheet">
@@ -872,26 +326,21 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
       </layout>
      </widget>
     </item>
-    <item row="3" column="3" rowspan="2" colspan="2">
-     <widget class="QFrame" name="frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+    <item row="0" column="0">
+     <spacer name="horizontalSpacer_6">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
       </property>
-      <widget class="QWidget" name="horizontalLayoutWidget_2">
-       <property name="geometry">
-        <rect>
-         <x>-1</x>
-         <y>-1</y>
-         <width>221</width>
-         <height>1051</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout"/>
-      </widget>
-     </widget>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>10</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item row="0" column="1">
      <widget class="QLabel" name="label">
@@ -916,7 +365,574 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="3" column="1">
+     <widget class="QFrame" name="imageFrame">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="16" column="2">
+        <widget class="QGraphicsView" name="Gimage2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="QGraphicsView" name="image1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <family>Microsoft Sans Serif</family>
+           <pointsize>11</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(66, 31, 99);
+font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Input Table</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="4">
+        <widget class="QGraphicsView" name="Gimage3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="0">
+        <widget class="QComboBox" name="Fourier_comboBox_1">
+         <property name="styleSheet">
+          <string notr="true">QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: #7B4F95;  /* Background color */
+    border: 1px solid #1C1C1C;
+    border-radius: 15px;  /* Rounded corners */
+    padding: 5px;
+    font-size: 14px;
+}
+QComboBox::drop-down {
+   
+	color: #ffffff;
+    border-radius: 10px;  /* Rounded corners for the arrow box */
+    background-color: #7B4F95;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    width: 15px;
+    height: 15px;
+    color: white;  /* Arrow color */
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #7B4F95;
+    selection-background-color: #7B4F95;  /* Selected item background color */
+    background-color: #7B4F95;  /* Dropdown background color */
+    color: white;
+    border-radius: 10px;
+}</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>FT Magnitude</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>FT Phase</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="19" column="2">
+        <widget class="QComboBox" name="Fourier_comboBox_2">
+         <property name="styleSheet">
+          <string notr="true">QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: #7B4F95;  /* Background color */
+    border: 1px solid #1C1C1C;
+    border-radius: 15px;  /* Rounded corners */
+    padding: 5px;
+    font-size: 14px;
+}
+QComboBox::drop-down {
+   
+	color: #ffffff;
+    border-radius: 10px;  /* Rounded corners for the arrow box */
+    background-color: #7B4F95;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    width: 15px;
+    height: 15px;
+    color: white;  /* Arrow color */
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #7B4F95;
+    selection-background-color: #7B4F95;  /* Selected item background color */
+    background-color: #7B4F95;  /* Dropdown background color */
+    color: white;
+    border-radius: 10px;
+}</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>FT Magnitude</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>FT Phase</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="16" column="6">
+        <widget class="QGraphicsView" name="Gimage4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="6">
+        <widget class="QComboBox" name="Fourier_comboBox_4">
+         <property name="styleSheet">
+          <string notr="true">QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: #7B4F95;  /* Background color */
+    border: 1px solid #1C1C1C;
+    border-radius: 15px;  /* Rounded corners */
+    padding: 5px;
+    font-size: 14px;
+}
+QComboBox::drop-down {
+   
+	color: #ffffff;
+    border-radius: 10px;  /* Rounded corners for the arrow box */
+    background-color: #7B4F95;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    width: 15px;
+    height: 15px;
+    color: white;  /* Arrow color */
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #7B4F95;
+    selection-background-color: #7B4F95;  /* Selected item background color */
+    background-color: #7B4F95;  /* Dropdown background color */
+    color: white;
+    border-radius: 10px;
+}</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>FT Magnitude</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>FT Phase</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="12" column="2">
+        <widget class="QGraphicsView" name="image2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="3">
+        <widget class="QSlider" name="weight_2">
+         <property name="styleSheet">
+          <string notr="true">QSlider::groove:vertical {
+    width: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+QSlider::handle:vertical {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: 0 -6px;
+    border-radius: 10px;
+}
+QSlider::sub-page:vertical {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+QSlider::add-page:vertical {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="4">
+        <widget class="QComboBox" name="Fourier_comboBox_3">
+         <property name="styleSheet">
+          <string notr="true">QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: #7B4F95;  /* Background color */
+    border: 1px solid #1C1C1C;
+    border-radius: 15px;  /* Rounded corners */
+    padding: 5px;
+    font-size: 14px;
+}
+QComboBox::drop-down {
+   
+	color: #ffffff;
+    border-radius: 10px;  /* Rounded corners for the arrow box */
+    background-color: #7B4F95;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    width: 15px;
+    height: 15px;
+    color: white;  /* Arrow color */
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #7B4F95;
+    selection-background-color: #7B4F95;  /* Selected item background color */
+    background-color: #7B4F95;  /* Dropdown background color */
+    color: white;
+    border-radius: 10px;
+}</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>FT Magnitude</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>FT Phase</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="16" column="0">
+        <widget class="QGraphicsView" name="Gimage1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="mouseTracking">
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="6">
+        <widget class="QGraphicsView" name="image4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="4">
+        <widget class="QGraphicsView" name="image3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="Glabel1">
+         <property name="font">
+          <font>
+           <family>Microsoft Sans Serif</family>
+           <pointsize>11</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(66, 31, 99);
+font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Fourier Transform</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="6">
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="switch_button">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>140</horstretch>
+             <verstretch>30</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(123, 79, 149);
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+border-radius: 10px;
+color: rgb(255, 255, 255);
+font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Switch mode</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="16" column="5">
+        <widget class="QSlider" name="weight_3">
+         <property name="styleSheet">
+          <string notr="true">QSlider::groove:vertical {
+    width: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+QSlider::handle:vertical {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: 0 -6px;
+    border-radius: 10px;
+}
+QSlider::sub-page:vertical {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+QSlider::add-page:vertical {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+
+</string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="7">
+        <widget class="QSlider" name="weight_4">
+         <property name="styleSheet">
+          <string notr="true">QSlider::groove:vertical {
+    width: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+QSlider::handle:vertical {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: 0 -6px;
+    border-radius: 10px;
+}
+QSlider::sub-page:vertical {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+QSlider::add-page:vertical {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="1">
+        <widget class="QSlider" name="weight_1">
+         <property name="styleSheet">
+          <string notr="true">QSlider::groove:vertical {
+    width: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+QSlider::handle:vertical {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: 0 -6px;
+    border-radius: 10px;
+}
+QSlider::sub-page:vertical {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+QSlider::add-page:vertical {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="3" rowspan="2" colspan="2">
+     <widget class="QFrame" name="frame">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QWidget" name="horizontalLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>-1</x>
+         <y>-1</y>
+         <width>221</width>
+         <height>1051</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout"/>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="1">
      <widget class="QFrame" name="frame_5">
       <property name="styleSheet">
        <string notr="true">color: rgb(66, 31, 99);
@@ -928,59 +944,14 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QGridLayout" name="gridLayout_7">
-       <item row="1" column="1" rowspan="3">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="spacing">
-          <number>15</number>
-         </property>
-         <property name="leftMargin">
-          <number>15</number>
-         </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_3"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_15">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_16">
-           <item>
-            <widget class="QRadioButton" name="linear_radio_button_3">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>50</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-             </property>
-             <property name="text">
-              <string>Linear</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_11">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>50</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QLabel" name="label_14">
              <property name="sizePolicy">
@@ -1076,720 +1047,65 @@ QSpinBox::down-arrow {
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <layout class="QGridLayout" name="gridLayout_5">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetNoConstraint</enum>
+            <spacer name="horizontalSpacer_11">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="topMargin">
-              <number>10</number>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
-             <property name="bottomMargin">
-              <number>10</number>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>25</width>
+               <height>20</height>
+              </size>
              </property>
-             <property name="spacing">
-              <number>15</number>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="linear_radio_button_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
-             <item row="2" column="5">
-              <spacer name="horizontalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="9" column="0">
-              <spacer name="horizontalSpacer_16">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="11" column="0">
-              <spacer name="horizontalSpacer_12">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="5" column="1">
-              <widget class="QSlider" name="beam_phase_slider">
-               <property name="minimumSize">
-                <size>
-                 <width>120</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QSlider::groove:horizontal {
-    height: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: -6px 0;
-    border-radius: 10px;
-}
-
-QSlider::sub-page:horizontal {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="5">
-              <spacer name="horizontalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>30</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="9" column="5">
-              <spacer name="horizontalSpacer_8">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="10" column="1">
-              <widget class="QLabel" name="label_4">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
+             <property name="minimumSize">
+              <size>
+               <width>50</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: rgb(66, 31, 99);
 font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Position - Y</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_9">
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>11</pointsize>
-                 <weight>50</weight>
-                 <italic>false</italic>
-                 <bold>false</bold>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Frequency</string>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="1">
-              <widget class="QLabel" name="label_7">
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>11</pointsize>
-                 <weight>50</weight>
-                 <italic>false</italic>
-                 <bold>false</bold>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Position - X</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QSlider" name="beam_curvature_slider">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QSlider::groove:horizontal {
-    height: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: -6px 0;
-    border-radius: 10px;
-}
-
-QSlider::sub-page:horizontal {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>60</number>
-               </property>
-               <property name="value">
-                <number>30</number>
-               </property>
-               <property name="sliderPosition">
-                <number>30</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="1">
-              <widget class="QSlider" name="position_y_slider">
-               <property name="styleSheet">
-                <string notr="true">QSlider::groove:horizontal {
-    height: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: -6px 0;
-    border-radius: 10px;
-}
-
-QSlider::sub-page:horizontal {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}</string>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="1">
-              <widget class="QSlider" name="beam_position_slider">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QSlider::groove:horizontal {
-    height: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: -6px 0;
-    border-radius: 10px;
-}
-
-QSlider::sub-page:horizontal {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="3">
-              <widget class="QLCDNumber" name="position_lcd">
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>12</pointsize>
-                 <weight>75</weight>
-                 <italic>false</italic>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="smallDecimalPoint">
-                <bool>true</bool>
-               </property>
-               <property name="digitCount">
-                <number>4</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::Flat</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QLabel" name="curvature_angle_label">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>11</pointsize>
-                 <weight>50</weight>
-                 <italic>false</italic>
-                 <bold>false</bold>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Curvature Angle</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <spacer name="horizontalSpacer_14">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="7" column="5">
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="2" column="0">
-              <spacer name="horizontalSpacer_10">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>30</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="7" column="3">
-              <widget class="QLCDNumber" name="curvature_lcd">
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>12</pointsize>
-                 <weight>75</weight>
-                 <italic>false</italic>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="smallDecimalPoint">
-                <bool>true</bool>
-               </property>
-               <property name="digitCount">
-                <number>4</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::Flat</enum>
-               </property>
-               <property name="value" stdset="0">
-                <double>30.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="3">
-              <widget class="QLCDNumber" name="phase_lcd">
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>12</pointsize>
-                 <weight>75</weight>
-                 <italic>false</italic>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="smallDecimalPoint">
-                <bool>true</bool>
-               </property>
-               <property name="digitCount">
-                <number>4</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::Flat</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="3">
-              <widget class="QLCDNumber" name="frequency_lcd">
-               <property name="minimumSize">
-                <size>
-                 <width>20</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="smallDecimalPoint">
-                <bool>true</bool>
-               </property>
-               <property name="digitCount">
-                <number>4</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::Flat</enum>
-               </property>
-               <property name="value" stdset="0">
-                <double>1000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QLabel" name="label_8">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Phase</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <spacer name="horizontalSpacer_15">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="2" column="1">
-              <widget class="QSlider" name="beam_frequency_slider">
-               <property name="minimumSize">
-                <size>
-                 <width>200</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Microsoft Sans Serif</family>
-                 <pointsize>9</pointsize>
-                 <weight>50</weight>
-                 <italic>false</italic>
-                 <bold>false</bold>
-                </font>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QSlider::groove:horizontal {
-    height: 8px;
-    background: #7B4F95; /* Lighter shade of the dark color */
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: #5F357D; /* Mid-tone between the dark and lighter colors */
-    border: 2px solid #7B4F95; /* Matches groove */
-    width: 20px;
-    height: 20px;
-    margin: -6px 0;
-    border-radius: 10px;
-}
-
-QSlider::sub-page:horizontal {
-    background: #5F357D; /* Matches handle */
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: #7B4F95; /* Matches groove */
-    border-radius: 4px;
-}
-</string>
-               </property>
-               <property name="minimum">
-                <number>500000000</number>
-               </property>
-               <property name="maximum">
-                <number>2000000000</number>
-               </property>
-               <property name="singleStep">
-                <number>100000000</number>
-               </property>
-               <property name="pageStep">
-                <number>100000000</number>
-               </property>
-               <property name="value">
-                <number>1000000000</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="invertedAppearance">
-                <bool>false</bool>
-               </property>
-               <property name="invertedControls">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="5">
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="11" column="3">
-              <widget class="QLCDNumber" name="position_y_lcd">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="smallDecimalPoint">
-                <bool>true</bool>
-               </property>
-               <property name="digitCount">
-                <number>4</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::Flat</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="4">
-              <widget class="QLabel" name="label_10">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>MHz</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="4">
-              <widget class="QLabel" name="label_11">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>°</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="4">
-              <widget class="QLabel" name="label_12">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(66, 31, 99);
-font:11pt &quot;Microsoft Sans Serif&quot;;</string>
-               </property>
-               <property name="text">
-                <string>°</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+             </property>
+             <property name="text">
+              <string>Linear</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_9">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>600</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <property name="spacing">
-          <number>15</number>
-         </property>
-         <property name="leftMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QWidget" name="beam_map" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="beam_plot" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border-radius: 25px;
-buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
-widget-shadow: 2px 2px 5px rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_15">
-         <item>
-          <spacer name="horizontalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>350</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <widget class="QComboBox" name="comboBox_Open_scenario">
@@ -1925,24 +1241,741 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QWidget" name="beam_plot" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="beam_map" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-radius: 25px;
+buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
+widget-shadow: 2px 2px 5px rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetNoConstraint</enum>
+         </property>
+         <property name="topMargin">
+          <number>40</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <property name="spacing">
+          <number>15</number>
+         </property>
+         <item row="4" column="9">
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="5">
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="4" column="5">
+          <spacer name="horizontalSpacer_13">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="11">
+          <widget class="QLCDNumber" name="position_lcd">
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>4</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="6">
+          <widget class="QSlider" name="beam_curvature_slider">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>60</number>
+           </property>
+           <property name="value">
+            <number>30</number>
+           </property>
+           <property name="sliderPosition">
+            <number>30</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="6">
+          <widget class="QLabel" name="label_8">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Phase</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="12">
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="4" column="1">
+          <widget class="QSlider" name="spacing_slider">
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}</string>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="8">
+          <widget class="QLabel" name="label_12">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>°</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="7">
+          <widget class="QLCDNumber" name="phase_lcd">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>4</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_9">
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Frequency</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="6">
+          <widget class="QSlider" name="beam_phase_slider">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="6">
+          <widget class="QLabel" name="curvature_angle_label">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Curvature Angle</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="spacing_label">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Transmitter Spacing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="7">
+          <widget class="QLCDNumber" name="curvature_lcd">
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>4</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+           <property name="value" stdset="0">
+            <double>30.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="10">
+          <widget class="QLabel" name="label_4">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Position - Y</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="9">
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="10">
+          <widget class="QLabel" name="label_7">
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>Position - X</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <spacer name="horizontalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="4" column="12">
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="10">
+          <widget class="QSlider" name="beam_position_slider">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="4">
+          <widget class="QLabel" name="label_10">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>MHz</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QLCDNumber" name="frequency_lcd">
+           <property name="minimumSize">
+            <size>
+             <width>20</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>4</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+           <property name="value" stdset="0">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <spacer name="horizontalSpacer_18">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="4" column="11">
+          <widget class="QLCDNumber" name="position_y_lcd">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>4</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="8">
+          <widget class="QLabel" name="label_11">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:11pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="text">
+            <string>°</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSlider" name="beam_frequency_slider">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Microsoft Sans Serif</family>
+             <pointsize>9</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}
+</string>
+           </property>
+           <property name="minimum">
+            <number>500000000</number>
+           </property>
+           <property name="maximum">
+            <number>2000000000</number>
+           </property>
+           <property name="singleStep">
+            <number>100000000</number>
+           </property>
+           <property name="pageStep">
+            <number>100000000</number>
+           </property>
+           <property name="value">
+            <number>1000000000</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="invertedAppearance">
+            <bool>false</bool>
+           </property>
+           <property name="invertedControls">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QLCDNumber" name="spacing_lcd">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(66, 31, 99);
+font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+           <property name="intValue" stdset="0">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="10">
+          <widget class="QSlider" name="position_y_slider">
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Lighter shade of the dark color */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #5F357D; /* Mid-tone between the dark and lighter colors */
+    border: 2px solid #7B4F95; /* Matches groove */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Matches handle */
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Matches groove */
+    border-radius: 4px;
+}</string>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
-    </item>
-    <item row="0" column="0">
-     <spacer name="horizontalSpacer_6">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>10</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>
