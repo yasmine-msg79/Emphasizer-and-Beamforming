@@ -111,12 +111,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # # Add selection rectangles to Fourier scenes
         self.linked_rectangles = []
-        self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)
-        self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
-        self.rect2 = ResizableRectangle(x=10, y=10, width=100, height=100)
-        self.rect3 = ResizableRectangle(x=10, y=10, width=100, height=100)
-        self.rect4 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rectangle = ResizableRectangle(x=10, y=10, width=245, height=130)
+        self.rect1 = ResizableRectangle(width=200, height=140)
+        self.rect2 = ResizableRectangle(x=10, y=10, width=245, height=130)
+        self.rect3 = ResizableRectangle(x=10, y=10, width=245, height=130)
+        self.rect4 = ResizableRectangle(x=10, y=10, width=245, height=130)
         self.rects = [self.rect1, self.rect2, self.rect3,self.rect4]
+        ResizableRectangle.center_on_images(self.min_width, self.min_height)
+        # self.rect1.geometryChanged.connect(self.handle_region_change)
 
         # Inside your main setup method (e.g., __init__ or a setupUi wrapper)
         self.in_region_radioButton.toggled.connect(self.handle_region_change)
@@ -139,6 +141,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_y_slider = self.findChild(QtWidgets.QSlider, "position_y_slider")
         self.position_y_lcd = self.findChild(QtWidgets.QLCDNumber, "position_y_lcd")
         self.curvature_unit_label = self.findChild(QtWidgets.QLabel, "label_12")
+        self.spacing_slider = self.findChild(QtWidgets.QSlider, "spacing_slider")
+        self.spacing_lcd = self.findChild(QtWidgets.QLCDNumber, "spacing_lcd")
 
 
         self.beam_map_view = self.findChild(QtWidgets.QWidget, "beam_map")
@@ -165,7 +169,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.frequency_slider.setMinimum(500000000)
         self.frequency_slider.setMaximum(2000000000)
         self.frequency_slider.setSingleStep(10000000)  # Step size
-        # self.frequency_slider.setValue(1000000000)
         self.frequency_slider.valueChanged.connect(self.update_frequency)
         self.phase_slider.setMinimum(-180)
         self.phase_slider.setMaximum(180)
@@ -173,7 +176,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.valueChanged.connect(self.update_phase)
         self.curvature_slider.setMinimum(1)
         self.curvature_slider.setMaximum(180)
-        # self.curvature_slider.setValue(30)
         self.curvature_slider.valueChanged.connect(self.update_curvature_angle)
         self.no_transmitters_spinbox.setMinimum(2)
         self.no_transmitters_spinbox.setMaximum(100)
@@ -182,10 +184,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.beam_position_slider.setMaximum(10)
         self.beam_position_slider.setSingleStep(1)
         self.beam_position_slider.valueChanged.connect(self.update_array_Xposition)
-        self.beam_position_y_slider.setMinimum(-10)
+        self.beam_position_y_slider.setMinimum(0)
         self.beam_position_y_slider.setMaximum(10)
         self.beam_position_y_slider.setSingleStep(1)
         self.beam_position_y_slider.valueChanged.connect(self.update_array_Yposition)
+
+        self.spacing_slider.setMinimum(1)
+        self.spacing_slider.setMaximum(200)
+        self.spacing_slider.setSingleStep(1)
+        self.spacing_slider.setValue(50)
+        self.spacing_slider.valueChanged.connect(self.update_spacing)
 
         self.scenario_combobox.currentIndexChanged.connect(self.update_scenario_parameters)
 
@@ -276,27 +284,17 @@ class MainWindow(QtWidgets.QMainWindow):
             currentFourierImage = self.fourierimage2
             print("frame2")
         elif frame == 2:
-            selected_component = self.Fourier_comboBox_3.currentText()
             currentFourierImage = self.fourierimage3
             self.update_weight(2, self.weight_3.value())
             print("frame3")
         elif frame == 3:
-            selected_component = self.Fourier_comboBox_4.currentText()
             currentFourierImage = self.fourierimage4
             self.update_weight(3, self.weight_4.value()) 
 
         # if selected_component in self.ft_components[frame]:
         print("def add_rectangle_to_frame(self, frame):**********")
-            # component_image = self.ft_components[frame][selected_component]
-            # component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-            # q_image = QtGui.QImage(component_image.data, self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
-            # pixmap = QtGui.QPixmap.fromImage(q_image)
-            # currentFourierImage.clear()
-            # pixmap = pixmap.scaled(self.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-            # currentFourierImage.addPixmap(pixmap)
-            # currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
             
-        self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+        self.rect1 = ResizableRectangle(x=10, y=10, width=245, height=130)
         self.rect1.linked_rectangles = self.rects  # Share the same list
         self.rects[frame] = self.rect1
         currentFourierImage.addItem(self.rect1)
@@ -536,20 +534,8 @@ class MainWindow(QtWidgets.QMainWindow):
             currentFourierImage.addPixmap(pixmap)
             currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
 
-            # self.rectangle = ResizableRectangle(x=10, y=10, width=100, height=100)  # Adjust parameters as needed
-            # currentFourierImage.addItem(self.rectangle)
-            # self.rectangles = [
-            #     ResizableRectangle(x=10, y=10, width=100, height=100),
-            #     ResizableRectangle(x=10, y=10, width=100, height=100),
-            #     ResizableRectangle(x=10, y=10, width=100, height=100),
-            #     ResizableRectangle(x=10, y=10, width=100, height=100)
-            # ]
-            # self.rectangle = self.rectangles[0]
-
-            # currentFourierImage.addItem(self.rectangles[index])
-
             
-            self.rect1 = ResizableRectangle(x=10, y=10, width=100, height=100)
+            self.rect1 = ResizableRectangle(x=10, y=10, width=245, height=130)
             self.rect1.linked_rectangles = self.rects  # Share the same list
             self.rects[index] = self.rect1
             currentFourierImage.addItem(self.rect1)
@@ -565,13 +551,10 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
 
     def handle_region_change(self):
-        # Check which radio button is selected
         if self.in_region_radioButton.isChecked():
             print("Processing inner region.")
         elif self.out_region_radioButton.isChecked():
             print("Processing outer region.")
-
-        # Update the output location with the selected region
         self.change_output_location()
 
 
@@ -735,17 +718,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.position_y_lcd.display(value)
         self.beam_forming()
 
-    def beam_forming(self):
-        print(f"self.frequencies updated: {self.frequencies}")
-        print(f"self.phases updated: {self.phases}")
-        print(f"self.array_type updated: {self.array_type}")
-        print(f"self.curvature_angle updated: {self.curvature_angle}")
+    def update_spacing(self, value):
+        spacing = value / 100.0
+        self.element_spacing = spacing
+        print(f"Element spacing updated: {spacing:.2f}")
+        self.spacing_lcd.setDigitCount(4)  # Ensure enough space for decimal display
+        self.spacing_lcd.display(f"{spacing:.2f}")  # Show decimal value
+        self.beam_forming()
 
+    def beam_forming(self):
         visualizer = Visualizer()
         visualizer.set_frequencies(self.frequencies)
         visualizer.set_phases(self.phases)
         visualizer.set_array_type(self.array_type, self.curvature_angle)
         visualizer.set_position_offset(self.array_position[0], self.array_position[1])
+        visualizer.set_element_spacing(self.element_spacing)
         
         # Generate and display the plots
         field_map_fig = visualizer.plot_field_map(
@@ -808,6 +795,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.phase_slider.setValue(parameters.phase)
         self.curvature_slider.setValue(parameters.curvature_angle)
         self.no_transmitters_spinbox.setValue(parameters.num_transmitters)
+        self.spacing_slider.setValue(int(parameters.position_between_transmitters * 10))
         self.beam_position_slider.setValue(0)
         self.beam_position_y_slider.setValue(0)
         

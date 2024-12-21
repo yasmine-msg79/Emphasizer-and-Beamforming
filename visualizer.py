@@ -8,7 +8,7 @@ class Visualizer:
         self.magnitudes = []  
         self.array_type = "linear"  
         self.curvature_angle = 30 
-        self.element_spacing = 0.5  
+        self.element_spacing = 50  
         self.position_offset = [0, 0]  # Default position offset (x, y)
 
     def set_frequencies(self, frequencies):
@@ -26,6 +26,10 @@ class Visualizer:
         self.curvature_angle = curvature_angle
         print(f"self.array_type in visualizer : {self.array_type}")
         print(f"self.curvature_angle in visualizer : {self.curvature_angle}")
+
+    def set_element_spacing(self, element_spacing):
+        self.element_spacing = element_spacing
+        print(f"self.element_spacing in visualizer: {self.element_spacing}")
 
     def set_position_offset(self, offset_x, offset_y):
         self.position_offset = [offset_x, offset_y]
@@ -73,7 +77,7 @@ class Visualizer:
         # Define grid for heat map calculation in polar coordinates
         grid_size = 500  # Number of points along one axis
         r = np.linspace(0, 15, grid_size)
-        theta = np.linspace(0, 2 * np.pi, grid_size)
+        theta = np.linspace(0, np.pi, grid_size)
         R, Theta = np.meshgrid(r, theta)
 
         # Convert polar grid to Cartesian coordinates
@@ -106,12 +110,13 @@ class Visualizer:
             intensity = np.roll(intensity, shift=theta_shift, axis=0)
 
         # Plot the heat map in polar coordinates
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(5, 8))
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24, 18))
+        ax.set_aspect(0.8)
+        ax.set_thetamax(180)
+        # plt.subplots_adjust(wspace=0.3)
         heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
-        fig.colorbar(heat_plot, ax=ax, label="Interference Intensity")
-        ax.set_title("") 
-        # fig.text(0.25, 0.5, "Field Map", va="center", ha="center", fontsize=16)
-
+        fig.colorbar(heat_plot, ax=ax, label="Interference Intensity", fraction=0.046, pad=0.12)
+        ax.set_title("Field Map") 
 
         # Overlay transmitter positions (red dots)
         transmitter_r = np.sqrt(positions_x**2 + positions_y**2)
@@ -131,7 +136,7 @@ class Visualizer:
         positions_x, positions_y = self.calculate_positions(num_transmitters)
 
         # Define angular range for beam pattern calculation
-        angles = np.linspace(0, 2 * np.pi, 360)  # Angular directions
+        angles = np.linspace(0, np.pi, 180)  # Angular directions
 
         # Initialize the beam pattern
         beam_pattern = np.zeros_like(angles, dtype=complex)
@@ -157,10 +162,11 @@ class Visualizer:
             intensity = np.roll(intensity, shift=theta_shift)
 
         # Create the polar plot
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(9, 8))
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24, 18))
+        ax.set_aspect(0.8)
+        ax.set_thetamax(180)
         ax.plot(angles, intensity, color="blue", linewidth=2)
-        ax.set_title("") 
-        # fig.text(0.21, 0.5, "Beam Pattern", va="center", ha="center", fontsize=16)
+        ax.set_title("Beam Pattern") 
         ax.grid(True)
 
         return fig
