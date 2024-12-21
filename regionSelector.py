@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtGui import QPen, QColor, QPainterPath, QBrush, QPainter, QCursor
-from PyQt5.QtCore import Qt, QRectF, QSizeF, QPointF
-import numpy as np
-
-
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
+from PyQt5.QtGui import QPen, QColor
+from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import QSizeF
 class ResizableRectangle(QGraphicsRectItem):
     linked_rectangles = []  # Shared list of linked rectangles
 
@@ -11,14 +9,7 @@ class ResizableRectangle(QGraphicsRectItem):
         super().__init__(x, y, width, height)
         self.setFlags(QGraphicsRectItem.ItemIsMovable | QGraphicsRectItem.ItemIsSelectable)
         self.setAcceptHoverEvents(True)
-
-        # Appearance
-        self.pen_color = QColor(128, 0, 128)  # Purple border
-        self.border_radius = 10
-        self.setPen(QPen(self.pen_color, 2))
-        self.setBrush(QBrush(QColor(0, 0, 255, 50)))  # Transparent blue fill
-
-        # Resizing behavior
+        self.setPen(QPen(QColor(128, 0, 128), 2))  # Purple color for rectangle with 2px border
         self.resize_handle_size = 10
         self.resizing = False
         self.cursor_in_resize = False
@@ -30,29 +21,21 @@ class ResizableRectangle(QGraphicsRectItem):
         self.y_max = y + height
 
     def hoverMoveEvent(self, event):
-        """
-        Change cursor when hovering over the resize handle.
-        """
         if self._is_in_resize_area(event.pos()):
-            self.setCursor(QCursor(Qt.SizeFDiagCursor))
+            self.setCursor(Qt.SizeFDiagCursor)
+            self.cursor_in_resize = True
         else:
-            self.setCursor(QCursor(Qt.ArrowCursor))
-        super().hoverMoveEvent(event)
+            self.setCursor(Qt.ArrowCursor)
+            self.cursor_in_resize = False
 
     def mousePressEvent(self, event):
-        """
-        Start resizing if clicking on the resize handle.
-        """
-        if self._is_in_resize_area(event.pos()):
+        if self.cursor_in_resize:
             self.resizing = True
             self.start_pos = event.pos()
         else:
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        """
-        Handle resizing or moving the rectangle.
-        """
         if self.resizing:
             delta = event.pos() - self.start_pos
             delta_width = delta.x()
@@ -72,7 +55,7 @@ class ResizableRectangle(QGraphicsRectItem):
             if self.scene():
                 self.scene().update()
 
-            # self.sync_with_linked_rectangles()  # Sync changes
+            self.sync_with_linked_rectangles()  # Sync changes
 
             # Debug: Print updated geometry
             print("Rect:", self.rect())
@@ -105,63 +88,16 @@ class ResizableRectangle(QGraphicsRectItem):
     #         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        """
-        Stop resizing.
-        """
-        if self.resizing:
-            self.resizing = False
-            self.setCursor(QCursor(Qt.ArrowCursor))
+        self.resizing = False
         super().mouseReleaseEvent(event)
 
-
     def _is_in_resize_area(self, pos):
-        """
-        Determine if the mouse is near the bottom-right corner for resizing.
-        """
-        rect = self.rect()
-        resize_x = rect.right() - self.resize_handle_size
-        resize_y = rect.bottom() - self.resize_handle_size
-        return resize_x <= pos.x() <= rect.right() and resize_y <= pos.y() <= rect.bottom()
-    def update_start_end_points(self):
-        """
-        Update the start and end points of the rectangle after resizing or movement.
-        """
-        rect = self.rect()
-        self.rect_start = rect.topLeft()
-        self.rect_end = rect.bottomRight()
+        return abs(pos.x() - self.rect().width()) < self.resize_handle_size and \
+               abs(pos.y() - self.rect().height()) < self.resize_handle_size
 
-    def extract_region_data(self, image_data, innerRegion):
-        """
-        Extract the region inside or outside the rectangle from the given image data.
-        
-        Args:
-            image_data (np.ndarray): The image data as a NumPy array.
-            mode (str): 'InsideRegion' or 'OutsideRegion' to determine masking behavior.
+    def sync_with_linked_rectangles(self):
+        valid_rectangles = [rect for rect in self.linked_rectangles if rect.scene() is not None]
+        self.linked_rectangles = valid_rectangles  # Remove invalid rectangles
 
-        Returns:
-            cropped_data (np.ndarray): The image data with the mask applied.
-        """
-        # Get integer bounds
-        start_x = int(self.rect_start.x())
-        start_y = int(self.rect_start.y())
-        end_x = int(self.rect_end.x())
-        end_y = int(self.rect_end.y())
-
-        # Ensure bounds are within the image dimensions
-        height, width = image_data.shape
-        start_x = max(0, min(start_x, width))
-        start_y = max(0, min(start_y, height))
-        end_x = max(0, min(end_x, width))
-        end_y = max(0, min(end_y, height))
-
-        # Create a mask based on mode
-        mask = np.zeros_like(image_data, dtype=np.float32)
-        if innerRegion:
-            mask[start_y:end_y, start_x:end_x] = 1
-        else:  # OutsideRegion
-            mask[:, :] = 1
-            mask[start_y:end_y, start_x:end_x] = 0
-
-        # Apply the mask to the image data
-        cropped_data = image_data * mask
-        return cropped_data
+        for rect in valid_rectangles:
+            rect.setRect(self.rect())
