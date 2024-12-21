@@ -110,12 +110,12 @@ class Visualizer:
             intensity = np.roll(intensity, shift=theta_shift, axis=0)
 
         # Plot the heat map in polar coordinates
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24, 18))
-        ax.set_aspect(0.8)
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24.8, 18.8))
+        ax.set_aspect(0.55)
         ax.set_thetamax(180)
         # plt.subplots_adjust(wspace=0.3)
         heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
-        fig.colorbar(heat_plot, ax=ax, label="Interference Intensity", fraction=0.046, pad=0.12)
+        fig.colorbar(heat_plot, ax=ax, label="Interference Intensity", fraction=0.03, pad=0.12)
         ax.set_title("Field Map") 
 
         # Overlay transmitter positions (red dots)
@@ -163,7 +163,7 @@ class Visualizer:
 
         # Create the polar plot
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24, 18))
-        ax.set_aspect(0.8)
+        ax.set_aspect(0.55)
         ax.set_thetamax(180)
         ax.plot(angles, intensity, color="blue", linewidth=2)
         ax.set_title("Beam Pattern") 
