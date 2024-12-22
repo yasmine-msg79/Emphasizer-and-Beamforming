@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
+from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtCore import QSizeF, pyqtSignal
@@ -8,12 +8,10 @@ class ResizableRectangleSignal(QObject):
     
 class ResizableRectangle(QGraphicsRectItem):
     linked_rectangles = []  # Shared list of linked rectangles
-    # geometryChanged = pyqtSignal()
     x_min = 10
     x_max = 90
     y_min = 10
     y_max = 90
-    # resizing_signal = pyqtSignal(str)
     
     def __init__(self, x=0, y=0, width=80, height=80):
         super().__init__(QRectF(x, y, width, height))
@@ -69,17 +67,13 @@ class ResizableRectangle(QGraphicsRectItem):
             print("Rect:", self.rect())
             rect = self.rect()  # Call the rect method to get the QRectF object
 
-            # Emit geometry change signal
-            # self.geometryChanged.emit(self.rect())
-
             # Now extract the values
             ResizableRectangle.x_min = int(rect.x())  # Leftmost x
             ResizableRectangle.x_max = int(rect.x() + new_width)  # Rightmost x
             ResizableRectangle.y_min = int(rect.y())  # Topmost y
             ResizableRectangle.y_max = int(rect.y() + new_height)  # Bottommost y
             print("Classsss///**x_min, y_min:",  self.x_min,  self.y_min, "x_max, y_max",  self.x_max,  self.y_max)  
-            # self.resizing_signal.emit("resized")
-            # self.geometryChanged.emit()
+            # Emit geometry change signal
             self.signal_wrapper.geometryChanged.emit()
         else:
             # Handle movement
@@ -94,7 +88,6 @@ class ResizableRectangle(QGraphicsRectItem):
             self.y_max = int(self.rect().y() + self.rect().height())
 
             # Emit geometry change signal
-            # self.geometryChanged.emit()
             self.signal_wrapper.geometryChanged.emit()
 
             self.sync_with_linked_rectangles()
@@ -107,23 +100,6 @@ class ResizableRectangle(QGraphicsRectItem):
         for rect in self.linked_rectangles:
             if rect is not self:
                 rect.setRect(rect.rect().translated(dx, dy))
-
-
-    # def mouseMoveEvent(self, event):
-    #     if self.resizing:
-    #         delta = event.pos() - self.start_pos
-    #         delta_width = delta.x()
-    #         delta_height = delta.y()
-
-    #         new_width = max(self.rect().width() + delta_width, self.resize_handle_size)
-    #         new_height = max(self.rect().height() + delta_height, self.resize_handle_size)
-    #         new_rect = QRectF(self.rect().topLeft(), QSizeF(new_width, new_height))
-    #         self.setRect(new_rect)
-    #         self.start_pos = event.pos()
-
-    #         self.sync_with_linked_rectangles()  # Sync changes
-    #     else:
-    #         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         self.resizing = False
