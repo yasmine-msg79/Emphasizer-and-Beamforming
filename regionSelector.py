@@ -2,12 +2,21 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtCore import QSizeF, pyqtSignal
+from PyQt5.QtCore import Qt, QRectF, QSizeF, pyqtSignal, QObject
+class ResizableRectangleSignal(QObject):
+    geometryChanged = pyqtSignal()
+    
 class ResizableRectangle(QGraphicsRectItem):
     linked_rectangles = []  # Shared list of linked rectangles
-    geometryChanged = pyqtSignal(QRectF)
-
+    # geometryChanged = pyqtSignal()
+    x_min = 10
+    x_max = 90
+    y_min = 10
+    y_max = 90
+    # resizing_signal = pyqtSignal(str)
+    
     def __init__(self, x=0, y=0, width=80, height=80):
-        super().__init__(x, y, width, height)
+        super().__init__(QRectF(x, y, width, height))
         self.setFlags(QGraphicsRectItem.ItemIsMovable | QGraphicsRectItem.ItemIsSelectable)
         self.setAcceptHoverEvents(True)
         self.setPen(QPen(QColor(128, 0, 128), 2))  # Purple color for rectangle with 2px border
@@ -16,10 +25,8 @@ class ResizableRectangle(QGraphicsRectItem):
         self.cursor_in_resize = False
         ResizableRectangle.linked_rectangles.append(self)  # Add rectangle to shared list
         self.bounding_rect = self.sceneBoundingRect()
-        self.x_min = x
-        self.x_max = x + width
-        self.y_min = y
-        self.y_max = y + height
+        self.signal_wrapper = ResizableRectangleSignal()
+        
 
     def hoverMoveEvent(self, event):
         if self._is_in_resize_area(event.pos()):
@@ -66,11 +73,14 @@ class ResizableRectangle(QGraphicsRectItem):
             # self.geometryChanged.emit(self.rect())
 
             # Now extract the values
-            self.x_min = int(rect.x())  # Leftmost x
-            self.x_max = int(rect.x() + new_width)  # Rightmost x
-            self.y_min = int(rect.y())  # Topmost y
-            self.y_max = int(rect.y() + new_height)  # Bottommost y
+            ResizableRectangle.x_min = int(rect.x())  # Leftmost x
+            ResizableRectangle.x_max = int(rect.x() + new_width)  # Rightmost x
+            ResizableRectangle.y_min = int(rect.y())  # Topmost y
+            ResizableRectangle.y_max = int(rect.y() + new_height)  # Bottommost y
             print("Classsss///**x_min, y_min:",  self.x_min,  self.y_min, "x_max, y_max",  self.x_max,  self.y_max)  
+            # self.resizing_signal.emit("resized")
+            # self.geometryChanged.emit()
+            self.signal_wrapper.geometryChanged.emit()
         else:
             # Handle movement
             delta = event.scenePos() - self.start_pos
@@ -84,7 +94,8 @@ class ResizableRectangle(QGraphicsRectItem):
             self.y_max = int(self.rect().y() + self.rect().height())
 
             # Emit geometry change signal
-            # self.geometryChanged.emit(self.rect())
+            # self.geometryChanged.emit()
+            self.signal_wrapper.geometryChanged.emit()
 
             self.sync_with_linked_rectangles()
             
