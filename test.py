@@ -21,6 +21,7 @@ import scenarios
 from visualizer import Visualizer
 from PIL import Image
 from regionSelector import ResizableRectangle
+from fourier_components import FourierComponents
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -70,11 +71,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.preserved_images= [None,None,None,None]
         self.output1_image = None
         self.ft_components = [{},{},{},{}]
-        
-        self.Fourier_comboBox_1.currentIndexChanged.connect(lambda: self.update_ft_component(0))
-        self.Fourier_comboBox_2.currentIndexChanged.connect(lambda: self.update_ft_component(1))
-        self.Fourier_comboBox_3.currentIndexChanged.connect(lambda: self.update_ft_component(2))
-        self.Fourier_comboBox_4.currentIndexChanged.connect(lambda: self.update_ft_component(3))
+
+        self.fourier_components = FourierComponents(self.Gimage1, self.current_images,
+                                                   self.Fourier_comboBox_1, self.Fourier_comboBox_2,
+                                                   self.Fourier_comboBox_3, self.Fourier_comboBox_4,
+                                                   self.weight_1, self.weight_2, self.weight_3, self.weight_4, self.fourierimage1, self.fourierimage2, self.fourierimage3, self.fourierimage4)
+
         self.checkboxes = [self.Fourier_comboBox_1,self.Fourier_comboBox_2,self.Fourier_comboBox_3,self.Fourier_comboBox_4]
             
         self.weights = [0,0,0,0]
@@ -238,8 +240,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene1.addPixmap(pixmap)
                 self.scene1.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image1.fitInView(self.scene1.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.compute_ft_components(0)
-                self.update_ft_component(0)
+                self.fourier_components.compute_ft_components(0)
+                self.fourier_components.update_ft_component(0)
                 self.add_rectangle_to_frame(0) 
                 self.image1_loaded = True  
 
@@ -249,8 +251,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene2.addPixmap(pixmap)
                 self.scene2.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image2.fitInView(self.scene2.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.compute_ft_components(1)
-                self.update_ft_component(1)
+                self.fourier_components.compute_ft_components(1)
+                self.fourier_components.update_ft_component(1)
                 self.add_rectangle_to_frame(1) 
                 self.image2_loaded = True
 
@@ -260,8 +262,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene3.addPixmap(pixmap)
                 self.scene3.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image3.fitInView(self.scene3.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.compute_ft_components(2)
-                self.update_ft_component(2)
+                self.fourier_components.compute_ft_components(2)
+                self.fourier_components.update_ft_component(2)
                 self.add_rectangle_to_frame(2) 
                 self.image3_loaded = True
 
@@ -271,8 +273,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scene4.addPixmap(pixmap)
                 self.scene4.setSceneRect(QtCore.QRectF(pixmap.rect()))
                 self.image4.fitInView(self.scene4.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.compute_ft_components(3)
-                self.update_ft_component(3)
+                self.fourier_components.compute_ft_components(3)
+                self.fourier_components.update_ft_component(3)
                 self.add_rectangle_to_frame(3) 
                 self.image4_loaded = True
             self.resize_images()   
@@ -327,26 +329,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 print(f"Image {i} resized to {self.min_width}x{self.min_height}")
                 # to resize the ft image also     
-                self.update_ft_component(i)
-
+                self.fourier_components.update_ft_component(i)
 
 
     def change_choices_combobox(self):
-        for combobox in self.checkboxes:
-            if self.magnitude_phase.isChecked():
-                combobox.setItemText(0,"FT Magnitude")
-                combobox.setItemText(1,"FT Phase")
-            else:
-                combobox.setItemText(0,"FT Real")
-                combobox.setItemText(1,"FT Imaginary") 
-        for i in range (4): # to change fourier images
-            if self.current_images[i] is not None:
-                self.update_ft_component(i) 
-                mixed_image = self.compute_inverse_ft_components()
-                if self.output1.isChecked():
-                    self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
-                else:
-                    self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image) 
+        # This method is now in the FourierComponents class
+        self.fourier_components.change_choices_combobox(self.magnitude_phase, self.real_imaginary)
                     
     
     def change_output_location(self):
@@ -356,18 +344,6 @@ class MainWindow(QtWidgets.QMainWindow):
         elif self.output2.isChecked():
             self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image)                                
     
-
-    def compute_ft_components(self, frame):
-        ft = np.fft.fft2(self.current_images[frame])
-        ft_shifted = np.fft.fftshift(ft)
-
-        self.ft_components[frame] = {
-            "FT Magnitude": np.log1p(np.abs(ft_shifted)),  # avoid log(0)
-            "FT Phase": np.angle(ft_shifted),
-            "FT Real": np.real(ft_shifted),
-            "FT Imaginary": np.imag(ft_shifted),
-        }
-
     
     def compute_inverse_ft_components(self):
         reconstructed_image = None
@@ -392,7 +368,7 @@ class MainWindow(QtWidgets.QMainWindow):
             ft_magnitude_sum = np.zeros((self.min_height, self.min_width))
             ft_phase_sum = np.zeros((self.min_height, self.min_width))
 
-            for i in range(len(self.ft_components)):
+            for i in range(len(self.fourier_components.ft_components)):
                 if self.current_images[i] is not None:
                     x_min = self.rects[i].x_min    # Leftmost x
                     x_max = self.rects[i].x_max   # Rightmost x
@@ -413,8 +389,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         mask[y_min:y_max, x_min:x_max] = 0
                         
                     mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    resized_magnitude = cv2.resize(self.fourier_components.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    resized_phase = cv2.resize(self.fourier_components.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     # ft_phase_sum = np.zeros_like(resized_phase, dtype=np.complex128)
                     ft_magnitude_sum += resized_magnitude * magnitude_weights[i] 
                     # ft_phase_sum += np.exp(1j * resized_phase) * phase_weights[i]
@@ -435,7 +411,7 @@ class MainWindow(QtWidgets.QMainWindow):
             x_max, y_max = int(rect_bounds.right()), int(rect_bounds.bottom())
             print(f"self.rectangle in inverse ft: {self.rectangle}")
 
-            for i in range(len(self.ft_components)):
+            for i in range(len(self.fourier_components.ft_components)):
                 if self.current_images[i] is not None:
                     x_min = self.rects[i].x_min    # Leftmost x
                     x_max = self.rects[i].x_max   # Rightmost x
@@ -455,8 +431,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         mask[y_min:y_max, x_min:x_max] = 0
                         
                     mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
-                    resized_real = self.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
-                    resized_imaginary = self.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
+                    resized_real = self.fourier_components.ft_components[i]["FT Real"].reshape(self.min_height, self.min_width)
+                    resized_imaginary = self.fourier_components.ft_components[i]["FT Imaginary"].reshape(self.min_height, self.min_width)
                     ft_real_sum += resized_real * real_weights[i] * mask
                     ft_imaginary_sum += resized_imaginary * imaginary_weights[i] * mask
 
@@ -470,55 +446,6 @@ class MainWindow(QtWidgets.QMainWindow):
             reconstructed_image = (255 * (reconstructed_image / max_val)).astype(np.uint8) if max_val > 0 else np.zeros_like(reconstructed_image, dtype=np.uint8)
 
         return reconstructed_image
-    
-
-
-    def update_ft_component(self, index):
-        if index == 0:
-            selected_component = self.Fourier_comboBox_1.currentText()
-            currentFourierImage = self.fourierimage1
-            self.update_weight(0, self.weight_1.value())
-            print("frame1")
-        elif index == 1:
-            selected_component = self.Fourier_comboBox_2.currentText()
-            currentFourierImage = self.fourierimage2
-            self.update_weight(1, self.weight_2.value())
-            print("frame2")
-        elif index == 2:
-            selected_component = self.Fourier_comboBox_3.currentText()
-            currentFourierImage = self.fourierimage3
-            self.update_weight(2, self.weight_3.value())
-            print("frame3")
-        elif index == 3:
-            selected_component = self.Fourier_comboBox_4.currentText()
-            currentFourierImage = self.fourierimage4
-            self.update_weight(3, self.weight_4.value()) 
-
-        if selected_component in self.ft_components[index]:
-            component_image = self.ft_components[index][selected_component]
-            component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-            q_image = QtGui.QImage(component_image.data, self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
-            pixmap = QtGui.QPixmap.fromImage(q_image)
-            currentFourierImage.clear()
-            pixmap = pixmap.scaled(self.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-            currentFourierImage.addPixmap(pixmap)
-            currentFourierImage.setSceneRect(QtCore.QRectF(pixmap.rect()))
-
-            
-            self.rect1 = ResizableRectangle(x=10, y=10, width=245, height=130)
-            self.rect1.linked_rectangles = self.rects  # Share the same list
-            self.rects[index] = self.rect1
-            currentFourierImage.addItem(self.rect1)
-
-
-            print(f"self.rectangle in update ft: {self.rectangle}")
-
-            print(f"rectangles:{self.linked_rectangles}")
-
-            self.Gimage1.fitInView(currentFourierImage.sceneRect(), QtCore.Qt.KeepAspectRatio)
-           
-        else:
-            QtWidgets.QMessageBox.warning(self, "Error", f"Component {selected_component} not found.")
 
     def handle_region_change(self):
         if self.in_region_radioButton.isChecked():
@@ -586,8 +513,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.contrast[frame_index] = max(0.1, self.contrast[frame_index]) 
             self.adjust_brightness_contrast(frame_index)
             print(frame_index)
-            self.compute_ft_components(frame_index)
-            self.update_ft_component(frame_index)
+            self.fourier_components.compute_ft_components(frame_index)
+            self.fourier_components.update_ft_component(frame_index)
             self.last_mouse_pos = event.pos()
 
 
