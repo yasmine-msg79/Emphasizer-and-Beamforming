@@ -438,9 +438,12 @@ class MainWindow(QtWidgets.QMainWindow):
                     mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_magnitude = cv2.resize(self.ft_components[i]["FT Magnitude"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
+                    # ft_phase_sum = np.zeros_like(resized_phase, dtype=np.complex128)
                     ft_magnitude_sum += resized_magnitude * magnitude_weights[i] 
+                    # ft_phase_sum += np.exp(1j * resized_phase) * phase_weights[i]
                     ft_phase_sum += resized_phase * phase_weights[i]
             # Reconstruct using magnitude and phase
+            # reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * np.angle(ft_phase_sum)))
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
             reconstructed_ft *= mask
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
