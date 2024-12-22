@@ -11,33 +11,41 @@ class ScenarioParameters:
 
     def set_5g_parameters(self):
         self.frequency = 1000000000 
-        self.phase = 0 
-        self.curvature_angle = 30 
-        self.position_between_transmitters = 1  
+        self.phase = 90 
+        self.curvature_angle = 10 
+        self.position_between_transmitters = 5  
         self.num_transmitters = 16  
-        self.array_geometry = "linear"
+        self.array_geometry = "curved"
 
     def set_radar_parameters(self):
         self.frequency = 1600000000 
         self.phase = 90
         self.curvature_angle = 30  
-        self.position_between_transmitters = 0.8  
-        self.num_transmitters = 32 
+        self.position_between_transmitters = 8 
+        self.num_transmitters = 16
         self.array_geometry = "linear"
 
     def set_tumor_ablation_parameters(self):
-        self.frequency = 2000000000 
-        self.phase = 0 
-        self.curvature_angle = 60  
-        self.position_between_transmitters = 0.1  
-        self.num_transmitters = 4  
-        self.array_geometry = "curved"
+        self.frequency = 500000000 
+        self.phase = 45 
+        self.curvature_angle = 30  
+        self.position_between_transmitters = 1 
+        self.num_transmitters = 8  
+        self.array_geometry = "linear"
+        
+    def set_ultrasound_parameters(self):
+        self.frequency = 1800000000
+        self.phase = 30
+        self.curvature_angle = 30
+        self.position_between_transmitters = 2.5
+        self.num_transmitters = 32 
+        self.array_geometry = "linear"
 
     def reset_parameters(self):
         self.frequency = 1000000000
         self.phase = 0
         self.curvature_angle = 30
-        self.position_between_transmitters = 0.5
+        self.position_between_transmitters = 5
         self.num_transmitters = 2  
         self.array_geometry = "curved" 
        
@@ -51,6 +59,8 @@ class ScenarioParameters:
             self.set_radar_parameters()
         elif scenario == "Tumor Ablation":
             self.set_tumor_ablation_parameters()
+        elif scenario == "Ultrasound":
+            self.set_ultrasound_parameters()
         else:
             self.reset_parameters()
 
