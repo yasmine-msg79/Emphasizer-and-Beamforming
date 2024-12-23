@@ -82,10 +82,10 @@ class ResizableRectangle(QGraphicsRectItem):
 
             self.moveBy(delta.x(), delta.y())
             # Update boundaries
-            self.x_min = int(self.rect().x())
-            self.x_max = int(self.rect().x() + self.rect().width())
-            self.y_min = int(self.rect().y())
-            self.y_max = int(self.rect().y() + self.rect().height())
+            ResizableRectangle.x_min = int(self.rect().x())
+            ResizableRectangle.x_max = int(self.rect().x() + self.rect().width())
+            ResizableRectangle.y_min = int(self.rect().y())
+            ResizableRectangle.y_max = int(self.rect().y() + self.rect().height())
 
             # Emit geometry change signal
             self.signal_wrapper.geometryChanged.emit()
