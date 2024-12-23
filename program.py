@@ -385,7 +385,7 @@ class MainWindow(QtWidgets.QMainWindow):
             for slider, combobox in zip(self.weights_sliders, self.checkboxes)
         ]
         if self.magnitude_phase.isChecked():
-            ft_magnitude_sum = np.zeros((self.min_height, self.min_width),dtype=np.complex128)
+            ft_magnitude_sum = np.zeros((self.min_height, self.min_width),dtype=np.float64)
             ft_phase_sum = np.zeros((self.min_height, self.min_width),dtype=np.complex128)
 
             for i in range(len(self.ft_components)):
@@ -395,17 +395,17 @@ class MainWindow(QtWidgets.QMainWindow):
                     y_min = self.rects[i].y_min     # Topmost y
                     y_max = self.rects[i].y_max  # Bottommost y
                     print(f"self.rectangle in inverse ft: {self.rectangle}")
-                    print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
+                    print("in inversaa*** x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
                     print("self.min_width:", self.min_width, "self.min_height", self.min_height)
 
                     # Ensure bounds are within the image size
                     x_min, x_max = max(0, x_min), min(self.used_width, x_max)
                     y_min, y_max = max(0, y_min), min(self.used_height, y_max)
                     if self.in_region_radioButton.isChecked():
-                        mask = np.zeros(( self.used_width,self.used_height), dtype=np.uint8)
+                        mask = np.zeros((self.used_height,self.used_width), dtype=np.uint8)
                         mask[y_min:y_max, x_min:x_max] = 1
                     else:
-                        mask = np.ones((self.used_width,self.used_height), dtype=np.uint8)
+                        mask = np.ones((self.used_height,self.used_width), dtype=np.uint8)
                         mask[y_min:y_max, x_min:x_max] = 0
                         
                     mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
@@ -417,11 +417,10 @@ class MainWindow(QtWidgets.QMainWindow):
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * np.angle(ft_phase_sum)))
             reconstructed_ft *= mask
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
-            # reconstructed_image *= mask
 
         else:
-            ft_real_sum = np.zeros((self.min_height, self.min_width))
-            ft_imaginary_sum = np.zeros((self.min_height, self.min_width))
+            ft_real_sum = np.zeros((self.min_height, self.min_width),dtype=np.float64)
+            ft_imaginary_sum = np.zeros((self.min_height, self.min_width),dtype=np.float64)
 
             rect_bounds = self.rectangle.sceneBoundingRect()
             x_min, y_min = int(rect_bounds.left()), int(rect_bounds.top())
@@ -441,10 +440,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     x_min, x_max = max(0, x_min), min(self.used_width, x_max)
                     y_min, y_max = max(0, y_min), min(self.used_height, y_max)
                     if self.in_region_radioButton.isChecked():
-                        mask = np.zeros(( self.used_width,self.used_height), dtype=np.uint8)
+                        mask = np.zeros(( self.used_height,self.used_width), dtype=np.uint8)
                         mask[y_min:y_max, x_min:x_max] = 1
                     else:
-                        mask = np.ones((self.used_width,self.used_height), dtype=np.uint8)
+                        mask = np.ones((self.used_height,self.used_width), dtype=np.uint8)
                         mask[y_min:y_max, x_min:x_max] = 0
                         
                     mask = cv2.resize(mask, (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
