@@ -1,22 +1,10 @@
 from PyQt5 import QtWidgets, QtGui, QtCore, uic   # Added uic import
 import sys
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QMessageBox
 import numpy as np
 import cv2
-
-import matplotlib.pyplot as plt
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView, QGraphicsSceneMouseEvent
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHeaderView
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidget, QTableWidgetItem, QSpinBox, QVBoxLayout, QDoubleSpinBox, QHeaderView
-from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QSlider, QSpinBox)
 import scenarios
 from visualizer import Visualizer
 from PIL import Image
@@ -118,7 +106,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rect4 = ResizableRectangle(x=10, y=10, width=245, height=130)
         self.rects = [self.rect1, self.rect2, self.rect3,self.rect4]
         ResizableRectangle.center_on_images(self.min_width, self.min_height)
-        # self.rect1.geometryChanged.connect(self.handle_region_change)
 
         # Inside your main setup method (e.g., __init__ or a setupUi wrapper)
         self.in_region_radioButton.toggled.connect(self.handle_region_change)
@@ -300,6 +287,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rect1.linked_rectangles = self.rects  # Share the same list
         self.rects[frame] = self.rect1
         currentFourierImage.addItem(self.rect1)
+        
 
                 
     def resize_images(self):
@@ -351,12 +339,21 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def change_output_location(self):
         mixed_image = self.compute_inverse_ft_components()
+        print("self.output1.isChecked(): ", self.output1.isChecked())
         if self.output1.isChecked():
             self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
         elif self.output2.isChecked():
             self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image)                                
     
+    
+    def on_region_signal_received(self):
+        mixed_image = self.compute_inverse_ft_components()
+        if self.output1.isChecked():
+            self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
+        else:
+            self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image)  
 
+        
     def compute_ft_components(self, frame):
         ft = np.fft.fft2(self.current_images[frame])
         ft_shifted = np.fft.fftshift(ft)
@@ -389,8 +386,8 @@ class MainWindow(QtWidgets.QMainWindow):
             for slider, combobox in zip(self.weights_sliders, self.checkboxes)
         ]
         if self.magnitude_phase.isChecked():
-            ft_magnitude_sum = np.zeros((self.min_height, self.min_width))
-            ft_phase_sum = np.zeros((self.min_height, self.min_width))
+            ft_magnitude_sum = np.zeros((self.min_height, self.min_width),dtype=np.complex128)
+            ft_phase_sum = np.zeros((self.min_height, self.min_width),dtype=np.complex128)
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
@@ -417,11 +414,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     resized_phase = cv2.resize(self.ft_components[i]["FT Phase"], (self.min_width, self.min_height), interpolation=cv2.INTER_LINEAR)
                     # ft_phase_sum = np.zeros_like(resized_phase, dtype=np.complex128)
                     ft_magnitude_sum += resized_magnitude * magnitude_weights[i] 
-                    # ft_phase_sum += np.exp(1j * resized_phase) * phase_weights[i]
-                    ft_phase_sum += resized_phase * phase_weights[i]
+                    ft_phase_sum += np.exp(1j *resized_phase) * phase_weights[i]
             # Reconstruct using magnitude and phase
-            # reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * np.angle(ft_phase_sum)))
-            reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * ft_phase_sum))
+            reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * np.angle(ft_phase_sum)))
             reconstructed_ft *= mask
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
             # reconstructed_image *= mask
@@ -437,10 +432,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for i in range(len(self.ft_components)):
                 if self.current_images[i] is not None:
-                    x_min = self.rects[i].x_min    # Leftmost x
+                    x_min = self.rects[i].x_min   # Leftmost x
                     x_max = self.rects[i].x_max   # Rightmost x
-                    y_min = self.rects[i].y_min     # Topmost y
-                    y_max = self.rects[i].y_max  # Bottommost y
+                    y_min = self.rects[i].y_min   # Topmost y
+                    y_max = self.rects[i].y_max   # Bottommost y
                     print(f"self.rectangle in inverse ft: {self.rectangle}")
                     print("x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
                     print("self.min_width:", self.min_width, "self.min_height", self.min_height)
@@ -508,8 +503,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.rect1 = ResizableRectangle(x=10, y=10, width=245, height=130)
             self.rect1.linked_rectangles = self.rects  # Share the same list
             self.rects[index] = self.rect1
+            self.rect1.signal_wrapper.geometryChanged.connect(self.on_region_signal_received)
             currentFourierImage.addItem(self.rect1)
-
 
             print(f"self.rectangle in update ft: {self.rectangle}")
 
@@ -546,10 +541,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.weights[frame] = value
         mixed_image = self.compute_inverse_ft_components()
         if self.output1.isChecked():
-            self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)  
-        else:
-            self.display_output_image(self.output_mixer2, self.scene_output1, mixed_image)  
-        
+            self.display_output_image(self.output_mixer1, self.scene_output1, mixed_image)
+        elif self.output2.isChecked():
+            self.display_output_image(self.output_mixer2, self.scene_output2, mixed_image)        
+
         
     def display_output_image(self, label, scene, mixed_image):
         # Clear the previous output
