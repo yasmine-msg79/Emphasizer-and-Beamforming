@@ -419,7 +419,7 @@ class MainWindow(QtWidgets.QMainWindow):
             reconstructed_ft = np.multiply(np.expm1(ft_magnitude_sum), np.exp(1j * np.angle(ft_phase_sum)))
             reconstructed_ft *= mask
             reconstructed_image =  np.abs(np.fft.ifft2(np.fft.ifftshift(reconstructed_ft)))
-            reconstructed_image *= mask
+            # reconstructed_image *= mask
 
         else:
             ft_real_sum = np.zeros((self.min_height, self.min_width),dtype=np.float64)
