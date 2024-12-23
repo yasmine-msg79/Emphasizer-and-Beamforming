@@ -166,7 +166,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_scenario_parameters()
 
         # Connect UI elements to methods
-        self.frequency_slider.setMinimum(100000000)
+        self.frequency_slider.setMinimum(1000000)
         self.frequency_slider.setMaximum(2000000000)
         self.frequency_slider.setSingleStep(10000000)  # Step size
         self.frequency_slider.valueChanged.connect(self.update_frequency)
@@ -776,9 +776,6 @@ class MainWindow(QtWidgets.QMainWindow):
         parameters = scenarios.ScenarioParameters()
         if scenario == "5G":
             parameters.update_parameters("5G")
-            parameters.display_parameters()
-        elif scenario == "Airborne Radar":
-            parameters.update_parameters("Airborne Radar")
             parameters.display_parameters()
         elif scenario == "Tumor Ablation":
             parameters.update_parameters("Tumor Ablation")

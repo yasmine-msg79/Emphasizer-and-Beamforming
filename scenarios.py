@@ -11,34 +11,26 @@ class ScenarioParameters:
 
     def set_5g_parameters(self):
         self.frequency = 1000000000 
-        self.phase = 90 
-        self.curvature_angle = 10 
+        self.phase = 0 
+        self.curvature_angle = 30 
         self.position_between_transmitters = 5  
-        self.num_transmitters = 16  
-        self.array_geometry = "curved"
-
-    def set_radar_parameters(self):
-        self.frequency = 1600000000 
-        self.phase = 90
-        self.curvature_angle = 30  
-        self.position_between_transmitters = 8 
-        self.num_transmitters = 16
+        self.num_transmitters = 32  
         self.array_geometry = "linear"
 
     def set_tumor_ablation_parameters(self):
-        self.frequency = 500000000 
-        self.phase = 45 
+        self.frequency = 1500000000 
+        self.phase = 0 
         self.curvature_angle = 30  
         self.position_between_transmitters = 1 
-        self.num_transmitters = 8  
+        self.num_transmitters = 4  
         self.array_geometry = "linear"
         
     def set_ultrasound_parameters(self):
-        self.frequency = 1800000000
-        self.phase = 30
+        self.frequency = 5000000
+        self.phase = 0
         self.curvature_angle = 30
         self.position_between_transmitters = 2.5
-        self.num_transmitters = 32 
+        self.num_transmitters = 8 
         self.array_geometry = "linear"
 
     def reset_parameters(self):
@@ -55,8 +47,6 @@ class ScenarioParameters:
     def update_parameters(self, scenario):
         if scenario == "5G":
             self.set_5g_parameters()
-        elif scenario == "Airborne Radar":
-            self.set_radar_parameters()
         elif scenario == "Tumor Ablation":
             self.set_tumor_ablation_parameters()
         elif scenario == "Ultrasound":
