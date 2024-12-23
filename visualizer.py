@@ -42,8 +42,8 @@ class Visualizer:
         """
         if self.array_type == "linear":
             # Linear array positions
-            x_positions = np.linspace(-num_elements * self.element_spacing / 2,
-                                    num_elements * self.element_spacing / 2,
+            x_positions = np.linspace(-num_elements *(self.element_spacing / 2),
+                                    num_elements *(self.element_spacing / 2),
                                     num_elements)
             y_positions = np.zeros_like(x_positions)
         else:

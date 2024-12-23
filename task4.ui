@@ -1201,11 +1201,6 @@ QComboBox QAbstractItemView {
            </item>
            <item>
             <property name="text">
-             <string>Airborne Radar</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
              <string>Tumor Ablation</string>
             </property>
            </item>
