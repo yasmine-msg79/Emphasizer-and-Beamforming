@@ -19,8 +19,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.min_width = 0
         self.min_height = 0
-        self.used_height = 657
-        self.used_width = 458
+        self.used_height = 149
+        self.used_width = 265
 
         # Connect buttons to their methods
         self.switch_button.clicked.connect(self.hide_image_frame_and_label)
@@ -288,6 +288,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rects[frame] = self.rect1
         currentFourierImage.addItem(self.rect1)
         
+    def update_rectangle(self, index):
+        if index == 0:
+            currentFourierImage = self.fourierimage1
+            self.update_weight(0, self.weight_1.value())
+        elif index == 1:
+            currentFourierImage = self.fourierimage2
+            self.update_weight(1, self.weight_2.value())
+        elif index == 2:
+            currentFourierImage = self.fourierimage3
+            self.update_weight(2, self.weight_3.value())
+        elif index == 3:
+            currentFourierImage = self.fourierimage4
+            self.update_weight(3, self.weight_4.value()) 
+
+            
+        self.rect1 = ResizableRectangle(x=10, y=10, width=245, height=130)
+        self.rect1.linked_rectangles = self.rects  # Share the same list
+        self.rects[index] = self.rect1
+        self.rect1.signal_wrapper.geometryChanged.connect(self.on_region_signal_received)
+        currentFourierImage.addItem(self.rect1)
 
                 
     def resize_images(self):
@@ -307,10 +327,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.scenes[i].clear()
                 self.scenes[i].addPixmap(pixmap)
                 self.scenes[i].setSceneRect(QtCore.QRectF(pixmap.rect()))
-                self.loaded_images[i].fitInView(self.scenes[i].sceneRect(), QtCore.Qt.KeepAspectRatio)
+                # self.loaded_images[i].fitInView(self.scenes[i].sceneRect(), QtCore.Qt.KeepAspectRatio)
                 
-                self.used_width = self.loaded_images[i].width()
-                self.used_height = self.loaded_images[i].height()
+                # self.used_width = self.loaded_images[i].width()
+                # self.used_height = self.loaded_images[i].height()
                 print("self.used_width: ",self.used_width)
                 
                 print(f"Image {i} resized to {self.min_width}x{self.min_height}")
@@ -397,8 +417,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     y_max = self.rects[i].y_max  # Bottommost y
                     print(f"self.rectangle in inverse ft: {self.rectangle}")
                     print("in inversaa*** x_min, y_min:", x_min, y_min, "x_max, y_max", x_max, y_max)
-                    print("self.min_width:", self.min_width, "self.min_height", self.min_height)
-
+                    print("self.fourierimage1.width(): ", self.fourierimage1.width(), "self.fourierimage1.height(): ", self.fourierimage1.height())
+                    print("self.Gimage1.size(): ", self.Gimage1.size())
+                    
                     # Ensure bounds are within the image size
                     x_min, x_max = max(0, x_min), min(self.used_width, x_max)
                     y_min, y_max = max(0, y_min), min(self.used_height, y_max)
@@ -492,7 +513,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if selected_component in self.ft_components[index]:
             component_image = self.ft_components[index][selected_component]
             component_image = cv2.normalize(component_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-            q_image = QtGui.QImage(component_image.data, self.min_width, self.min_height, self.min_width, QtGui.QImage.Format_Grayscale8)
+            q_image = QtGui.QImage(component_image.data, 735, 415, 735, QtGui.QImage.Format_Grayscale8)
             pixmap = QtGui.QPixmap.fromImage(q_image)
             currentFourierImage.clear()
             pixmap = pixmap.scaled(self.Gimage1.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
