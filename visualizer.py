@@ -111,7 +111,7 @@ class Visualizer:
 
         # Plot the heat map in polar coordinates
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24.8, 18.8))
-        ax.set_aspect(0.55)
+        ax.set_aspect(0.7)
         ax.set_thetamax(180)
         # plt.subplots_adjust(wspace=0.3)
         heat_plot = ax.pcolormesh(Theta, R, intensity, cmap="viridis", shading="auto")
@@ -163,7 +163,7 @@ class Visualizer:
 
         # Create the polar plot
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(24, 18))
-        ax.set_aspect(0.55)
+        ax.set_aspect(0.7)
         ax.set_thetamax(180)
         ax.plot(angles, intensity, color="blue", linewidth=2)
         ax.set_title("Beam Pattern") 

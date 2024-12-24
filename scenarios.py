@@ -37,7 +37,7 @@ class ScenarioParameters:
         self.frequency = 1800000000
         self.phase = 30
         self.curvature_angle = 30
-        self.position_between_transmitters = 2.5
+        self.position_between_transmitters = 2
         self.num_transmitters = 32 
         self.array_geometry = "linear"
 
