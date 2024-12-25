@@ -10,27 +10,27 @@ class ScenarioParameters:
         self.array_geometry = None
 
     def set_5g_parameters(self):
-        self.frequency = 1000000000 
+        self.frequency = 1800000000 
         self.phase = 0 
         self.curvature_angle = 30 
-        self.position_between_transmitters = 5  
+        self.position_between_transmitters = 1  
         self.num_transmitters = 32  
         self.array_geometry = "linear"
 
     def set_tumor_ablation_parameters(self):
-        self.frequency = 1500000000 
+        self.frequency = 900000000 
         self.phase = 0 
-        self.curvature_angle = 30  
-        self.position_between_transmitters = 1 
+        self.curvature_angle = 5  
+        self.position_between_transmitters = 2 
         self.num_transmitters = 4  
-        self.array_geometry = "linear"
+        self.array_geometry = "curved"
         
     def set_ultrasound_parameters(self):
         self.frequency = 5000000
         self.phase = 0
         self.curvature_angle = 30
-        self.position_between_transmitters = 2.5
-        self.num_transmitters = 8 
+        self.position_between_transmitters = 3
+        self.num_transmitters = 16
         self.array_geometry = "linear"
 
     def reset_parameters(self):
