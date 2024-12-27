@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1243</width>
+    <width>1301</width>
     <height>1746</height>
    </rect>
   </property>
@@ -107,6 +107,22 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
          </attribute>
         </widget>
        </item>
+       <item row="13" column="1">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>200</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="1" column="3" rowspan="15">
         <widget class="QGraphicsView" name="output_mixer2">
          <property name="sizePolicy">
@@ -140,60 +156,6 @@ font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
          </attribute>
         </widget>
        </item>
-       <item row="13" column="1">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>200</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QSlider" name="region_selecter">
-         <property name="styleSheet">
-          <string notr="true">/* 441F62
-CE9BFA
-D9B1FA
-B6DDFE
-7B4F95
-5F357D
-*/
-QSlider::groove:horizontal {
-    height: 8px;
-    background: #7B4F95; /* Updated lighter color */
-    border-radius: 4px;
-}
-QSlider::handle:horizontal {
-    background: #5F357D; /* Updated darker color */
-    border: 2px solid #7B4F95; /* Updated lighter color */
-    width: 20px;
-    height: 20px;
-    margin: -6px 0;
-    border-radius: 10px;
-}
-QSlider::sub-page:horizontal {
-    background: #5F357D; /* Updated darker color */
-    border-radius: 4px;
-}
-QSlider::add-page:horizontal {
-    background: #7B4F95; /* Updated lighter color */
-    border-radius: 4px;
-}
-</string>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="2" rowspan="15">
         <widget class="QGraphicsView" name="output_mixer1">
          <property name="sizePolicy">
@@ -208,6 +170,23 @@ buttoon-shadow: 2px 2px 5px rgb(0, 0, 0);
 widget-shadow: 2px 2px 5px rgb(0, 0, 0);
 background-color: rgb(255, 255, 255);</string>
          </property>
+        </widget>
+       </item>
+       <item row="16" column="2">
+        <widget class="QRadioButton" name="output1">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(66, 31, 99);
+font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Output Channel 1</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">output_buttonGroup</string>
+         </attribute>
         </widget>
        </item>
        <item row="3" column="1">
@@ -263,23 +242,6 @@ font: 16pt &quot;MS Shell Dlg 2&quot;;</string>
          </property>
         </widget>
        </item>
-       <item row="16" column="2">
-        <widget class="QRadioButton" name="output1">
-         <property name="styleSheet">
-          <string notr="true">color: rgb(66, 31, 99);
-font: 9pt &quot;Microsoft Sans Serif&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Output Channel 1</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">output_buttonGroup</string>
-         </attribute>
-        </widget>
-       </item>
        <item row="8" column="0">
         <widget class="QLabel" name="label_6">
          <property name="font">
@@ -321,6 +283,44 @@ font: 11pt &quot;Microsoft Sans Serif&quot;;</string>
          <attribute name="buttonGroup">
           <string notr="true">output_buttonGroup</string>
          </attribute>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QSlider" name="region_selecter">
+         <property name="styleSheet">
+          <string notr="true">/* 441F62
+CE9BFA
+D9B1FA
+B6DDFE
+7B4F95
+5F357D
+*/
+QSlider::groove:horizontal {
+    height: 8px;
+    background: #7B4F95; /* Updated lighter color */
+    border-radius: 4px;
+}
+QSlider::handle:horizontal {
+    background: #5F357D; /* Updated darker color */
+    border: 2px solid #7B4F95; /* Updated lighter color */
+    width: 20px;
+    height: 20px;
+    margin: -6px 0;
+    border-radius: 10px;
+}
+QSlider::sub-page:horizontal {
+    background: #5F357D; /* Updated darker color */
+    border-radius: 4px;
+}
+QSlider::add-page:horizontal {
+    background: #7B4F95; /* Updated lighter color */
+    border-radius: 4px;
+}
+</string>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
         </widget>
        </item>
       </layout>
@@ -1137,7 +1137,6 @@ font:11pt &quot;Microsoft Sans Serif&quot;;</string>
              <weight>50</weight>
              <italic>false</italic>
              <bold>false</bold>
-             <stylestrategy>PreferAntialias</stylestrategy>
             </font>
            </property>
            <property name="styleSheet">
@@ -1178,11 +1177,11 @@ QComboBox QAbstractItemView {
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
            </property>
-           <property name="placeholderText">
-            <string/>
-           </property>
            <property name="duplicatesEnabled">
             <bool>false</bool>
+           </property>
+           <property name="placeholderText" stdset="0">
+            <string/>
            </property>
            <item>
             <property name="text">
@@ -2020,8 +2019,8 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1243</width>
-     <height>21</height>
+     <width>1301</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -2031,7 +2030,7 @@ font:Bold 12pt &quot;Microsoft Sans Serif&quot;;</string>
  <connections/>
  <buttongroups>
   <buttongroup name="components_buttonGroup"/>
-  <buttongroup name="output_buttonGroup"/>
   <buttongroup name="region_buttonGroup"/>
+  <buttongroup name="output_buttonGroup"/>
  </buttongroups>
 </ui>
