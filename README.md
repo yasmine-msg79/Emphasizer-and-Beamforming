@@ -1,6 +1,3 @@
-Certainly! Here's the README in the same format as the previous one, with the added table of contents:
-
----
 
 # Signal Processing and Beamforming Simulator
 
