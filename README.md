@@ -24,7 +24,7 @@ This project includes two main parts:
 
 ### Part A: FT Magnitude/Phase Mixer or Emphasizer
 
-![](#)
+![](media\fourier.png)
 
 1. **Image Viewer**:
    - Open and view four grayscale images.
@@ -47,9 +47,13 @@ This project includes two main parts:
    - Progress bar to indicate the status of the ifft operation.
    - Allow cancellation and restart of operations in real-time.
 
-### Part B: Beamforming Simulator
+![](media\fourier1.png)
+![](media\fourier2.png)
+![](media\patrickmix.png)
 
-![](#)
+
+### Part B: Beamforming Simulator
+![](media\beam_main.png)
 
 1. **Customization of Parameters**:
    - Customize system parameters: number of transmitters/receivers, delays/phase shifts, operating frequencies.
@@ -63,6 +67,15 @@ This project includes two main parts:
 3. **Scenario Management**:
    - Load and customize predefined scenarios inspired by applications in 5G, ultrasound, and tumor ablation.
    - Fine-tune the parameters and visualize the effects of different configurations.
+
+   ![](media\ultrasound.png)
+   ![](media\5g.png)
+   ![](media\tumor.png)
+#### DEMO
+
+![](media\beam_demo.gif)
+
+
 
 ## Installation
 
@@ -102,9 +115,6 @@ This project includes two main parts:
    - The program will display a progress bar during the ifft operation.
    - If a new operation is requested while another is still processing, the previous operation will be canceled, and the new one will begin.
 
-#### DEMO
-
-![](#)
 
 ### Beamforming Simulator
 
@@ -120,14 +130,11 @@ This project includes two main parts:
    - Open predefined scenarios and fine-tune their parameters.
    - Explore scenarios inspired by 5G, ultrasound, and tumor ablation applications.
 
-#### DEMO
-
-![](#)
 
 ## Configuration
 
 - **Scenario Files**:
-  - The simulator comes with three predefined scenarios. These can be loaded through the “File” menu and customized in real-time.
+  - The simulator comes with three predefined scenarios. These can be loaded through the “Open Scenario” menu and customized in real-time.
 
 - **Customizing Parameters**:
   - For both the FT mixer and beamforming simulator, you can adjust various settings through intuitive graphical user interfaces (GUIs) with sliders, combo-boxes, and buttons.
