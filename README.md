@@ -24,7 +24,7 @@ This project includes two main parts:
 
 ### Part A: FT Magnitude/Phase Mixer or Emphasizer
 
-![](media\fourier.png)
+ ![](media/fourier.png)
 
 1. **Image Viewer**:
    - Open and view four grayscale images.
@@ -47,13 +47,13 @@ This project includes two main parts:
    - Progress bar to indicate the status of the ifft operation.
    - Allow cancellation and restart of operations in real-time.
 
-![](media\fourier1.png)
-![](media\fourier2.png)
-![](media\patrickmix.png)
+  ![](media/fourier1.png)
+  ![](media/fourier2.png)
+  ![](media/patrickmix.png)
 
 
 ### Part B: Beamforming Simulator
-![](media\beam_main.png)
+  ![](media/beam_main.png)
 
 1. **Customization of Parameters**:
    - Customize system parameters: number of transmitters/receivers, delays/phase shifts, operating frequencies.
@@ -68,13 +68,13 @@ This project includes two main parts:
    - Load and customize predefined scenarios inspired by applications in 5G, ultrasound, and tumor ablation.
    - Fine-tune the parameters and visualize the effects of different configurations.
 
-   ![](media\ultrasound.png)
-   ![](media\5g.png)
-   ![](media\tumor.png)
+      ![](media/ultrasound.png)
+      ![](media/5g.png)
+      ![](media/tumor.png)
    
 #### DEMO
 
-![](media\beam_demo.gif)
+  ![](media/beam_demo.gif)
 
 
 
