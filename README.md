@@ -24,7 +24,10 @@ This project includes two main parts:
 
 ### Part A: FT Magnitude/Phase Mixer or Emphasizer
 
- ![](media/fourier.png)
+
+https://github.com/user-attachments/assets/36effe15-a067-471a-8d64-0d27a2c93cd1
+
+
 
 1. **Image Viewer**:
    - Open and view four grayscale images.
@@ -62,6 +65,8 @@ This project includes two main parts:
   
   ![](media/fourier2.png)  
 <br>
+
+---
 
 ### Part B: Beamforming Simulator
   ![](media/beam_main.png)
