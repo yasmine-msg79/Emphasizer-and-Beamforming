@@ -41,16 +41,27 @@ This project includes two main parts:
 3. **Regions Mixer**:
    - Select regions of interest for FT components (low frequencies or high frequencies).
    - Draw and resize rectangles on FT displays to choose the regions.
-   - Highlight selected regions with semi-transparent coloring or hashing.
+<br>
 
-4. **Real-Time Mixing**:
-   - Progress bar to indicate the status of the ifft operation.
-   - Allow cancellation and restart of operations in real-time.
+<p>
+   Selecting the low-frequency components of an image enables nearly complete reconstruction with high accuracy,
+   demonstrating that the majority of the image's information resides in the low frequencies.
+</p>
 
-  ![](media/fourier1.png)
-  ![](media/fourier2.png)
+![low_feqs](https://github.com/user-attachments/assets/7511fd8a-be7a-4cc9-9e08-b245270ce43e)
+
+<br>
+
+<p>Merging the phase of one image with the magnitude of another allows for the reconstruction of the image, retaining over 70% of its original information. This demonstrates that the phase component holds a significantly larger share of the image's information compared to the magnitude.</p>
+
   ![](media/patrickmix.png)
 
+<br>
+
+<p>Combining two images using just three components (two phases and one magnitude) enables overlaying the images.</p>
+  
+  ![](media/fourier2.png)  
+<br>
 
 ### Part B: Beamforming Simulator
   ![](media/beam_main.png)
