@@ -99,7 +99,7 @@ https://github.com/user-attachments/assets/36effe15-a067-471a-8d64-0d27a2c93cd1
  ### How to Run
 1. Clone this repository:
    ```bash
-   git clone https://github.com/hassnaa11/Emphasizer-and-Beamforming.git
+   git clone https://github.com/yasmine-msg79/Emphasizer-and-Beamforming.git
    ```
 2. Install dependencies:
    ```bash
